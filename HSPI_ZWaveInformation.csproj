@@ -1,0 +1,240 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6AFED710-7BB6-40E3-B4CD-4642DA950411}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Hspi</RootNamespace>
+    <AssemblyName>HSPI_Tasmota</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <Nullable>enable</Nullable>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>ExtendedCorrectnessRules.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>ExtendedCorrectnessRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Hspi.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="HS4PlugInHelper\Hspi\CompilerHelper.cs" />
+    <Compile Include="HS4PlugInHelper\Hspi\HSPIBase.cs" />
+    <Compile Include="HS4PlugInHelper\Hspi\Logger.cs" />
+    <Compile Include="HS4PlugInHelper\Hspi\PluginConfigBase.cs" />
+    <Compile Include="HS4PlugInHelper\Hspi\Utils\EnumHelper.cs" />
+    <Compile Include="HS4PlugInHelper\Hspi\Utils\ExceptionHelper.cs" />
+    <Compile Include="HS4PlugInHelper\Hspi\Utils\MiscHelper.cs" />
+    <Compile Include="HS4PlugInHelper\Hspi\Utils\ObjectSerialize.cs" />
+    <Compile Include="HS4PlugInHelper\Hspi\Utils\ScribanHelper.cs" />
+    <Compile Include="HS4PlugInHelper\Hspi\Utils\TaskHelper.cs" />
+    <Compile Include="Hspi\HSPI.cs" />
+    <Compile Include="Hspi\PlugIn.cs" />
+    <Compile Include="Hspi\PluginConfig.cs" />
+    <Compile Include="Hspi\PlugInData.cs" />
+    <Compile Include="Hspi\Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".editorconfig" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="appveyor.yml" />
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Fody">
+      <Version>6.5.3</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="HomeSeer-PluginSDK">
+      <Version>1.3.1</Version>
+    </PackageReference>
+    <PackageReference Include="ILMerge">
+      <Version>3.0.41</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
+      <Version>5.0.3</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="MSBuildTasks">
+      <Version>1.5.0.235</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Nito.AsyncEx.Coordination">
+      <Version>5.1.2</Version>
+    </PackageReference>
+    <PackageReference Include="Nito.AsyncEx.Tasks">
+      <Version>5.1.2</Version>
+    </PackageReference>
+    <PackageReference Include="Nito.Collections.Deque">
+      <Version>1.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Nito.Disposables">
+      <Version>2.2.1</Version>
+    </PackageReference>
+    <PackageReference Include="NLog">
+      <Version>4.7.11</Version>
+    </PackageReference>
+    <PackageReference Include="NullGuard.Fody">
+      <Version>3.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Collections.Immutable">
+      <Version>5.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.IO">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Net.Http">
+      <Version>4.3.4</Version>
+    </PackageReference>
+    <PackageReference Include="System.Runtime">
+      <Version>4.3.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.Security.Cryptography.Algorithms">
+      <Version>4.3.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.Security.Cryptography.Encoding">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Security.Cryptography.Primitives">
+      <Version>4.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="System.Security.Cryptography.X509Certificates">
+      <Version>4.3.2</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Hspi\html\empty.txt" />
+    <Content Include="install.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="updater_override.tt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <ArtifactsDirectory>$(OutputPath)\Artifacts</ArtifactsDirectory>
+    <_TransformExe>$(DevEnvDir)\TextTransform.exe</_TransformExe>
+  </PropertyGroup>
+  <Target Name="ZipHtmlFiles" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)\Hspi\html" DestinationFile="$(OutputPath)\html.zip" Overwrite="true" />
+  </Target>
+  <Target Name="ILMerge" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <InputAssemblies Include="$(OutputPath)\HSPI_Tasmota.exe" />
+      <InputAssemblies Include="$(OutputPath)\*.dll" Exclude="**\HSCF.dll;**\NullGuard.dll;**\PluginSdk.dll" />
+    </ItemGroup>
+    <Message Importance="high" Text="Executing ILMerge in $(ProjectDir)..." />
+    <Exec WorkingDirectory="$(ProjectDir)" Command="&quot;$(ILMergeConsolePath)&quot; /ndebug /target:winexe /out:@(MainAssembly) /internalize /targetplatform:v4 @(InputAssemblies->'&quot;%(FullPath)&quot;', ' ')" />
+  </Target>
+  <Target Name="ZipFinalFiles" DependsOnTargets="Build;ZipHtmlFiles;ILMerge" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <RemoveDir Directories="$(ArtifactsDirectory)" />
+    <MakeDir Directories="$(ArtifactsDirectory)" />
+    <GetAssemblyIdentity AssemblyFiles="$(OutputPath)\HSPI_Tasmota.exe">
+      <Output TaskParameter="Assemblies" ItemName="myAssemblyInfo" />
+    </GetAssemblyIdentity>
+    <PropertyGroup>
+      <Pattern>(\d+)\.(\d+).(\d+)\.(\d+)</Pattern>
+      <In>%(myAssemblyInfo.Version)</In>
+      <OutVersion>$([System.Text.RegularExpressions.Regex]::Match($(In), $(Pattern)))</OutVersion>
+    </PropertyGroup>
+    <ItemGroup>
+      <ReleaseFiles Include="$(OutputPath)\HSPI_Tasmota.exe" />
+      <ReleaseFiles Include="$(OutputPath)\HSPI_Tasmota.exe.config" />
+      <ReleaseFiles Include="$(OutputPath)\html.zip" />
+      <ReleaseFiles Include="$(OutputPath)\install.txt" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ReleaseFiles)" DestinationFolder="$(ArtifactsDirectory)" />
+    <ZipDirectory SourceDirectory="$(ArtifactsDirectory)" DestinationFile="$(OutputPath)\$(AssemblyName)_$(OutVersion).zip" Overwrite="true" />
+    <Error Text="Failed to find TextTransform.exe tool at '$(_TransformExe)." Condition="!Exists('$(_TransformExe)')" />
+    <Exec Command="&quot;$(_TransformExe)&quot; &quot;$(MSBuildProjectDirectory)\updater_override.tt&quot; -out &quot;$(OutputPath)\updater_override.json&quot; -a !!Version!$(OutVersion)" />
+    <RemoveDir Directories="$(ArtifactsDirectory)" />
+  </Target>
+</Project>

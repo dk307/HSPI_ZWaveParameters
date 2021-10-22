@@ -84,12 +84,20 @@
     <Compile Include="HS4PlugInHelper\Hspi\Utils\ObjectSerialize.cs" />
     <Compile Include="HS4PlugInHelper\Hspi\Utils\ScribanHelper.cs" />
     <Compile Include="HS4PlugInHelper\Hspi\Utils\TaskHelper.cs" />
+    <Compile Include="Hspi\BootstrapHtmlHelper.cs" />
+    <Compile Include="Hspi\DeviceConfigPage.cs" />
     <Compile Include="Hspi\HSPI.cs" />
+    <Compile Include="Hspi\OpenZWaveDBInformation.cs" />
     <Compile Include="Hspi\PlugIn.cs" />
     <Compile Include="Hspi\PluginConfig.cs" />
     <Compile Include="Hspi\PlugInData.cs" />
     <Compile Include="Hspi\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -118,7 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fody">
-      <Version>6.5.3</Version>
+      <Version>6.5.5</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -197,7 +205,12 @@
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <ArtifactsDirectory>$(OutputPath)\Artifacts</ArtifactsDirectory>

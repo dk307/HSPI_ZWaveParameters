@@ -23,7 +23,7 @@ namespace Hspi
         /// <summary>
         /// The plugin name
         /// </summary>
-        public const string PlugInName = @"ZWave Information";
+        public const string PlugInName = @"Z-Wave Information";
         /// <summary>
         /// The plugin Id
         /// </summary>

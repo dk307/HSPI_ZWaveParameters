@@ -192,7 +192,7 @@ namespace Hspi
             if (parameter.HasOptions)
             {
                 return (new SelectListView(currentControlValueId,
-                                           "Value",
+                                           string.Empty,
                                            parameter.Options.Select(x => x.Description).ToList(),
                                            parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList(),
                                            ESelectListType.DropDown)).ToHtml();

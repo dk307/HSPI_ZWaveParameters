@@ -61,9 +61,18 @@ namespace Hspi
                 throw new Exception("Failed to get data from website");
             }
 
-            page = AddTopLevelStuff(page, openZWaveData.Data);
+            var data = openZWaveData.Data;
 
+            // Label
+            page = page.WithLabel(NewId(), BootstrapHtmlHelper.MakeBolder(data.FullName));
+
+            // Overview
+            page = AddCollapsibleCardIfNotEmpty(data.Overview, page, "Overview");
+
+            //Parameters
             page = AddParameters(page, openZWaveData, homeId, nodeId.Value);
+
+            page = AddInclusionSections(page, data);
 
             return page.Page.ToJsonString();
 
@@ -100,8 +109,34 @@ namespace Hspi
             return null; ;
         }
 
+        private PageFactory AddCollapsibleCardIfNotEmpty(string? data, PageFactory page, string name)
+        {
+            if (!string.IsNullOrWhiteSpace(data))
+            {
+                string html = BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), name, data!);
+                return page.WithView(AddRawHtml(html));
+            }
+            return page;
+        }
+
+        private PageFactory AddInclusionSections(PageFactory page, ZWaveInformation data)
+        {
+            // some devices has same value for these fields
+            if (data.Inclusion == data.Exclusion)
+            {
+                page = AddCollapsibleCardIfNotEmpty(data.Inclusion, page, "Inclusion/Exclusion");
+            }
+            else
+            {
+                page = AddCollapsibleCardIfNotEmpty(data.Inclusion, page, "Inclusion");
+                page = AddCollapsibleCardIfNotEmpty(data.Exclusion, page, "Exclusion");
+            }
+
+            return page;
+        }
+
         private PageFactory AddParameters(PageFactory page, OpenZWaveDBInformation openZWaveData,
-                                            string homeId, byte nodeId)
+                                                            string homeId, byte nodeId)
         {
             if (openZWaveData.Data?.Parameters != null && openZWaveData.Data.Parameters.Count > 0)
             {
@@ -154,36 +189,6 @@ namespace Hspi
             };
             return label;
         }
-
-        private PageFactory AddTopLevelStuff(PageFactory page, ZWaveInformation data)
-        {
-            page = page.WithLabel(NewId(), BootstrapHtmlHelper.MakeBolder(data.FullName));
-            page = AddNodeIfNotEmpty(data.Overview, page, "Overview");
-
-            // some devices has same value for these fields
-            if (data.Inclusion == data.Exclusion)
-            {
-                page = AddNodeIfNotEmpty(data.Inclusion, page, "Inclusion/Exclusion");
-            }
-            else
-            {
-                page = AddNodeIfNotEmpty(data.Inclusion, page, "Inclusion");
-                page = AddNodeIfNotEmpty(data.Exclusion, page, "Exclusion");
-            }
-
-            return page;
-
-            PageFactory AddNodeIfNotEmpty(string? data, PageFactory page, string name)
-            {
-                if (!string.IsNullOrWhiteSpace(data))
-                {
-                    string html = BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), name, data!);
-                    return page.WithView(AddRawHtml(html));
-                }
-                return page;
-            }
-        }
-
         private string NewId()
         {
             return Invariant($"z-wave{id++}");

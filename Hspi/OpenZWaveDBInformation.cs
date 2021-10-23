@@ -21,7 +21,6 @@ namespace Hspi
 
         [JsonIgnore]
         public string Description => Invariant($"{Value} - {Label}");
-
     }
 
     internal record ZWaveDeviceParameter
@@ -55,6 +54,22 @@ namespace Hspi
             {
                 var list = new[] { Description, Overview, Label };
                 return list.OrderByDescending(x => x?.Length ?? 0).First() ?? string.Empty;
+            }
+        }
+
+        [JsonIgnore]
+        public string DefaultValueDescription
+        {
+            get
+            {
+                if (HasOptions)
+                {
+                    return Options.FirstOrDefault(x => x.Value == Default)?.Description ?? string.Empty;
+                }
+                else
+                {
+                    return Invariant($"{Default} {Units}");
+                }
             }
         }
 

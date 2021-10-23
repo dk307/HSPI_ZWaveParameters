@@ -163,12 +163,12 @@ namespace Hspi
                     var row1 = new GridRow();
                     // row1.AddItem(AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(label, button)));
 
-                    string currentMessageValue = BootstrapHtmlHelper.MakeNormal(Invariant($"<span id=\"{currentMessageValueId}\">Not Retrieved</span>"));
+                    string currentMessageValue = BootstrapHtmlHelper.MakeNormal(Invariant($"<span id=\"{currentMessageValueId}\">Value not retrieved</span>"));
                     string currentControlValue = CreateParameterValueControl(parameter, currentControlValueId);
                     string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
 
                     string current = BootstrapHtmlHelper.MakeMultipleRows(label,
-                                                                          Invariant($"Default:{parameter.Default} {parameter.Units}"),
+                                                                          Invariant($"Default: {parameter.DefaultValueDescription}"),
                                                                           currentMessageValue, 
                                                                           currentControlValueWrapper,
                                                                           button);

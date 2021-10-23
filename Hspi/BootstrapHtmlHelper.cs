@@ -9,17 +9,17 @@ namespace Hspi
     {
         public static string MakeBolder(string data)
         {
-            return Invariant($"<div class=\"font-weight-bolder\">{data}</div>");
+            return Invariant($"<span class=\"font-weight-bolder\">{data}</span>");
         }
 
         public static string MakeBold(string data)
         {
-            return Invariant($"<div class=\"font-weight-bold\">{data}</div>");
+            return Invariant($"<span class=\"font-weight-bold\">{data}</span>");
         }
 
         public static string MakeNormal(string data)
         {
-            return Invariant($"<div class=\"font-weight-normal\">{data}</div>");
+            return Invariant($"<span class=\"font-weight-normal\">{data}</span>");
         }
 
         public static string MakeMultipleRows(params string[] values)

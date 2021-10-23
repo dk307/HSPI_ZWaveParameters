@@ -1,7 +1,10 @@
-﻿using HomeSeer.Jui.Views;
+﻿using HomeSeer.Jui.Types;
+using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
 using HomeSeer.PluginSdk.Devices;
 using System;
+using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -96,11 +99,11 @@ namespace Hspi
 
         private static string? CreateOptionsDescription(ZWaveDeviceParameter parameter)
         {
-            if (parameter.Options != null && parameter.Options.Count > 0)
+            if (parameter.HasOptions)
             {
                 StringBuilder stb = new StringBuilder();
                 stb.Append("Options:<BR>");
-                foreach (var option in parameter.Options)
+                foreach (var option in parameter.Options!)
                 {
                     stb.Append(Invariant($"{option.Value} - {option.Label}<BR>"));
                 }
@@ -146,21 +149,24 @@ namespace Hspi
 
                 foreach (var parameter in openZWaveData.Data.Parameters)
                 {
-                    string currentValueId = NewId();
+                    string currentMessageValueId = NewId();
+                    string currentWrapperControlValueId = NewId();
+                    string currentControlValueId = NewId();
 
                     string button =
-                      string.Format("<button type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshZWaveParameter('{0}', {1}, {2}, '{3}')\"> Refresh</button>",
-                              homeId, nodeId, parameter.Id, currentValueId);
+                      string.Format("<button type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\"> Refresh</button>",
+                              homeId, nodeId, parameter.Id, currentMessageValueId, currentWrapperControlValueId, currentControlValueId);
 
-                    string label = BootstrapHtmlHelper.MakeMultipleRows(BootstrapHtmlHelper.MakeNormal(parameter.Label ?? string.Empty),
-                                                                        Invariant($"Parameter #{parameter.Id}"),
-                                                                        button);
+                    string label = Invariant($"{BootstrapHtmlHelper.MakeNormal(parameter.Label ?? string.Empty)}(#{parameter.Id})");
+
                     var row1 = new GridRow();
-                    row1.AddItem(AddRawHtml(label));
+                    row1.AddItem(AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(label, button)));
 
-                    string currentValue = BootstrapHtmlHelper.MakeNormal(Invariant($"<div id=\"{currentValueId}\">Not Retrieved</div>"));
+                    string currentMessageValue = BootstrapHtmlHelper.MakeNormal(Invariant($"<span id=\"{currentMessageValueId}\">Not Retrieved</span>"));
+                    string currentControlValue = CreateParameterValueControl(parameter, currentControlValueId);
+                    string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
 
-                    string current = BootstrapHtmlHelper.MakeMultipleRows(Invariant($"Current:{currentValue}"),
+                    string current = BootstrapHtmlHelper.MakeMultipleRows(currentMessageValue, currentControlValueWrapper,
                                                                           Invariant($"Default:{parameter.Default} {parameter.Units}"));
                     row1.AddItem(AddRawHtml(current));
 
@@ -181,6 +187,33 @@ namespace Hspi
             return page;
         }
 
+        private static string CreateParameterValueControl(ZWaveDeviceParameter parameter, string currentControlValueId)
+        {
+            if (parameter.HasOptions)
+            {
+                return (new SelectListView(currentControlValueId,
+                                           "Value",
+                                           parameter.Options.Select(x => x.Description).ToList(),
+                                           parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList(),
+                                           ESelectListType.DropDown)).ToHtml();
+            }
+            else
+            {
+                var stb = new StringBuilder();
+                stb.Append("Value");
+                stb.Append(Invariant($" ({parameter.Minimum}-{parameter.Maximum}"));
+
+                if (!string.IsNullOrWhiteSpace(parameter.Units))
+                {
+                    stb.Append(parameter.Units);
+                }
+                stb.Append(')');
+                
+                return (new InputView(currentControlValueId, stb.ToString(),
+                                                             HomeSeer.Jui.Types.EInputType.Number)).ToHtml();
+            }
+        }
+
         private LabelView AddRawHtml(string value)
         {
             var label = new LabelView(NewId(), string.Empty, value)
@@ -189,6 +222,7 @@ namespace Hspi
             };
             return label;
         }
+
         private string NewId()
         {
             return Invariant($"z-wave{id++}");

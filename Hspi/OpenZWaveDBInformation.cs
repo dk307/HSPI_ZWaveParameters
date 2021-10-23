@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.FormattableString;
 
 #nullable enable
 
@@ -17,6 +18,10 @@ namespace Hspi
     {
         public string? Label;
         public int Value;
+
+        [JsonIgnore]
+        public string Description => Invariant($"{Value} - {Label}");
+
     }
 
     internal record ZWaveDeviceParameter
@@ -52,6 +57,9 @@ namespace Hspi
                 return list.OrderByDescending(x => x?.Length ?? 0).First() ?? string.Empty;
             }
         }
+
+        [JsonIgnore]
+        public bool HasOptions => Options != null && Options.Count > 0;
     }
 
     internal record DeviceManufacturer

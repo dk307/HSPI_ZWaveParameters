@@ -78,7 +78,7 @@ namespace Hspi {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;script&gt;
-        ///function refreshZWaveParameter(homeId, nodeId, parameter, idToUpdate) {
+        ///function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrapper, idValue) {
         ///	var formObject = {
         ///		   homeId: homeId,
         ///		   nodeId: nodeId,
@@ -86,21 +86,17 @@ namespace Hspi {
         ///		   operation: &quot;GET&quot;
         ///	   };
         ///	   
-        ///	
-        ///	$(&apos;#&apos; + idToUpdate).html(&quot;&quot;);	
-        ///	$(&apos;#&apos; + idToUpdate).addClass(&quot;spinner-border&quot;);	
+        ///	$(&apos;#&apos; + idValueWrapper).attr(&quot;hidden&quot;,true);
+        ///	$(&apos;#&apos; + idMessage).html(&apos;&apos;)
+        ///	$(&apos;#&apos; + idMessage).addClass(&quot;spinner-border&quot;);
+        ///	$(&apos;#&apos; + idMessage).show();	
         ///	
         ///	$.ajax({
         ///		type: &quot;POST&quot;,
         ///		async: &quot;true&quot;,
         ///		url: &apos;/ZWaveInformation/Update&apos;,
         ///		cache:false,
-        ///		data: JSON.stringify(formObject)
-        ///	})  
-        ///	.done(function(msg) {
-        ///		$(&apos;#&apos; + idToUpdate).html(msg);	
-        ///	})
-        ///     [rest of string was truncated]&quot;;.
+        ///		data: JSON.strin [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PostForRefreshScript {
             get {

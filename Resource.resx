@@ -133,7 +133,7 @@
   </data>
   <data name="PostForRefreshScript" xml:space="preserve">
     <value>&lt;script&gt;
-function refreshZWaveParameter(homeId, nodeId, parameter, idToUpdate) {
+function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrapper, idValue) {
 	var formObject = {
 		   homeId: homeId,
 		   nodeId: nodeId,
@@ -141,9 +141,10 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idToUpdate) {
 		   operation: "GET"
 	   };
 	   
-	
-	$('#' + idToUpdate).html("");	
-	$('#' + idToUpdate).addClass("spinner-border");	
+	$('#' + idValueWrapper).attr("hidden",true);
+	$('#' + idMessage).html('')
+	$('#' + idMessage).addClass("spinner-border");
+	$('#' + idMessage).show();	
 	
 	$.ajax({
 		type: "POST",
@@ -153,13 +154,18 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idToUpdate) {
 		data: JSON.stringify(formObject)
 	})  
 	.done(function(msg) {
-		$('#' + idToUpdate).html(msg);	
+		$('#' + idMessage).removeClass("spinner-border");	
+		$('#' + idMessage).hide();
+		$('#' + idValueWrapper).attr("hidden",false);
+		$('#' + idValue).val(msg);	
 	})
     .fail(function() {
-		$('#' + idToUpdate).html("Failed to get");	
+		$('#' + idMessage).removeClass("spinner-border");	
+		$('#' + idValueWrapper).attr("hidden",true);
+		$('#' + idMessage).html("Failed to get");	
 	})
     .always(function() {
-		$('#' + idToUpdate).removeClass("spinner-border");	
+		$('#' + idMessage).removeClass("spinner-border");	
     });
 }
 &lt;/script&gt;</value>

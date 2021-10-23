@@ -22,14 +22,14 @@ namespace Hspi {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resource {
+    internal class HtmlSnippets {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resource() {
+        internal HtmlSnippets() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Hspi {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Hspi.Resource", typeof(Resource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Hspi.HtmlSnippets", typeof(HtmlSnippets).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,21 @@ namespace Hspi {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;script&gt;
+        ///function refreshAllZWaveParameters(idParametersGroup) {
+        ///	$(&apos;#&apos; + idParametersGroup).find(&apos;button.btn.btn-secondary.refresh-z-wave&apos;).each(function() {		
+        ///		$(this).click();
+        ///	});
+        ///}
+        ///&lt;/script&gt;.
+        /// </summary>
+        internal static string AllParametersScript {
+            get {
+                return ResourceManager.GetString("AllParametersScript", resourceCulture);
             }
         }
         

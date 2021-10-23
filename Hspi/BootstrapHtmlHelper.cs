@@ -40,7 +40,7 @@ namespace Hspi
 
         public static string MakeCollapsibleCard(string id, string header, string body)
         {
-            return string.Format(Resource.CollapseHeader, id, header, body);
+            return string.Format(HtmlSnippets.CollapseHeader, id, header, body);
         }
     }
 }

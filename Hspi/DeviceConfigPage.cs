@@ -37,7 +37,6 @@ namespace Hspi
             }
 
             var plugInData = (PlugExtraData)HomeSeerSystem.GetPropertyByRef(deviceOrFeatureRef, EProperty.PlugExtraData);
-
             if (plugInData == null)
             {
                 throw new Exception("Device Plugin extra data is not valid");
@@ -50,7 +49,7 @@ namespace Hspi
             var nodeId = GetValueFromExtraData<Byte>(plugInData, "node_id");
             var homeId = plugInData["homeid"];
 
-            if (!manufacturerId.HasValue || !productType.HasValue || 
+            if (!manufacturerId.HasValue || !productType.HasValue ||
                     !productId.HasValue || !nodeId.HasValue || homeId == null)
             {
                 throw new Exception("Device Z-Wave plugin data is not valid");
@@ -144,9 +143,18 @@ namespace Hspi
         {
             if (openZWaveData.Data?.Parameters != null && openZWaveData.Data.Parameters.Count > 0)
             {
-                page = page.WithLabel(NewId(), string.Empty, Resource.PostForRefreshScript);
-
+                page = page.WithLabel(NewId(), string.Empty, HtmlSnippets.PostForRefreshScript);
                 var parametersView = new GridView(NewId(), string.Empty);
+
+                string parametersCardId = NewId();
+
+                string allButton =
+                    string.Format("<button type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshAllZWaveParameters('{0}')\"> Refresh all parameters</button>",
+                                   parametersCardId);
+
+                var row = new GridRow();
+                row.AddItem(AddRawHtml(HtmlSnippets.AllParametersScript + allButton));
+                parametersView.AddRow(row);
 
                 foreach (var parameter in openZWaveData.Data.Parameters)
                 {
@@ -155,37 +163,35 @@ namespace Hspi
                     string currentControlValueId = NewId();
 
                     string button =
-                      string.Format("<button type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\"> Refresh</button>",
+                      string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\"> Refresh</button>",
                               homeId, nodeId, parameter.Id, currentMessageValueId, currentWrapperControlValueId, currentControlValueId);
 
                     string label = Invariant($"{BootstrapHtmlHelper.MakeNormal(parameter.Label ?? string.Empty)}(#{parameter.Id})");
 
                     var row1 = new GridRow();
-                    // row1.AddItem(AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(label, button)));
 
-                    string currentMessageValue = BootstrapHtmlHelper.MakeNormal(Invariant($"<span id=\"{currentMessageValueId}\">Value not retrieved</span>"));
+                    string notRetrievedMessage = BootstrapHtmlHelper.MakeNormal(Invariant($"<span id=\"{currentMessageValueId}\">Value not retrieved</span>"));
                     string currentControlValue = CreateParameterValueControl(parameter, currentControlValueId);
                     string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
 
                     string current = BootstrapHtmlHelper.MakeMultipleRows(label,
                                                                           Invariant($"Default: {parameter.DefaultValueDescription}"),
-                                                                          currentMessageValue, 
+                                                                          notRetrievedMessage,
                                                                           currentControlValueWrapper,
                                                                           button);
                     row1.AddItem(AddRawHtml(current));
 
                     var options = CreateOptionsDescription(parameter);
 
-                    LabelView detailsLabel = AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(parameter.LongerDescription,
+                    var detailsLabel = AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(parameter.LongerDescription,
                                                                                            Invariant($"Size:{parameter.Size} Byte(s)"),
                                                                                            options ?? Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}")));
                     row1.AddItem(detailsLabel);
-
                     parametersView.AddRow(row1);
                 }
 
-                page = page.WithView(AddRawHtml(
-                                        BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), "Parameters", parametersView.ToHtml())));
+                var view = AddRawHtml(BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), "Parameters", parametersView.ToHtml()), parametersCardId);
+                page = page.WithView(view);
             }
 
             return page;
@@ -209,18 +215,19 @@ namespace Hspi
 
                 if (!string.IsNullOrWhiteSpace(parameter.Units))
                 {
+                    stb.Append(' ');
                     stb.Append(parameter.Units);
                 }
                 stb.Append(')');
-                
+
                 return (new InputView(currentControlValueId, stb.ToString(),
                                                              HomeSeer.Jui.Types.EInputType.Number)).ToHtml();
             }
         }
 
-        private LabelView AddRawHtml(string value)
+        private LabelView AddRawHtml(string value,string? id = null)
         {
-            var label = new LabelView(NewId(), string.Empty, value)
+            var label = new LabelView(id ?? NewId(), string.Empty, value)
             {
                 LabelType = HomeSeer.Jui.Types.ELabelType.Default
             };

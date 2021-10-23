@@ -50,7 +50,8 @@ namespace Hspi
             var nodeId = GetValueFromExtraData<Byte>(plugInData, "node_id");
             var homeId = plugInData["homeid"];
 
-            if (!manufacturerId.HasValue || !productType.HasValue || !productId.HasValue || !nodeId.HasValue || homeId == null)
+            if (!manufacturerId.HasValue || !productType.HasValue || 
+                    !productId.HasValue || !nodeId.HasValue || homeId == null)
             {
                 throw new Exception("Device Z-Wave plugin data is not valid");
             }
@@ -160,14 +161,17 @@ namespace Hspi
                     string label = Invariant($"{BootstrapHtmlHelper.MakeNormal(parameter.Label ?? string.Empty)}(#{parameter.Id})");
 
                     var row1 = new GridRow();
-                    row1.AddItem(AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(label, button)));
+                    // row1.AddItem(AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(label, button)));
 
                     string currentMessageValue = BootstrapHtmlHelper.MakeNormal(Invariant($"<span id=\"{currentMessageValueId}\">Not Retrieved</span>"));
                     string currentControlValue = CreateParameterValueControl(parameter, currentControlValueId);
                     string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
 
-                    string current = BootstrapHtmlHelper.MakeMultipleRows(currentMessageValue, currentControlValueWrapper,
-                                                                          Invariant($"Default:{parameter.Default} {parameter.Units}"));
+                    string current = BootstrapHtmlHelper.MakeMultipleRows(label,
+                                                                          Invariant($"Default:{parameter.Default} {parameter.Units}"),
+                                                                          currentMessageValue, 
+                                                                          currentControlValueWrapper,
+                                                                          button);
                     row1.AddItem(AddRawHtml(current));
 
                     var options = CreateOptionsDescription(parameter);

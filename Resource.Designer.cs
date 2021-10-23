@@ -75,5 +75,37 @@ namespace Hspi {
                 return ResourceManager.GetString("CollapseHeader", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;script&gt;
+        ///function refreshZWaveParameter(homeId, nodeId, parameter, idToUpdate) {
+        ///	var formObject = {
+        ///		   homeId: homeId,
+        ///		   nodeId: nodeId,
+        ///		   parameter: parameter,
+        ///		   operation: &quot;GET&quot;
+        ///	   };
+        ///	   
+        ///	
+        ///	$(&apos;#&apos; + idToUpdate).html(&quot;&quot;);	
+        ///	$(&apos;#&apos; + idToUpdate).addClass(&quot;spinner-border&quot;);	
+        ///	
+        ///	$.ajax({
+        ///		type: &quot;POST&quot;,
+        ///		async: &quot;true&quot;,
+        ///		url: &apos;/ZWaveInformation/Update&apos;,
+        ///		cache:false,
+        ///		data: JSON.stringify(formObject)
+        ///	})  
+        ///	.done(function(msg) {
+        ///		$(&apos;#&apos; + idToUpdate).html(msg);	
+        ///	})
+        ///     [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string PostForRefreshScript {
+            get {
+                return ResourceManager.GetString("PostForRefreshScript", resourceCulture);
+            }
+        }
     }
 }

@@ -2,8 +2,10 @@
 using HomeSeer.PluginSdk;
 using HomeSeer.PluginSdk.Devices;
 using Hspi.Utils;
+using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
 using System;
+using System.Globalization;
 using System.Threading;
 using static System.FormattableString;
 
@@ -35,15 +37,38 @@ namespace Hspi
             }
         }
 
-        public string RefreshDeviceParameterValues(string homeId, byte nodeId)
+        private int GetConfiguration(string homeId, byte nodeId, byte param)
         {
-            return (string)HomeSeerSystem.LegacyPluginFunction("Z-Wave", "", "RefreshDeviceParameterValues", new object[2] { homeId, nodeId }) as string;
+            return (int)HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
         }
-
-
 
         public override string PostBackProc(string page, string data, string user, int userRights)
         {
+            try
+            {
+                var input = JObject.Parse(data);
+
+                if (input["operation"]?.ToString() == "GET")
+                {
+                    var homeId = input["homeId"]?.ToString();
+                    var nodeId = (byte?)input["nodeId"];
+                    var parameter = (byte?)input["parameter"];
+
+                    if ((homeId == null) || !nodeId.HasValue || !parameter.HasValue)
+                    {
+                        throw new Exception("Input not valid");
+                    }
+
+                    int value = GetConfiguration(homeId, nodeId.Value, parameter.Value);
+
+                    return value.ToString(CultureInfo.InvariantCulture);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(Invariant($"Failed to process PostBackProc for {page} with {data} with error {ex.GetFullMessage()}"));
+                return ex.GetFullMessage();
+            }
             return base.PostBackProc(page, data, user, userRights);
         }
 

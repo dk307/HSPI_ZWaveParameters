@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,9 +12,10 @@ using System.Threading.Tasks;
 
 namespace Hspi
 {
+#pragma warning disable 0649
     internal record ZWaveDeviceParameterOption
     {
-        public string Label;
+        public string? Label;
         public int Value;
     }
 
@@ -22,10 +24,10 @@ namespace Hspi
         [JsonProperty("param_id")]
         public int Id;
 
-        public string Label;
-        public string Description;
-        public string Overview;
-        public string Units;
+        public string? Label;
+        public string? Description;
+        public string? Overview;
+        public string? Units;
         public int Advanced;
         public int Size;
         public int Bitmask;
@@ -34,60 +36,75 @@ namespace Hspi
         public int Default;
 
         [JsonProperty("read_only")]
-        public string ReadOnly;
+        public string? ReadOnly;
 
         [JsonProperty("write_only")]
-        public string WriteOnly;
+        public string? WriteOnly;
 
-        public IReadOnlyList<ZWaveDeviceParameterOption> Options;
+        public IReadOnlyList<ZWaveDeviceParameterOption>? Options;
 
-        [JsonProperty]
-        public string FinalDescription
+        [JsonIgnore]
+        public string LongerDescription
         {
             get
             {
-                // return the longer one
-                string value = Description.Length > Overview.Length ? Description : Overview;
-                return string.IsNullOrWhiteSpace(value) ? Label : value;
+                var list = new[] { Description, Overview, Label };
+                return list.OrderByDescending(x => x?.Length ?? 0).First() ?? string.Empty;
             }
         }
     }
 
     internal record DeviceManufacturer
     {
-        public string Label;
+        public string? Label;
     }
 
     internal record DeviceDocuments
     {
-        public string Label;
-        public string File;
+        public string? Label;
+        public string? File;
     }
 
     internal record DeviceAssociations
     {
-        public string Label;
-        public string Overview;
-        public string Description;
+        public string? Label;
+        public string? Overview;
+        public string? Description;
         [JsonProperty("max_nodes")]
         public int MaxNodes;
         [JsonProperty("group_id")]
         public int GroupId;
-        public string Controller;
+        public string? Controller;
     }
 
     internal record ZWaveInformation
     {
-        public string Inclusion;
-        public string Overview;
-        public string Description;
-        public string Label;
-        public string Exclusion;
-        public DeviceManufacturer Manufacturer;
-        public IReadOnlyList<ZWaveDeviceParameter> Parameters;
-        public IReadOnlyList<DeviceDocuments> Documents;
-        public IReadOnlyList<DeviceAssociations> Associations;
+        public string? Inclusion;
+        public string? Overview;
+        public string? Description;
+        public string? Label;
+        public string? Exclusion;
+        public DeviceManufacturer? Manufacturer;
+        public IReadOnlyList<ZWaveDeviceParameter>? Parameters;
+        public IReadOnlyList<DeviceDocuments>? Documents;
+        public IReadOnlyList<DeviceAssociations>? Associations;
+
+        [JsonIgnore]
+        public string FullName
+        {
+            get
+            {
+                var listName = new List<string?>();
+                listName.Add(Manufacturer?.Label);
+                listName.Add(Description);
+                listName.Add("(" + Label + ")");
+
+                return string.Join(" ", listName.Where(s => !string.IsNullOrEmpty(s)));
+            }
+        }
     }
+
+#pragma warning restore 0649
 
     internal class OpenZWaveDBInformation
     {
@@ -98,21 +115,8 @@ namespace Hspi
             this.productId = productId;
         }
 
-        public ZWaveInformation Data => data;
+        public ZWaveInformation? Data => data;
 
-        public string FullName
-        {
-            get
-            {
-                var listName = new List<string>();
-
-                listName.Add(data.Manufacturer.Label);
-                listName.Add(data.Description);
-                listName.Add("(" + data.Label + ")");
-
-                return string.Join(" ", listName);
-            }
-        }
         public async Task Update(CancellationToken cancellationToken)
         {
             string listUrl = string.Format(listUrlFormat, manufactureId, productType, productId);
@@ -139,7 +143,7 @@ namespace Hspi
 
         private static async Task<string> GetCall(string deviceUrl, CancellationToken cancellationToken)
         {
-            var result = await httpClient.GetAsync(deviceUrl, cancellationToken).ConfigureAwait(false);
+            var result = await httpClient.GetAsync(new Uri(deviceUrl, UriKind.Absolute), cancellationToken).ConfigureAwait(false);
             result.EnsureSuccessStatusCode();
 
             var json = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -153,6 +157,6 @@ namespace Hspi
         private readonly int manufactureId;
         private readonly int productId;
         private readonly int productType;
-        private ZWaveInformation data;
+        private ZWaveInformation? data;
     }
 }

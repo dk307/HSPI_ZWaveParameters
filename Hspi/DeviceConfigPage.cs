@@ -47,7 +47,7 @@ namespace Hspi
             var nodeId = GetValueFromExtraData<Byte>(plugInData, "node_id");
             var homeId = plugInData["homeid"];
 
-            if (!manufacturerId.HasValue || !productType.HasValue || !productId.HasValue)
+            if (!manufacturerId.HasValue || !productType.HasValue || !productId.HasValue || !nodeId.HasValue || homeId == null)
             {
                 throw new Exception("Device Z-Wave plugin data is not valid");
             }
@@ -56,9 +56,14 @@ namespace Hspi
 
             await openZWaveData.Update(cancellationToken);
 
-            page = AddTopLevelStuff(page, openZWaveData);
+            if (openZWaveData.Data == null)
+            {
+                throw new Exception("Failed to get data from website");
+            }
 
-            page = AddParameters(page, openZWaveData);
+            page = AddTopLevelStuff(page, openZWaveData.Data);
+
+            page = AddParameters(page, openZWaveData, homeId, nodeId.Value);
 
             return page.Page.ToJsonString();
 
@@ -75,95 +80,109 @@ namespace Hspi
             }
         }
 
-        private PageFactory AddParameters(PageFactory page, OpenZWaveDBInformation openZWaveData)
+        public bool IsZwaveDevice(int devOrFeatRef)
         {
-            if (openZWaveData.Data.Parameters.Count > 0)
+            return ((string)HomeSeerSystem.GetPropertyByRef(devOrFeatRef, EProperty.Interface) == ZWaveInterface);
+        }
+
+        private static string CreateOptionsDescription(ZWaveDeviceParameter parameter)
+        {
+            StringBuilder stb = new StringBuilder();
+            if (parameter.Options != null && parameter.Options.Count > 0)
             {
-                GridView parametersView = new GridView(NewId(), string.Empty);
+                stb.Append("Options:<BR>");
+                foreach (var option in parameter.Options)
+                {
+                    stb.Append(Invariant($"{option.Value} - {option.Label}<BR>"));
+                }
+            }
+            string options = stb.ToString();
+            return options;
+        }
 
-                //Stopwatch stopwatch = new Stopwatch();
+        private PageFactory AddParameters(PageFactory page, OpenZWaveDBInformation openZWaveData,
+                                            string homeId, byte nodeId)
+        {
+            if (openZWaveData.Data?.Parameters != null && openZWaveData.Data.Parameters.Count > 0)
+            {
+                page = page.WithLabel(NewId(), string.Empty, Resource.PostForRefreshScript);
 
-                //stopwatch.Start();
+                var parametersView = new GridView(NewId(), string.Empty);
 
-                //logger.Info(Invariant($"Getting {openZWaveData.Data.Parameters.Count}"));
                 foreach (var parameter in openZWaveData.Data.Parameters)
                 {
-                    string label = Invariant($"{parameter.Label}({parameter.Id})");
+                    string currentValueId = NewId();
 
+                    string button =
+                      string.Format("<button type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshZWaveParameter('{0}', {1}, {2}, '{3}')\"> Refresh</button>",
+                              homeId, nodeId, parameter.Id, currentValueId);
+
+                    string label = BootstrapHtmlHelper.MakeMultipleRows(BootstrapHtmlHelper.MakeNormal(parameter.Label ?? string.Empty),
+                                                                        Invariant($"Parameter #{parameter.Id}"),
+                                                                        button);
                     var row1 = new GridRow();
-                    row1.AddItem(new LabelView(NewId(), string.Empty, BootstrapHtmlHelper.MakeNormal(label)));
-                    string range = Invariant($"Size:{parameter.Size} Byte(s)<BR>Default:{ parameter.Default}</BR>{parameter.Units} Range {parameter.Minimum} - {parameter.Maximum} {parameter.Units}");
-                    row1.AddItem(new LabelView(NewId(), string.Empty, range));
+                    row1.AddItem(AddRawHtml(label));
 
-                    // int value = GetConfiguration(homeId, nodeId.Value, (byte)parameter.Id);
-                    // row1.AddItem(new LabelView(NewId(), "Val", Invariant($"{value}")));
+                    string currentValue = BootstrapHtmlHelper.MakeNormal(Invariant($"<div id=\"{currentValueId}\">Not Retrieved</div>"));
+
+                    string current = BootstrapHtmlHelper.MakeMultipleRows(Invariant($"Current:{currentValue}"),
+                                                                          Invariant($"Default:{parameter.Default} {parameter.Units}"));
+                    row1.AddItem(AddRawHtml(current));
 
                     string options = CreateOptionsDescription(parameter);
 
-                    row1.AddItem(new LabelView(NewId(), string.Empty, parameter.FinalDescription + "<BR>" + options));
+                    LabelView detailsLabel = AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(parameter.LongerDescription,
+                                                                                           Invariant($"Size:{parameter.Size} Byte(s)"),
+                                                                                           Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}"),
+                                                                                           options));
+                    row1.AddItem(detailsLabel);
 
                     parametersView.AddRow(row1);
                 }
 
-                //stopwatch.Stop();
-
-                //logger.Info(Invariant($"Took {stopwatch.Elapsed.TotalMilliseconds} for {openZWaveData.Data.Parameters.Count} Parameters"));
-
-                page = page.WithView(new LabelView(NewId(), string.Empty,
+                page = page.WithView(AddRawHtml(
                                         BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), "Parameters", parametersView.ToHtml())));
             }
 
             return page;
         }
 
-        private PageFactory AddTopLevelStuff(PageFactory page, OpenZWaveDBInformation openZWaveData)
+        private LabelView AddRawHtml(string value)
         {
-            page = page.WithLabel(NewId(), BootstrapHtmlHelper.MakeBolder(openZWaveData.FullName));
-            page = AddNodeIfNotEmpty(openZWaveData.Data.Overview, page, "Overview");
+            var label = new LabelView(NewId(), string.Empty, value)
+            {
+                LabelType = HomeSeer.Jui.Types.ELabelType.Default
+            };
+            return label;
+        }
+
+        private PageFactory AddTopLevelStuff(PageFactory page, ZWaveInformation data)
+        {
+            page = page.WithLabel(NewId(), BootstrapHtmlHelper.MakeBolder(data.FullName));
+            page = AddNodeIfNotEmpty(data.Overview, page, "Overview");
 
             // some devices has same value for these fields
-            if (openZWaveData.Data.Inclusion == openZWaveData.Data.Exclusion)
+            if (data.Inclusion == data.Exclusion)
             {
-                page = AddNodeIfNotEmpty(openZWaveData.Data.Inclusion, page, "Inclusion/Exclusion");
+                page = AddNodeIfNotEmpty(data.Inclusion, page, "Inclusion/Exclusion");
             }
             else
             {
-                page = AddNodeIfNotEmpty(openZWaveData.Data.Inclusion, page, "Inclusion");
-                page = AddNodeIfNotEmpty(openZWaveData.Data.Exclusion, page, "Exclusion");
+                page = AddNodeIfNotEmpty(data.Inclusion, page, "Inclusion");
+                page = AddNodeIfNotEmpty(data.Exclusion, page, "Exclusion");
             }
 
             return page;
 
-            PageFactory AddNodeIfNotEmpty(string data, PageFactory page, string name)
+            PageFactory AddNodeIfNotEmpty(string? data, PageFactory page, string name)
             {
                 if (!string.IsNullOrWhiteSpace(data))
                 {
-                    string html = BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), name, data);
-                    return page.WithView(new LabelView(NewId(), string.Empty, html));
+                    string html = BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), name, data!);
+                    return page.WithView(AddRawHtml(html));
                 }
                 return page;
             }
-        }
-
-        private static string CreateOptionsDescription(ZWaveDeviceParameter parameter)
-        {
-            StringBuilder stb = new StringBuilder();
-            foreach (var option in parameter.Options)
-            {
-                stb.Append(Invariant($"{option.Value} - {option.Label}<BR>"));
-            }
-            string options = stb.ToString();
-            return options;
-        }
-
-        public bool IsZwaveDevice(int devOrFeatRef)
-        {
-            return ((string)HomeSeerSystem.GetPropertyByRef(devOrFeatRef, EProperty.Interface) == ZWaveInterface);
-        }
-
-        private int GetConfiguration(string homeId, byte nodeId, byte param)
-        {
-            return (int)HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
         }
 
         private string NewId()

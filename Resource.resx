@@ -131,4 +131,37 @@
 	&lt;/div&gt;
 &lt;/div&gt;</value>
   </data>
+  <data name="PostForRefreshScript" xml:space="preserve">
+    <value>&lt;script&gt;
+function refreshZWaveParameter(homeId, nodeId, parameter, idToUpdate) {
+	var formObject = {
+		   homeId: homeId,
+		   nodeId: nodeId,
+		   parameter: parameter,
+		   operation: "GET"
+	   };
+	   
+	
+	$('#' + idToUpdate).html("");	
+	$('#' + idToUpdate).addClass("spinner-border");	
+	
+	$.ajax({
+		type: "POST",
+		async: "true",
+		url: '/ZWaveInformation/Update',
+		cache:false,
+		data: JSON.stringify(formObject)
+	})  
+	.done(function(msg) {
+		$('#' + idToUpdate).html(msg);	
+	})
+    .fail(function() {
+		$('#' + idToUpdate).html("Failed to get");	
+	})
+    .always(function() {
+		$('#' + idToUpdate).removeClass("spinner-border");	
+    });
+}
+&lt;/script&gt;</value>
+  </data>
 </root>

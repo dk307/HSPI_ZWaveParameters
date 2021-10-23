@@ -85,19 +85,19 @@ namespace Hspi
             return ((string)HomeSeerSystem.GetPropertyByRef(devOrFeatRef, EProperty.Interface) == ZWaveInterface);
         }
 
-        private static string CreateOptionsDescription(ZWaveDeviceParameter parameter)
+        private static string? CreateOptionsDescription(ZWaveDeviceParameter parameter)
         {
-            StringBuilder stb = new StringBuilder();
             if (parameter.Options != null && parameter.Options.Count > 0)
             {
+                StringBuilder stb = new StringBuilder();
                 stb.Append("Options:<BR>");
                 foreach (var option in parameter.Options)
                 {
                     stb.Append(Invariant($"{option.Value} - {option.Label}<BR>"));
                 }
+                return stb.ToString();
             }
-            string options = stb.ToString();
-            return options;
+            return null; ;
         }
 
         private PageFactory AddParameters(PageFactory page, OpenZWaveDBInformation openZWaveData,
@@ -129,12 +129,11 @@ namespace Hspi
                                                                           Invariant($"Default:{parameter.Default} {parameter.Units}"));
                     row1.AddItem(AddRawHtml(current));
 
-                    string options = CreateOptionsDescription(parameter);
+                    var options = CreateOptionsDescription(parameter);
 
                     LabelView detailsLabel = AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(parameter.LongerDescription,
                                                                                            Invariant($"Size:{parameter.Size} Byte(s)"),
-                                                                                           Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}"),
-                                                                                           options));
+                                                                                           options ?? Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}")));
                     row1.AddItem(detailsLabel);
 
                     parametersView.AddRow(row1);

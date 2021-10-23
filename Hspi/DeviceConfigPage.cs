@@ -67,15 +67,17 @@ namespace Hspi
             var data = openZWaveData.Data;
 
             // Label
-            page = page.WithLabel(NewId(), BootstrapHtmlHelper.MakeBolder(data.FullName));
+            page = page.WithLabel(NewId(), 
+                    BootstrapHtmlHelper.MakeInfoHyperlinkInAnotherTab(BootstrapHtmlHelper.MakeBolder(data.FullName),
+                                                                      data.WebUrl));
 
             // Overview
-            page = AddCollapsibleCardIfNotEmpty(data.Overview, page, "Overview");
+            //page = AddCollapsibleCardIfNotEmpty(data.Overview, page, "Overview");
 
             //Parameters
             page = AddParameters(page, openZWaveData, homeId, nodeId.Value);
 
-            page = AddInclusionSections(page, data);
+            //page = AddInclusionSections(page, data);
 
             return page.Page.ToJsonString();
 
@@ -190,8 +192,8 @@ namespace Hspi
                     parametersView.AddRow(row1);
                 }
 
-                var view = AddRawHtml(BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), "Parameters", parametersView.ToHtml()), parametersCardId);
-                page = page.WithView(view);
+                // var view = AddRawHtml(BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), "Parameters", parametersView.ToHtml()), parametersCardId);
+                page = page.WithView(parametersView);
             }
 
             return page;
@@ -203,11 +205,13 @@ namespace Hspi
             {
                 var options = parameter.Options.Select(x => x.Description).ToList();
                 var optionKeys = parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList();
-                return (new SelectListView(currentControlValueId,
-                                           string.Empty,
-                                           options,
-                                           optionKeys,
-                                           ESelectListType.DropDown)).ToHtml();
+
+                var selectListView = new SelectListView(currentControlValueId,
+                                                           string.Empty,
+                                                           options,
+                                                           optionKeys,
+                                                           ESelectListType.DropDown);
+                return selectListView.ToHtml();
             }
             else
             {
@@ -231,7 +235,7 @@ namespace Hspi
         {
             var label = new LabelView(id ?? NewId(), string.Empty, value)
             {
-                LabelType = HomeSeer.Jui.Types.ELabelType.Default
+                LabelType = ELabelType.Default
             };
             return label;
         }

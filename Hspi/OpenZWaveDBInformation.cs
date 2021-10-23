@@ -102,6 +102,8 @@ namespace Hspi
 
     internal record ZWaveInformation
     {
+        [JsonProperty("database_id")]
+        public string? Id;
         public string? Inclusion;
         public string? Overview;
         public string? Description;
@@ -125,6 +127,11 @@ namespace Hspi
                 return string.Join(" ", listName.Where(s => !string.IsNullOrEmpty(s)));
             }
         }
+
+        [JsonIgnore]
+        public Uri WebUrl => new Uri(string.Format(webUrlFormat, Id), UriKind.Absolute);
+
+        private const string webUrlFormat = "https://www.opensmarthouse.org/zwavedatabase/{0}";
     }
 
 #pragma warning restore 0649

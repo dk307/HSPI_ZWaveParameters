@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using static System.FormattableString;
 
 #nullable enable
@@ -10,6 +11,12 @@ namespace Hspi
         public static string MakeBolder(string data)
         {
             return Invariant($"<span class=\"font-weight-bolder\">{data}</span>");
+        }       
+        
+        
+        public static string MakeInfoHyperlinkInAnotherTab(string data, Uri link)
+        {
+            return Invariant($"<a href=\"{link}\" class=\"link-info\" target=\"_blank\">{data}</a>");
         }
 
         public static string MakeBold(string data)

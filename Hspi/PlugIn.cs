@@ -1,6 +1,5 @@
 ﻿using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
-using HomeSeer.PluginSdk.Devices;
 using Hspi.Utils;
 using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
@@ -37,9 +36,9 @@ namespace Hspi
             }
         }
 
-        private int GetConfiguration(string homeId, byte nodeId, byte param)
+        public override bool HasJuiDeviceConfigPage(int devOrFeatRef)
         {
-            return (int)HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
+            return DeviceConfigPage.IsZwaveDevice(HomeSeerSystem, devOrFeatRef);
         }
 
         public override string PostBackProc(string page, string data, string user, int userRights)
@@ -70,24 +69,6 @@ namespace Hspi
                 return ex.GetFullMessage();
             }
             return base.PostBackProc(page, data, user, userRights);
-        }
-
-        public override bool HasJuiDeviceConfigPage(int devOrFeatRef)
-        {
-            return DeviceConfigPage.IsZwaveDevice(HomeSeerSystem, devOrFeatRef);
-        }
-
-        public override EPollResponse UpdateStatusNow(int devOrFeatRef)
-        {
-            try
-            {
-                return EPollResponse.Ok;
-            }
-            catch (Exception ex)
-            {
-                logger.Error(Invariant($"Failed to import value for Ref Id: {devOrFeatRef} with {ex.GetFullMessage()}"));
-                return EPollResponse.ErrorGettingStatus;
-            }
         }
 
         protected override void BeforeReturnStatus()
@@ -122,6 +103,15 @@ namespace Hspi
             }
         }
 
+        protected override bool OnDeviceConfigChange(Page deviceConfigPage, int devOrFeatRef)
+        {
+            return true;
+        }
+
+        private int GetConfiguration(string homeId, byte nodeId, byte param)
+        {
+            return (int)HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
+        }
         private void PluginConfigChanged()
         {
             UpdateDebugLevel();

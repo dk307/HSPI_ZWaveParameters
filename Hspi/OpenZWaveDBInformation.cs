@@ -166,6 +166,7 @@ namespace Hspi
 
         private static async Task<string> GetCall(string deviceUrl, CancellationToken cancellationToken)
         {
+            logger.Info("Getting data from " + deviceUrl);
             var result = await httpClient.GetAsync(new Uri(deviceUrl, UriKind.Absolute), cancellationToken).ConfigureAwait(false);
             result.EnsureSuccessStatusCode();
 
@@ -177,6 +178,7 @@ namespace Hspi
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
         private static readonly HttpClient httpClient = new HttpClient();
+        private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int manufactureId;
         private readonly int productId;
         private readonly int productType;

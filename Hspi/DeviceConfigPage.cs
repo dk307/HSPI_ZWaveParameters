@@ -201,10 +201,12 @@ namespace Hspi
         {
             if (parameter.HasOptions)
             {
+                var options = parameter.Options.Select(x => x.Description).ToList();
+                var optionKeys = parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList();
                 return (new SelectListView(currentControlValueId,
                                            string.Empty,
-                                           parameter.Options.Select(x => x.Description).ToList(),
-                                           parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList(),
+                                           options,
+                                           optionKeys,
                                            ESelectListType.DropDown)).ToHtml();
             }
             else

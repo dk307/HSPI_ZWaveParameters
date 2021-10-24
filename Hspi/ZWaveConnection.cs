@@ -70,7 +70,7 @@ namespace Hspi
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
         private const string ZWaveInterface = "Z-Wave";
-        public record ZWaveData(int ManufactureId, ushort productId, ushort ProductType, byte NodeId, string HomeId);
+        public record ZWaveData(int ManufactureId, ushort ProductId, ushort ProductType, byte NodeId, string HomeId);
         private readonly IHsController HomeSeerSystem;
     }
 }

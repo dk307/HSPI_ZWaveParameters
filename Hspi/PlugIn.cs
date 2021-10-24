@@ -153,7 +153,7 @@ namespace Hspi
         }
 
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        private IDictionary<int, DeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, DeviceConfigPage>();
+        private readonly IDictionary<int, DeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, DeviceConfigPage>();
         private PluginConfig? pluginConfig;
     }
 }

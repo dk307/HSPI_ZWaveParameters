@@ -15,10 +15,11 @@ using static System.FormattableString;
 namespace Hspi
 {
 #pragma warning disable 0649
+
     internal record ZWaveDeviceParameterOption
     {
-        public string? Label;
-        public int Value;
+        public string? Label { get; init; }
+        public int Value { get; init; }
 
         [JsonIgnore]
         public string Description => Invariant($"{Value} - {Label}");
@@ -27,26 +28,26 @@ namespace Hspi
     internal record ZWaveDeviceParameter
     {
         [JsonProperty("param_id")]
-        public int Id;
+        public int Id { get; init; }
 
-        public string? Label;
-        public string? Description;
-        public string? Overview;
-        public string? Units;
-        public int Advanced;
-        public int Size;
-        public int Bitmask;
-        public int Minimum;
-        public int Maximum;
-        public int Default;
+        public string? Label { get; init; }
+        public string? Description { get; init; }
+        public string? Overview { get; init; }
+        public string? Units { get; init; }
+        public int Advanced { get; init; }
+        public int Size { get; init; }
+        public int Bitmask { get; init; }
+        public int Minimum { get; init; }
+        public int Maximum { get; init; }
+        public int Default { get; init; }
 
         [JsonProperty("read_only")]
-        public string? ReadOnly;
+        public string? ReadOnly { get; init; }
 
         [JsonProperty("write_only")]
-        public string? WriteOnly;
+        public string? WriteOnly { get; init; }
 
-        public IReadOnlyList<ZWaveDeviceParameterOption>? Options;
+        public IReadOnlyList<ZWaveDeviceParameterOption>? Options { get; init; }
 
         [JsonIgnore]
         public string LongerDescription
@@ -75,7 +76,7 @@ namespace Hspi
         }
 
         [JsonIgnore]
-        public bool HasMultipleValues = false;
+        public bool HasMultipleValues { get; init; } = false;
 
         [JsonIgnore]
         public bool HasOptions => Options != null && Options.Count > 0 && !HasMultipleValues;
@@ -83,7 +84,7 @@ namespace Hspi
 
     internal record DeviceManufacturer
     {
-        public string? Label;
+        public string? Label { get; init; }
     }
 
     internal record DeviceDocuments
@@ -107,14 +108,14 @@ namespace Hspi
     internal record ZWaveInformation
     {
         [JsonProperty("database_id")]
-        public string? Id;
-        public string? Overview;
-        public string? Description;
-        public string? Label;
-        public DeviceManufacturer? Manufacturer;
-        public IReadOnlyList<ZWaveDeviceParameter>? Parameters;
-        public IReadOnlyList<DeviceDocuments>? Documents;
-        public IReadOnlyList<DeviceAssociations>? Associations;
+        public string? Id { get; init; }
+        public string? Overview { get; init; }
+        public string? Description { get; init; }
+        public string? Label { get; init; }
+        public DeviceManufacturer? Manufacturer { get; init; }
+        public IReadOnlyList<ZWaveDeviceParameter>? Parameters { get; init; }
+        public IReadOnlyList<DeviceDocuments>? Documents { get; init; }
+        public IReadOnlyList<DeviceAssociations>? Associations { get; init; }
 
         [JsonIgnore]
         public string FullName
@@ -196,19 +197,20 @@ namespace Hspi
                     }
                     string extraDescription = NewLine + string.Join(NewLine, extra);
 
-                    result.Overview = result.Overview ?? string.Empty;
-                    result.Description = result.Description ?? string.Empty;
+                    string overview = result.Overview ?? string.Empty;
+                    string description = result.Description ?? string.Empty;
 
-                    result.Overview += extraDescription;
-                    result.Description += extraDescription;
+                    overview += extraDescription;
+                    description += extraDescription;
 
-                    result.HasMultipleValues = true;
-
-                    finalParameters.Add(result);
+                    finalParameters.Add(result with
+                    {
+                        Overview = overview,
+                        Description = description,
+                        HasMultipleValues = true
+                    });
                 }
             }
-            obj.Parameters = finalParameters;
-
             data = obj with { Parameters = finalParameters.AsReadOnly() };
         }
 

@@ -26,7 +26,7 @@ namespace Hspi
             var page = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
             var zwaveData = zwaveConnection.GetDeviceZWaveData(this.deviceOrFeatureRef);
 
-            var openZWaveData = new OpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType, zwaveData.productId);
+            var openZWaveData = new OpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType, zwaveData.ProductId);
 
             await openZWaveData.Update(cancellationToken);
 
@@ -45,17 +45,12 @@ namespace Hspi
             //Parameters
             page = AddParameters(page, openZWaveData, zwaveData.HomeId, zwaveData.NodeId);
 
-            createdPage = page.Page;
+            var createdPage = page.Page;
             return createdPage.ToJsonString();
         }
 
         public void OnDeviceConfigChange(Page changes)
         {
-            if (createdPage == null)
-            {
-                throw new Exception("Existing Page is null");
-            }
-
             if (data == null)
             {
                 throw new Exception("Existing ZWave data is null");
@@ -68,7 +63,6 @@ namespace Hspi
                 byte parameter = checked((byte)ZWaveParameterFromId(view.Id));
 
                 var parameterInfo = data.Parameters.FirstOrDefault(x => x.Id == parameter);
-
                 if ((parameterInfo == null) || (parameterInfo.Size == 0))
                 {
                     throw new Exception("Z-wave paramater information not found");
@@ -149,17 +143,23 @@ namespace Hspi
             {
                 var stb = new StringBuilder();
                 stb.Append("Value");
-                stb.Append(Invariant($" ({parameter.Minimum}-{parameter.Maximum}"));
+
+                stb.Append('(');
+
+                // Range is not correct if there is bitmask
+                if (!parameter.HasMultipleValues)
+                {
+                    stb.Append(Invariant($" {parameter.Minimum}-{parameter.Maximum} "));
+                }
 
                 if (!string.IsNullOrWhiteSpace(parameter.Units))
                 {
-                    stb.Append(' ');
                     stb.Append(parameter.Units);
                 }
                 stb.Append(')');
 
                 return (new InputView(currentControlValueId, stb.ToString(),
-                                                             HomeSeer.Jui.Types.EInputType.Number)).ToHtml();
+                                                             EInputType.Number)).ToHtml();
             }
         }
 
@@ -172,7 +172,7 @@ namespace Hspi
                     return id;
                 }
             }
-            throw new ArgumentException(nameof(idParameter), "Not a ZWave Parameter");
+            throw new ArgumentException("Not a ZWave Parameter", nameof(idParameter));
         }
 
         private static string ZWaveParameterId(int parameter)
@@ -267,9 +267,8 @@ namespace Hspi
         private const string ZWaveParameterPrefix = "zw_parameter_";
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int deviceOrFeatureRef;
-        private Page? createdPage;
         private ZWaveInformation? data;
         private int id = 0;
-        private ZWaveConnection zwaveConnection;
+        private readonly ZWaveConnection zwaveConnection;
     }
 }

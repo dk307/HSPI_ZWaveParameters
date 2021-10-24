@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-#nullable enable
+﻿#nullable enable
 
 namespace Hspi
 {
@@ -9,7 +7,6 @@ namespace Hspi
     /// </summary>
     internal static class PlugInData
     {
-        
         /// <summary>
         /// The plugin name
         /// </summary>
@@ -24,12 +21,10 @@ namespace Hspi
         /// The plugin name
         /// </summary>
         public const string PlugInName = @"Z-Wave Parameters";
+
         /// <summary>
         /// The plugin Id
         /// </summary>
         public const string SettingFileName = @"HSPI_ZWaveParameters.ini";
-
-        public readonly static string HomeSeerDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-
     }
 }

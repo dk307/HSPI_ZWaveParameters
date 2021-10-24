@@ -4,6 +4,8 @@ using Hspi.Utils;
 using Newtonsoft.Json.Linq;
 using Nito.AsyncEx;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using static System.FormattableString;
@@ -26,7 +28,10 @@ namespace Hspi
             try
             {
                 DeviceConfigPage page = new DeviceConfigPage(HomeSeerSystem, deviceOrFeatureRef);
-                return page.BuildConfigPage(CancellationToken.None).ResultForSync();
+                var pageJson = page.BuildConfigPage(CancellationToken.None).ResultForSync();
+
+                cacheForUpdate[deviceOrFeatureRef] = page;
+                return pageJson;
             }
             catch (Exception ex)
             {
@@ -38,7 +43,8 @@ namespace Hspi
 
         public override bool HasJuiDeviceConfigPage(int devOrFeatRef)
         {
-            return DeviceConfigPage.IsZwaveDevice(HomeSeerSystem, devOrFeatRef);
+            ZWaveConnection connection = new ZWaveConnection(HomeSeerSystem);
+            return connection.IsZwaveDevice(devOrFeatRef);
         }
 
         public override string PostBackProc(string page, string data, string user, int userRights)
@@ -105,15 +111,34 @@ namespace Hspi
 
         protected override bool OnDeviceConfigChange(Page deviceConfigPage, int devOrFeatRef)
         {
-            //
-            deviceConfigPage.RemoveAllViews();
-            return true;
+            try
+            {
+                logger.Debug(Invariant($"OnDeviceConfigChange for {devOrFeatRef}"));
+
+                if (cacheForUpdate.TryGetValue(devOrFeatRef, out var page))
+                {
+                    page.OnDeviceConfigChange(deviceConfigPage);
+                }
+                else
+                {
+                    throw new Exception("PlugIn was restarted after page was created");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(Invariant($"Failed to process OnDeviceConfigChange for {devOrFeatRef} with error {ex.GetFullMessage()}"));
+                return false;
+            }
         }
 
         private int GetConfiguration(string homeId, byte nodeId, byte param)
         {
-            logger.Info(Invariant($"Getting HomeId:{homeId} NodeId:{nodeId} Parameter:{param}"));
-            return (int)HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
+            logger.Debug(Invariant($"Getting HomeId:{homeId} NodeId:{nodeId} Parameter:{param}"));
+            var value = (int)HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
+            logger.Debug(Invariant($"For HomeId:{homeId} NodeId:{nodeId} Parameter:{param} got {value}"));
+            return value;
         }
 
         private void PluginConfigChanged()
@@ -128,7 +153,7 @@ namespace Hspi
         }
 
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        private readonly AsyncLock dataLock = new AsyncLock();
+        private IDictionary<int, DeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, DeviceConfigPage>();
         private PluginConfig? pluginConfig;
     }
 }

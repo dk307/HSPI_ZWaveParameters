@@ -8,29 +8,23 @@ namespace Hspi
 {
     internal static class BootstrapHtmlHelper
     {
-        public static string MakeBolder(string data)
-        {
-            return Invariant($"<span class=\"font-weight-bolder\">{data}</span>");
-        }       
-        
-        
-        public static string MakeInfoHyperlinkInAnotherTab(string data, Uri link)
-        {
-            return Invariant($"<a href=\"{link}\" class=\"link-info\" target=\"_blank\">{data}</a>");
-        }
-
         public static string MakeBold(string data)
         {
             return Invariant($"<span class=\"font-weight-bold\">{data}</span>");
         }
-        public static string MakeItalic(string data)
+
+        public static string MakeBolder(string data)
         {
-            return Invariant($"<span class=\"font-weight-italic\">{data}</span>");
+            return Invariant($"<span class=\"font-weight-bolder\">{data}</span>");
         }
 
-        public static string MakeNormal(string data)
+        public static string MakeInfoHyperlinkInAnotherTab(string data, Uri link)
         {
-            return Invariant($"<span class=\"font-weight-normal\">{data}</span>");
+            return Invariant($"<a href=\"{link}\" class=\"link-info\" target=\"_blank\">{data}</a>");
+        }
+        public static string MakeItalic(string data)
+        {
+            return Invariant($"<span class=\"font-italic\">{data}</span>");
         }
 
         public static string MakeMultipleRows(params string[] values)
@@ -47,6 +41,11 @@ namespace Hspi
             }
             stb.Append("</div>");
             return stb.ToString();
+        }
+
+        public static string MakeNormal(string data)
+        {
+            return Invariant($"<span class=\"font-weight-normal\">{data}</span>");
         }
     }
 }

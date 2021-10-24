@@ -1,7 +1,6 @@
 ﻿using HomeSeer.Jui.Types;
 using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
-using HomeSeer.PluginSdk.Devices;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -18,45 +17,16 @@ namespace Hspi
     {
         public DeviceConfigPage(IHsController hsController, int deviceOrFeatureRef)
         {
-            this.HomeSeerSystem = hsController;
+            this.zwaveConnection = new ZWaveConnection(hsController);
             this.deviceOrFeatureRef = deviceOrFeatureRef;
-        }
-
-        private IHsController HomeSeerSystem { get; }
-
-        public static bool IsZwaveDevice(IHsController hsController, int devOrFeatRef)
-        {
-            return ((string)hsController.GetPropertyByRef(devOrFeatRef, EProperty.Interface) == ZWaveInterface);
         }
 
         public async Task<string> BuildConfigPage(CancellationToken cancellationToken)
         {
             var page = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
-            if (!IsZwaveDevice(deviceOrFeatureRef))
-            {
-                throw new Exception("Device is not a Z-Wave device");
-            }
+            var zwaveData = zwaveConnection.GetDeviceZWaveData(this.deviceOrFeatureRef);
 
-            var plugInData = (PlugExtraData)HomeSeerSystem.GetPropertyByRef(deviceOrFeatureRef, EProperty.PlugExtraData);
-            if (plugInData == null)
-            {
-                throw new Exception("Device Plugin extra data is not valid");
-            }
-
-            var manufacturerId = GetValueFromExtraData<Int32>(plugInData, "manufacturer_id");
-            var productId = GetValueFromExtraData<UInt16>(plugInData, "manufacturer_prod_id");
-            var productType = GetValueFromExtraData<UInt16>(plugInData, "manufacturer_prod_type");
-
-            var nodeId = GetValueFromExtraData<Byte>(plugInData, "node_id");
-            var homeId = plugInData["homeid"];
-
-            if (!manufacturerId.HasValue || !productType.HasValue ||
-                    !productId.HasValue || !nodeId.HasValue || homeId == null)
-            {
-                throw new Exception("Device Z-Wave plugin data is not valid");
-            }
-
-            var openZWaveData = new OpenZWaveDBInformation(manufacturerId.Value, productType.Value, productId.Value);
+            var openZWaveData = new OpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType, zwaveData.productId);
 
             await openZWaveData.Update(cancellationToken);
 
@@ -65,7 +35,7 @@ namespace Hspi
                 throw new Exception("Failed to get data from website");
             }
 
-            var data = openZWaveData.Data;
+            data = openZWaveData.Data;
 
             // Label
             page = page.WithLabel(NewId(),
@@ -73,26 +43,75 @@ namespace Hspi
                                                                       data.WebUrl));
 
             //Parameters
-            page = AddParameters(page, openZWaveData, homeId, nodeId.Value);
+            page = AddParameters(page, openZWaveData, zwaveData.HomeId, zwaveData.NodeId);
 
-            return page.Page.ToJsonString();
+            createdPage = page.Page;
+            return createdPage.ToJsonString();
+        }
 
-            static T? GetValueFromExtraData<T>(PlugExtraData plugInData, string name) where T : struct
+        public void OnDeviceConfigChange(Page changes)
+        {
+            if (createdPage == null)
             {
-                if (plugInData.ContainsNamed(name))
+                throw new Exception("Existing Page is null");
+            }
+
+            if (data == null)
+            {
+                throw new Exception("Existing ZWave data is null");
+            }
+
+            var zwaveData = zwaveConnection.GetDeviceZWaveData(this.deviceOrFeatureRef);
+
+            foreach (var view in changes.Views)
+            {
+                byte parameter = checked((byte)ZWaveParameterFromId(view.Id));
+
+                var parameterInfo = data.Parameters.FirstOrDefault(x => x.Id == parameter);
+
+                if ((parameterInfo == null) || (parameterInfo.Size == 0))
                 {
-                    return (T)Convert.ChangeType(plugInData[name].Trim('"', '\\'), typeof(T));
+                    throw new Exception("Z-wave paramater information not found");
+                }
+
+                int? value = null;
+
+                if (view is InputView inputView)
+                {
+                    if (int.TryParse(inputView.Value, out var temp))
+                    {
+                        value = temp;
+                    }
+                    else
+                    {
+                        throw new InvalidValueForTypeException("Value not integer");
+                    }
+                }
+                else if (view is SelectListView selectListView)
+                {
+                    if (int.TryParse(selectListView.GetSelectedOption(), out var temp))
+                    {
+                        value = parameterInfo?.Options?[temp].Value;
+                    }
+                    else
+                    {
+                        throw new InvalidValueForTypeException("Value not integer");
+                    }
+                }
+
+                if (value.HasValue)
+                {
+                    zwaveConnection.UpdateDeviceParameter(zwaveData.HomeId,
+                                                          zwaveData.NodeId,
+                                                          parameter,
+                                                          parameterInfo.Size,
+                                                          value.Value);
                 }
                 else
                 {
-                    return null;
+                    throw new InvalidValueForTypeException("View not valid");
                 }
             }
-        }
-
-        public bool IsZwaveDevice(int devOrFeatRef)
-        {
-            return ((string)HomeSeerSystem.GetPropertyByRef(devOrFeatRef, EProperty.Interface) == ZWaveInterface);
         }
 
         private static string? CreateOptionsDescription(ZWaveDeviceParameter parameter)
@@ -110,8 +129,59 @@ namespace Hspi
             return null; ;
         }
 
+        private static string CreateParameterValueControl(ZWaveDeviceParameter parameter, string currentControlValueId)
+        {
+            if (parameter.HasOptions)
+            {
+                var options = parameter.Options.Select(x => x.Description).ToList();
+                var optionKeys = parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList();
+
+                string script =
+                    Invariant($"<script> const {currentControlValueId}_option = [{string.Join(",", optionKeys)}];</script>");
+                var selectListView = new SelectListView(currentControlValueId,
+                                                           string.Empty,
+                                                           options,
+                                                           optionKeys,
+                                                           ESelectListType.DropDown);
+                return script + selectListView.ToHtml();
+            }
+            else
+            {
+                var stb = new StringBuilder();
+                stb.Append("Value");
+                stb.Append(Invariant($" ({parameter.Minimum}-{parameter.Maximum}"));
+
+                if (!string.IsNullOrWhiteSpace(parameter.Units))
+                {
+                    stb.Append(' ');
+                    stb.Append(parameter.Units);
+                }
+                stb.Append(')');
+
+                return (new InputView(currentControlValueId, stb.ToString(),
+                                                             HomeSeer.Jui.Types.EInputType.Number)).ToHtml();
+            }
+        }
+
+        private static int ZWaveParameterFromId(string idParameter)
+        {
+            if (idParameter.StartsWith(ZWaveParameterPrefix))
+            {
+                if (int.TryParse(idParameter.Substring(ZWaveParameterPrefix.Length), out int id))
+                {
+                    return id;
+                }
+            }
+            throw new ArgumentException(nameof(idParameter), "Not a ZWave Parameter");
+        }
+
+        private static string ZWaveParameterId(int parameter)
+        {
+            return Invariant($"{ZWaveParameterPrefix}{parameter}");
+        }
+
         private PageFactory AddParameters(PageFactory page, OpenZWaveDBInformation openZWaveData,
-                                                            string homeId, byte nodeId)
+                                                                            string homeId, byte nodeId)
         {
             if (openZWaveData.Data?.Parameters != null && openZWaveData.Data.Parameters.Count > 0)
             {
@@ -180,40 +250,6 @@ namespace Hspi
             return page;
         }
 
-        private static string CreateParameterValueControl(ZWaveDeviceParameter parameter, string currentControlValueId)
-        {
-            if (parameter.HasOptions)
-            {
-                var options = parameter.Options.Select(x => x.Description).ToList();
-                var optionKeys = parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList();
-
-                string script =
-                    Invariant($"<script> const {currentControlValueId}_option = [{string.Join(",", optionKeys)}];</script>");
-                var selectListView = new SelectListView(currentControlValueId,
-                                                           string.Empty,
-                                                           options,
-                                                           optionKeys,
-                                                           ESelectListType.DropDown);
-                return script + selectListView.ToHtml();
-            }
-            else
-            {
-                var stb = new StringBuilder();
-                stb.Append("Value");
-                stb.Append(Invariant($" ({parameter.Minimum}-{parameter.Maximum}"));
-
-                if (!string.IsNullOrWhiteSpace(parameter.Units))
-                {
-                    stb.Append(' ');
-                    stb.Append(parameter.Units);
-                }
-                stb.Append(')');
-
-                return (new InputView(currentControlValueId, stb.ToString(),
-                                                             HomeSeer.Jui.Types.EInputType.Number)).ToHtml();
-            }
-        }
-
         private LabelView AddRawHtml(string value, string? id = null)
         {
             var label = new LabelView(id ?? NewId(), string.Empty, value)
@@ -225,17 +261,15 @@ namespace Hspi
 
         private string NewId()
         {
-            return Invariant($"z_wave{id++}");
+            return Invariant($"z_wave_{id++}");
         }
 
-        private string ZWaveParameterId(int parameter)
-        {
-            return Invariant($"zw_parameter{parameter}");
-        }
-
-        private const string ZWaveInterface = "Z-Wave";
+        private const string ZWaveParameterPrefix = "zw_parameter_";
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int deviceOrFeatureRef;
+        private Page? createdPage;
+        private ZWaveInformation? data;
         private int id = 0;
+        private ZWaveConnection zwaveConnection;
     }
 }

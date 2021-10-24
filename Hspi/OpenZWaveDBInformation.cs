@@ -75,7 +75,10 @@ namespace Hspi
         }
 
         [JsonIgnore]
-        public bool HasOptions => Options != null && Options.Count > 0;
+        public bool HasMultipleValues = false;
+
+        [JsonIgnore]
+        public bool HasOptions => Options != null && Options.Count > 0 && !HasMultipleValues;
     }
 
     internal record DeviceManufacturer
@@ -180,21 +183,27 @@ namespace Hspi
                 else
                 {
                     var result = group.First();
-                    result.Overview = result.Overview ?? string.Empty;
-                    result.Description += result.Description ?? string.Empty;
 
+                    List<string> extra = new List<string>();
                     foreach (var item in group)
                     {
                         if (item == result)
                         {
                             continue;
                         }
-                        string description =
-                            string.Format(CultureInfo.InvariantCulture, "Bitmask:{0:x}: {1}<BR>", item.Bitmask, item.Label);
-
-                        result.Overview += description;
-                        result.Description += description;
+                        extra.Add(
+                            string.Format(CultureInfo.InvariantCulture, "Bitmask:{0:x}: {1}", item.Bitmask, item.Label));
                     }
+                    string extraDescription = NewLine + string.Join(NewLine, extra);
+
+                    result.Overview = result.Overview ?? string.Empty;
+                    result.Description = result.Description ?? string.Empty;
+
+                    result.Overview += extraDescription;
+                    result.Description += extraDescription;
+
+                    result.HasMultipleValues = true;
+
                     finalParameters.Add(result);
                 }
             }
@@ -216,6 +225,7 @@ namespace Hspi
 
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
+        private const string NewLine = "<BR>";
         private static readonly HttpClient httpClient = new HttpClient();
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int manufactureId;

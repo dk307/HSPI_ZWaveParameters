@@ -127,32 +127,41 @@ namespace Hspi
 
                 foreach (var parameter in openZWaveData.Data.Parameters)
                 {
-                    if (parameter.ReadOnly != "0")
-                    {
-                        continue;
-                    }
                     var elementId = ZWaveParameterId(parameter.Id);
                     string currentMessageValueId = elementId + "_message";
                     string currentWrapperControlValueId = elementId + "_wrapper";
                     string currentControlValueId = elementId;
 
-                    string button =
+                    string refreshButton =
                       string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\"> Refresh</button>",
                               homeId, nodeId, parameter.Id, currentMessageValueId, currentWrapperControlValueId, currentControlValueId);
 
                     string label = Invariant($"{BootstrapHtmlHelper.MakeBold(parameter.Label ?? string.Empty)}(#{parameter.Id})");
 
                     var row1 = new GridRow();
+                    string current;
+                    if (parameter.WriteOnly == "1")
+                    {
+                        string writeOnlyMessage = BootstrapHtmlHelper.MakeItalic(Invariant($"<span id=\"{currentMessageValueId}\">Write Only property</span>"));
+                        string currentControlValue = CreateParameterValueControl(parameter, currentControlValueId);
+                        string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\">{currentControlValue}</span>");
 
-                    string notRetrievedMessage = BootstrapHtmlHelper.MakeItalic(Invariant($"<span id=\"{currentMessageValueId}\">Value not retrieved</span>"));
-                    string currentControlValue = CreateParameterValueControl(parameter, currentControlValueId);
-                    string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
+                        current = BootstrapHtmlHelper.MakeMultipleRows(label,
+                                                                       writeOnlyMessage,
+                                                                       currentControlValueWrapper);
+                    }
+                    else
+                    {
+                        string notRetrievedMessage = BootstrapHtmlHelper.MakeItalic(Invariant($"<span id=\"{currentMessageValueId}\">Value not retrieved</span>"));
+                        string currentControlValue = CreateParameterValueControl(parameter, currentControlValueId);
+                        string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
 
-                    string current = BootstrapHtmlHelper.MakeMultipleRows(label,
-                                                                          Invariant($"Default: {parameter.DefaultValueDescription}"),
-                                                                          notRetrievedMessage,
-                                                                          currentControlValueWrapper,
-                                                                          button);
+                        current = BootstrapHtmlHelper.MakeMultipleRows(label,
+                                                                        Invariant($"Default: {parameter.DefaultValueDescription}"),
+                                                                        notRetrievedMessage,
+                                                                        currentControlValueWrapper,
+                                                                        refreshButton);
+                    }
                     row1.AddItem(AddRawHtml(current));
 
                     var options = CreateOptionsDescription(parameter);

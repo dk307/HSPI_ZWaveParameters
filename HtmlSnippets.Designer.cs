@@ -106,9 +106,9 @@ namespace Hspi {
         ///	$.ajax({
         ///		type: &quot;POST&quot;,
         ///		async: &quot;true&quot;,
-        ///		url: &apos;/ZWaveInformation/Update&apos;,
+        ///		url: &apos;/ZWaveParameters/Update&apos;,
         ///		cache: false,
-        ///		data: JSON.stri [rest of string was truncated]&quot;;.
+        ///		data: JSON.strin [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PostForRefreshScript {
             get {

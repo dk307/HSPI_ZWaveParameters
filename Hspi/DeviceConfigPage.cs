@@ -166,7 +166,7 @@ namespace Hspi
 
                     var options = CreateOptionsDescription(parameter);
                     var detailsLabel = AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(parameter.LongerDescription,
-                                                                                           Invariant($"Size:{parameter.Size} Byte(s)"),
+                                                                                           Invariant($"Size: {parameter.Size} Byte(s)"),
                                                                                            options ?? Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}")));
                     row1.AddItem(detailsLabel);
                     parametersView.AddRow(row1);

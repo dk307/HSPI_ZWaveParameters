@@ -152,7 +152,7 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 	$.ajax({
 		type: "POST",
 		async: "true",
-		url: '/ZWaveInformation/Update',
+		url: '/ZWaveParameters/Update',
 		cache: false,
 		data: JSON.stringify(formObject)
 	})  

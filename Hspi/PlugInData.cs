@@ -13,21 +13,21 @@ namespace Hspi
         /// <summary>
         /// The plugin name
         /// </summary>
-        public const string Hs3PlugInName = @"ZWaveInformation";
+        public const string Hs3PlugInName = @"ZWaveParameters";
 
         /// <summary>
         /// The plugin Id
         /// </summary>
-        public const string PlugInId = @"ZWaveInformation";
+        public const string PlugInId = @"ZWaveParameters";
 
         /// <summary>
         /// The plugin name
         /// </summary>
-        public const string PlugInName = @"Z-Wave Information";
+        public const string PlugInName = @"Z-Wave Parameters";
         /// <summary>
         /// The plugin Id
         /// </summary>
-        public const string SettingFileName = @"HSPI_ZWaveInformation.ini";
+        public const string SettingFileName = @"HSPI_ZWaveParameters.ini";
 
         public readonly static string HomeSeerDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
 

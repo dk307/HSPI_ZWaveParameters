@@ -76,18 +76,15 @@ namespace Hspi {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;div id=&quot;accordionstatus{0}&quot; class=&quot;accordion md-accordion&quot; aria-multiselectable=&quot;true&quot;&gt;
-        ///	&lt;div class=&quot;card&quot;&gt;
-        ///	  &lt;div class=&quot;card-header&quot; id=&quot;headingstatus{0}&quot;&gt;
-        ///		  &lt;a data-toggle=&quot;collapse&quot; data-parent=&quot;#accordionstatus{0}&quot; href=&quot;#collapsestatus{0}&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;collapsestatus{0}&quot;&gt;
-        ///				&lt;h5 class=&quot;mb-0&quot;&gt;{1}&lt;i class=&quot;fas fa-angle-down rotate-icon&quot;&gt;&lt;/i&gt;&lt;/h5&gt;
-        ///		  &lt;/a&gt;
-        ///	  &lt;/div&gt;
-        ///	  &lt;div id=&quot;collapsestatus{0}&quot; class=&quot;collapse&quot; aria-labelledby=&quot;headingstatus{0}&quot; data-parent=&quot;#accordi [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to &lt;script&gt;
+        ///$(&apos;#{0}&apos;).ready(function() {{
+        ///    $(&apos;#{1}&apos;).click();
+        ///}});
+        ///&lt;/script&gt;.
         /// </summary>
-        internal static string CollapseHeader {
+        internal static string ClickRefreshButtonScript {
             get {
-                return ResourceManager.GetString("CollapseHeader", resourceCulture);
+                return ResourceManager.GetString("ClickRefreshButtonScript", resourceCulture);
             }
         }
         
@@ -110,8 +107,8 @@ namespace Hspi {
         ///		type: &quot;POST&quot;,
         ///		async: &quot;true&quot;,
         ///		url: &apos;/ZWaveInformation/Update&apos;,
-        ///		cache:false,
-        ///		data: JSON.strin [rest of string was truncated]&quot;;.
+        ///		cache: false,
+        ///		data: JSON.stri [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PostForRefreshScript {
             get {

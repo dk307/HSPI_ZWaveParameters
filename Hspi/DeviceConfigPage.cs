@@ -16,9 +16,10 @@ namespace Hspi
 {
     internal class DeviceConfigPage
     {
-        public DeviceConfigPage(IHsController hsController)
+        public DeviceConfigPage(IHsController hsController, int deviceOrFeatureRef)
         {
             this.HomeSeerSystem = hsController;
+            this.deviceOrFeatureRef = deviceOrFeatureRef;
         }
 
         private IHsController HomeSeerSystem { get; }
@@ -28,7 +29,7 @@ namespace Hspi
             return ((string)hsController.GetPropertyByRef(devOrFeatRef, EProperty.Interface) == ZWaveInterface);
         }
 
-        public async Task<string> BuildConfigPage(int deviceOrFeatureRef, CancellationToken cancellationToken)
+        public async Task<string> BuildConfigPage(CancellationToken cancellationToken)
         {
             var page = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
             if (!IsZwaveDevice(deviceOrFeatureRef))
@@ -67,17 +68,12 @@ namespace Hspi
             var data = openZWaveData.Data;
 
             // Label
-            page = page.WithLabel(NewId(), 
+            page = page.WithLabel(NewId(),
                     BootstrapHtmlHelper.MakeInfoHyperlinkInAnotherTab(BootstrapHtmlHelper.MakeBolder(data.FullName),
                                                                       data.WebUrl));
 
-            // Overview
-            //page = AddCollapsibleCardIfNotEmpty(data.Overview, page, "Overview");
-
             //Parameters
             page = AddParameters(page, openZWaveData, homeId, nodeId.Value);
-
-            //page = AddInclusionSections(page, data);
 
             return page.Page.ToJsonString();
 
@@ -114,65 +110,41 @@ namespace Hspi
             return null; ;
         }
 
-        private PageFactory AddCollapsibleCardIfNotEmpty(string? data, PageFactory page, string name)
-        {
-            if (!string.IsNullOrWhiteSpace(data))
-            {
-                string html = BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), name, data!);
-                return page.WithView(AddRawHtml(html));
-            }
-            return page;
-        }
-
-        private PageFactory AddInclusionSections(PageFactory page, ZWaveInformation data)
-        {
-            // some devices has same value for these fields
-            if (data.Inclusion == data.Exclusion)
-            {
-                page = AddCollapsibleCardIfNotEmpty(data.Inclusion, page, "Inclusion/Exclusion");
-            }
-            else
-            {
-                page = AddCollapsibleCardIfNotEmpty(data.Inclusion, page, "Inclusion");
-                page = AddCollapsibleCardIfNotEmpty(data.Exclusion, page, "Exclusion");
-            }
-
-            return page;
-        }
-
         private PageFactory AddParameters(PageFactory page, OpenZWaveDBInformation openZWaveData,
                                                             string homeId, byte nodeId)
         {
             if (openZWaveData.Data?.Parameters != null && openZWaveData.Data.Parameters.Count > 0)
             {
                 page = page.WithLabel(NewId(), string.Empty, HtmlSnippets.PostForRefreshScript);
+
                 var parametersView = new GridView(NewId(), string.Empty);
-
-                string parametersCardId = NewId();
-
+                var allButtonId = NewId();
                 string allButton =
-                    string.Format("<button type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshAllZWaveParameters('{0}')\"> Refresh all parameters</button>",
-                                   parametersCardId);
+                    string.Format("<button id=\"{1}\" type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshAllZWaveParameters('{0}')\"> Refresh all parameters</button>",
+                                   parametersView.Id, allButtonId);
 
-                var row = new GridRow();
-                row.AddItem(AddRawHtml(HtmlSnippets.AllParametersScript + allButton));
-                parametersView.AddRow(row);
+                page = page.WithLabel(NewId(), string.Empty, (HtmlSnippets.AllParametersScript + allButton));
 
                 foreach (var parameter in openZWaveData.Data.Parameters)
                 {
-                    string currentMessageValueId = NewId();
-                    string currentWrapperControlValueId = NewId();
-                    string currentControlValueId = NewId();
+                    if (parameter.ReadOnly != "0")
+                    {
+                        continue;
+                    }
+                    var elementId = ZWaveParameterId(parameter.Id);
+                    string currentMessageValueId = elementId + "_message";
+                    string currentWrapperControlValueId = elementId + "_wrapper";
+                    string currentControlValueId = elementId;
 
                     string button =
                       string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\"> Refresh</button>",
                               homeId, nodeId, parameter.Id, currentMessageValueId, currentWrapperControlValueId, currentControlValueId);
 
-                    string label = Invariant($"{BootstrapHtmlHelper.MakeNormal(parameter.Label ?? string.Empty)}(#{parameter.Id})");
+                    string label = Invariant($"{BootstrapHtmlHelper.MakeBold(parameter.Label ?? string.Empty)}(#{parameter.Id})");
 
                     var row1 = new GridRow();
 
-                    string notRetrievedMessage = BootstrapHtmlHelper.MakeNormal(Invariant($"<span id=\"{currentMessageValueId}\">Value not retrieved</span>"));
+                    string notRetrievedMessage = BootstrapHtmlHelper.MakeItalic(Invariant($"<span id=\"{currentMessageValueId}\">Value not retrieved</span>"));
                     string currentControlValue = CreateParameterValueControl(parameter, currentControlValueId);
                     string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
 
@@ -184,7 +156,6 @@ namespace Hspi
                     row1.AddItem(AddRawHtml(current));
 
                     var options = CreateOptionsDescription(parameter);
-
                     var detailsLabel = AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(parameter.LongerDescription,
                                                                                            Invariant($"Size:{parameter.Size} Byte(s)"),
                                                                                            options ?? Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}")));
@@ -192,8 +163,9 @@ namespace Hspi
                     parametersView.AddRow(row1);
                 }
 
-                // var view = AddRawHtml(BootstrapHtmlHelper.MakeCollapsibleCard(NewId(), "Parameters", parametersView.ToHtml()), parametersCardId);
                 page = page.WithView(parametersView);
+                string clickRefreshButtonScript = HtmlSnippets.ClickRefreshButtonScript;
+                page = page.WithLabel(NewId(), string.Empty, string.Format(clickRefreshButtonScript, parametersView.Id, allButtonId));
             }
 
             return page;
@@ -206,12 +178,14 @@ namespace Hspi
                 var options = parameter.Options.Select(x => x.Description).ToList();
                 var optionKeys = parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList();
 
+                string script =
+                    Invariant($"<script> const {currentControlValueId}_option = [{string.Join(",", optionKeys)}];</script>");
                 var selectListView = new SelectListView(currentControlValueId,
                                                            string.Empty,
                                                            options,
                                                            optionKeys,
                                                            ESelectListType.DropDown);
-                return selectListView.ToHtml();
+                return script + selectListView.ToHtml();
             }
             else
             {
@@ -231,7 +205,7 @@ namespace Hspi
             }
         }
 
-        private LabelView AddRawHtml(string value,string? id = null)
+        private LabelView AddRawHtml(string value, string? id = null)
         {
             var label = new LabelView(id ?? NewId(), string.Empty, value)
             {
@@ -242,11 +216,17 @@ namespace Hspi
 
         private string NewId()
         {
-            return Invariant($"z-wave{id++}");
+            return Invariant($"z_wave{id++}");
+        }
+
+        private string ZWaveParameterId(int parameter)
+        {
+            return Invariant($"zw_parameter{parameter}");
         }
 
         private const string ZWaveInterface = "Z-Wave";
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private readonly int deviceOrFeatureRef;
         private int id = 0;
     }
 }

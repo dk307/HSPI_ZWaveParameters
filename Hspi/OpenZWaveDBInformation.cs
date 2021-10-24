@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -104,11 +105,9 @@ namespace Hspi
     {
         [JsonProperty("database_id")]
         public string? Id;
-        public string? Inclusion;
         public string? Overview;
         public string? Description;
         public string? Label;
-        public string? Exclusion;
         public DeviceManufacturer? Manufacturer;
         public IReadOnlyList<ZWaveDeviceParameter>? Parameters;
         public IReadOnlyList<DeviceDocuments>? Documents;
@@ -168,7 +167,40 @@ namespace Hspi
                 throw new Exception("Json invalid from database");
             }
 
-            data = obj;
+            // process parameters
+            var map = obj.Parameters.GroupBy(x => x.Id);
+            var finalParameters = new List<ZWaveDeviceParameter>();
+
+            foreach (var group in map)
+            {
+                if (group.Count() == 1)
+                {
+                    finalParameters.Add(group.First());
+                }
+                else
+                {
+                    var result = group.First();
+                    result.Overview = result.Overview ?? string.Empty;
+                    result.Description += result.Description ?? string.Empty;
+
+                    foreach (var item in group)
+                    {
+                        if (item == result)
+                        {
+                            continue;
+                        }
+                        string description =
+                            string.Format(CultureInfo.InvariantCulture, "Bitmask:{0:x}: {1}<BR>", item.Bitmask, item.Label);
+
+                        result.Overview += description;
+                        result.Description += description;
+                    }
+                    finalParameters.Add(result);
+                }
+            }
+            obj.Parameters = finalParameters;
+
+            data = obj with { Parameters = finalParameters.AsReadOnly() };
         }
 
         private static async Task<string> GetCall(string deviceUrl, CancellationToken cancellationToken)

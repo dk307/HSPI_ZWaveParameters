@@ -25,8 +25,8 @@ namespace Hspi
         {
             try
             {
-                DeviceConfigPage page = new DeviceConfigPage(HomeSeerSystem);
-                return page.BuildConfigPage(deviceOrFeatureRef, CancellationToken.None).ResultForSync();
+                DeviceConfigPage page = new DeviceConfigPage(HomeSeerSystem, deviceOrFeatureRef);
+                return page.BuildConfigPage(CancellationToken.None).ResultForSync();
             }
             catch (Exception ex)
             {
@@ -105,13 +105,17 @@ namespace Hspi
 
         protected override bool OnDeviceConfigChange(Page deviceConfigPage, int devOrFeatRef)
         {
+            //
+            deviceConfigPage.RemoveAllViews();
             return true;
         }
 
         private int GetConfiguration(string homeId, byte nodeId, byte param)
         {
+            logger.Info(Invariant($"Getting HomeId:{homeId} NodeId:{nodeId} Parameter:{param}"));
             return (int)HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
         }
+
         private void PluginConfigChanged()
         {
             UpdateDebugLevel();

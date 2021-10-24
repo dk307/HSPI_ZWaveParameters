@@ -126,19 +126,13 @@ function refreshAllZWaveParameters(idParametersGroup) {
 }
 &lt;/script&gt;</value>
   </data>
-  <data name="CollapseHeader" xml:space="preserve">
-    <value>&lt;div id="accordionstatus{0}" class="accordion md-accordion" aria-multiselectable="true"&gt;
-	&lt;div class="card"&gt;
-	  &lt;div class="card-header" id="headingstatus{0}"&gt;
-		  &lt;a data-toggle="collapse" data-parent="#accordionstatus{0}" href="#collapsestatus{0}" aria-expanded="false" aria-controls="collapsestatus{0}"&gt;
-				&lt;h5 class="mb-0"&gt;{1}&lt;i class="fas fa-angle-down rotate-icon"&gt;&lt;/i&gt;&lt;/h5&gt;
-		  &lt;/a&gt;
-	  &lt;/div&gt;
-	  &lt;div id="collapsestatus{0}" class="collapse" aria-labelledby="headingstatus{0}" data-parent="#accordionstatus{0}"&gt;
-		  &lt;div class="card-body"&gt;{2}&lt;/div&gt;
-	  &lt;/div&gt;
-	&lt;/div&gt;
-&lt;/div&gt;</value>
+  <data name="ClickRefreshButtonScript" xml:space="preserve">
+    <value>&lt;script&gt;
+$('#{0}').ready(function() {{
+    $('#{1}').click();
+}});
+&lt;/script&gt;</value>
+    <comment>{0}, {1}</comment>
   </data>
   <data name="PostForRefreshScript" xml:space="preserve">
     <value>&lt;script&gt;
@@ -159,14 +153,21 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 		type: "POST",
 		async: "true",
 		url: '/ZWaveInformation/Update',
-		cache:false,
+		cache: false,
 		data: JSON.stringify(formObject)
 	})  
 	.done(function(msg) {
 		$('#' + idMessage).removeClass("spinner-border");	
 		$('#' + idMessage).hide();
 		$('#' + idValueWrapper).attr("hidden",false);
-		$('#' + idValue).val(msg);	
+
+		if ($('#' + idValue).find('option').length &gt; 0) {		
+			// look up the option js array and set value
+			var index = eval( idValue + '_option').indexOf(parseInt(msg));
+			$('#' + idValue).val(index);		
+		} else {
+			$('#' + idValue).val(msg);	
+		}
 	})
     .fail(function() {
 		$('#' + idMessage).removeClass("spinner-border");	

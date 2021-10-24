@@ -23,6 +23,10 @@ namespace Hspi
         {
             return Invariant($"<span class=\"font-weight-bold\">{data}</span>");
         }
+        public static string MakeItalic(string data)
+        {
+            return Invariant($"<span class=\"font-weight-italic\">{data}</span>");
+        }
 
         public static string MakeNormal(string data)
         {
@@ -43,11 +47,6 @@ namespace Hspi
             }
             stb.Append("</div>");
             return stb.ToString();
-        }
-
-        public static string MakeCollapsibleCard(string id, string header, string body)
-        {
-            return string.Format(HtmlSnippets.CollapseHeader, id, header, body);
         }
     }
 }

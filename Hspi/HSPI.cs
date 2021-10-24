@@ -1,4 +1,4 @@
-﻿namespace HSPI_ZWaveInformation
+﻿namespace HSPI_ZWaveParameters
 {
     /// <summary>
     /// This enables HomeSeer to load the plugin directly.

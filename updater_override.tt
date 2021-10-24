@@ -6,17 +6,17 @@
  "Version":"4.0.0.0",
  "Packages":[
   {
-    "PackageName": "ZWaveInformation",
-    "EXEFile": "HSPI_ZWaveInformation.exe",
-    "ID": "ZWaveInformation",
+    "PackageName": "ZWaveParameters",
+    "EXEFile": "HSPI_ZWaveParameters.exe",
+    "ID": "ZWaveParameters",
     "Version": "<#=version#>",
     "UC": 63,
-    "ZipFile": "HSPI_ZWaveInformation_<#=version#>.zip",
+    "ZipFile": "HSPI_ZWaveParameters_<#=version#>.zip",
     "Author": "dk307",
     "Price": "Free",
-    "ReleaseNotesURL": "https://github.com/dk307/HSPI_ZWaveInformation",
-    "ShortDescription": "Show Z-wave device information",
-    "SupportURL": "https://github.com/dk307/HSPI_ZWaveInformation/issues",
+    "ReleaseNotesURL": "https://github.com/dk307/HSPI_ZWaveParameters",
+    "ShortDescription": "Show Z-wave parameters & update them",
+    "SupportURL": "https://github.com/dk307/HSPI_ZWaveParameters/issues",
     "Tags": [
       "Free",
       "Beta"

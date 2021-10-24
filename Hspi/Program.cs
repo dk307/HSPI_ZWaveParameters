@@ -12,7 +12,7 @@
 
             try
             {
-                using var plugin = new HSPI_ZWaveInformation.HSPI();
+                using var plugin = new HSPI_ZWaveParameters.HSPI();
                 plugin.Connect(args);
             }
             finally

@@ -18,9 +18,9 @@ build_script:
 
     nuget restore
 
-    msbuild "C:\projects\hspi-zwaveinformation\HSPI_ZWaveInformation.sln" /m /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:Platform="Any CPU"
+    msbuild "C:\projects\hspi-zwaveparameters\HSPI_ZWaveParameters.sln" /m /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:Platform="Any CPU"
 after_build:
- - ps: Get-ChildItem bin\Release\HSPI_ZWaveInformation*.zip | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+ - ps: Get-ChildItem bin\Release\HSPI_ZWaveParameters*.zip | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 artifacts:
 - path: bin\Release\updater_override.json
   name: config

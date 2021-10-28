@@ -12,18 +12,6 @@ using static System.FormattableString;
 
 namespace Hspi.OpenZWaveDB
 {
-    internal record ZWaveDevice
-    {
-        [JsonProperty("version_min")]
-        public Version? VersionMin { get; init; }
-
-        [JsonProperty("version_max")]
-        public Version? VersionMax { get; init; }
-
-        [JsonProperty("id")]
-        public int? Id { get; init; }
-    }
-
     internal class OpenZWaveDBInformation
     {
         public OpenZWaveDBInformation(int manufactureId, int productType, int productId, Version firmware)
@@ -38,33 +26,7 @@ namespace Hspi.OpenZWaveDB
 
         public async Task Update(CancellationToken cancellationToken)
         {
-            string listUrl = string.Format(listUrlFormat, manufactureId, productType, productId);
-            var listJson = await GetCall(listUrl, cancellationToken).ConfigureAwait(false);
-
-            var jobject = JObject.Parse(listJson);
-            var devices = jobject?["devices"]?.ToObject<ZWaveDevice[]>() ?? throw new Exception("Device not found in z-wave database");
-
-            logger.Debug(Invariant($"Found {devices.Length} devices for manufactureId:{manufactureId} productType:{productType} productId:{productId}"));
-
-            int? id = null;
-            foreach (var device in devices)
-            {
-                if ((device.VersionMin != null) && (device.VersionMax != null))
-                {
-                    if ((firmware >= device.VersionMin) && (firmware <= device.VersionMax))
-                    {
-                        logger.Debug(Invariant($"Found Specific device {device.Id} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}"));
-                        id = device.Id;
-                        break;
-                    }
-                }
-            }
-
-            if (id == null)
-            {
-                logger.Warn(Invariant($"No Firmware matching found for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}. Picking first in list"));
-                id = devices.First().Id;
-            }
+            var id = await GetDeviceId(cancellationToken).ConfigureAwait(false);
 
             string deviceUrl = string.Format(deviceUrlFormat, id);
             var deviceJson = await GetCall(deviceUrl, cancellationToken).ConfigureAwait(false);
@@ -122,6 +84,39 @@ namespace Hspi.OpenZWaveDB
             //}
 
             data = obj with { ParametersById = map.ToList().AsReadOnly() };
+        }
+
+        private async Task<int> GetDeviceId(CancellationToken cancellationToken)
+        {
+            string listUrl = string.Format(listUrlFormat, manufactureId, productType, productId);
+            var listJson = await GetCall(listUrl, cancellationToken).ConfigureAwait(false);
+
+            var jobject = JObject.Parse(listJson);
+            var devices = jobject?["devices"]?.ToObject<ZWaveDevice[]>() ?? throw new Exception("Device not found in z-wave database");
+
+            logger.Debug(Invariant($"Found {devices.Length} devices for manufactureId:{manufactureId} productType:{productType} productId:{productId}"));
+
+            int? id = null;
+            foreach (var device in devices)
+            {
+                if ((device.VersionMin != null) && (device.VersionMax != null))
+                {
+                    if ((firmware >= device.VersionMin) && (firmware <= device.VersionMax))
+                    {
+                        logger.Debug(Invariant($"Found Specific device {device.Id} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}"));
+                        id = device.Id;
+                        break;
+                    }
+                }
+            }
+
+            if (id == null)
+            {
+                logger.Warn(Invariant($"No Firmware matching found for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}. Picking first in list"));
+                id = devices.First().Id;
+            }
+
+            return id ?? throw new Exception("Device not found in the database");
         }
 
         private static async Task<string> GetCall(string deviceUrl, CancellationToken cancellationToken)

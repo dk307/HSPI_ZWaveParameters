@@ -18,6 +18,7 @@ namespace Hspi
     {
         public DeviceConfigPage(IHsController hsController, int deviceOrFeatureRef)
         {
+            logger.Debug(Invariant($"Creating Page for {deviceOrFeatureRef}"));
             this.zwaveConnection = new ZWaveConnection(hsController);
             this.deviceOrFeatureRef = deviceOrFeatureRef;
         }

@@ -128,7 +128,7 @@ namespace Hspi
         private static string CreateParameterValueControl(ZWaveDeviceParameter parameter, string id)
         {
             string scriptBitmask =
-                Invariant($"<script> const {id}_mask = {parameter.Bitmask};</script>");
+                Invariant($"<script> const {id}_mask = 0x{parameter.Bitmask:x};</script>");
             if (parameter.HasOptions)
             {
                 var options = parameter.Options.Select(x => x.Description).ToList();

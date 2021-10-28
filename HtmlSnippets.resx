@@ -186,6 +186,6 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 		$('#' + idMessage).removeClass("spinner-border");	
     });
 }
-&lt;/script&gt;\</value>
+&lt;/script&gt;</value>
   </data>
 </root>

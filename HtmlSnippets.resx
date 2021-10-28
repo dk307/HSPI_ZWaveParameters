@@ -156,17 +156,25 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 		cache: false,
 		data: JSON.stringify(formObject)
 	})  
-	.done(function(msg) {
+	.done(function(parameterValue) {
 		$('#' + idMessage).removeClass("spinner-border");	
 		$('#' + idMessage).hide();
 		$('#' + idValueWrapper).attr("hidden",false);
+		
+		
+		// apply mask
+		var bitmask = eval( idValue + '_mask');
+
+		if (bitmask != 0) {
+			parameterValue &amp;= bitmask;
+		}
 
 		if ($('#' + idValue).find('option').length &gt; 0) {		
 			// look up the option js array and set value
-			var index = eval( idValue + '_option').indexOf(parseInt(msg));
+			var index = eval( idValue + '_option').indexOf(parseInt(parameterValue));
 			$('#' + idValue).val(index);		
 		} else {
-			$('#' + idValue).val(msg);	
+			$('#' + idValue).val(parameterValue);	
 		}
 	})
     .fail(function() {
@@ -178,6 +186,6 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 		$('#' + idMessage).removeClass("spinner-border");	
     });
 }
-&lt;/script&gt;</value>
+&lt;/script&gt;\</value>
   </data>
 </root>

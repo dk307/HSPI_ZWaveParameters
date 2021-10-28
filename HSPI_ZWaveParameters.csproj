@@ -87,7 +87,11 @@
     <Compile Include="Hspi\BootstrapHtmlHelper.cs" />
     <Compile Include="Hspi\DeviceConfigPage.cs" />
     <Compile Include="Hspi\HSPI.cs" />
-    <Compile Include="Hspi\OpenZWaveDBInformation.cs" />
+    <Compile Include="Hspi\OpenZWaveDB\ZWaveDeviceManufacturer.cs" />
+    <Compile Include="Hspi\OpenZWaveDB\OpenZWaveDBInformation.cs" />
+    <Compile Include="Hspi\OpenZWaveDB\ZWaveDeviceParameter.cs" />
+    <Compile Include="Hspi\OpenZWaveDB\ZWaveDeviceParameterOption.cs" />
+    <Compile Include="Hspi\OpenZWaveDB\ZWaveInformation.cs" />
     <Compile Include="Hspi\PlugIn.cs" />
     <Compile Include="Hspi\PluginConfig.cs" />
     <Compile Include="Hspi\PlugInData.cs" />

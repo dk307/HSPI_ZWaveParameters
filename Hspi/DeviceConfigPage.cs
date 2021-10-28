@@ -1,6 +1,7 @@
 ﻿using HomeSeer.Jui.Types;
 using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
+using Hspi.OpenZWaveDB;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -26,7 +27,8 @@ namespace Hspi
             var page = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
             var zwaveData = zwaveConnection.GetDeviceZWaveData(this.deviceOrFeatureRef);
 
-            var openZWaveData = new OpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType, zwaveData.ProductId);
+            var openZWaveData = new OpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType,
+                                                           zwaveData.ProductId, zwaveData.Firmware);
 
             await openZWaveData.Update(cancellationToken);
 
@@ -62,7 +64,7 @@ namespace Hspi
             {
                 byte parameter = checked((byte)ZWaveParameterFromId(view.Id));
 
-                var parameterInfo = data.Parameters.FirstOrDefault(x => x.Id == parameter);
+                var parameterInfo = data.Parameters.FirstOrDefault(x => x.ParameterId == parameter);
                 if ((parameterInfo == null) || (parameterInfo.Size == 0))
                 {
                     throw new Exception("Z-wave paramater information not found");
@@ -123,21 +125,23 @@ namespace Hspi
             return null; ;
         }
 
-        private static string CreateParameterValueControl(ZWaveDeviceParameter parameter, string currentControlValueId)
+        private static string CreateParameterValueControl(ZWaveDeviceParameter parameter, string id)
         {
+            string scriptBitmask =
+                Invariant($"<script> const {id}_mask = {parameter.Bitmask};</script>");
             if (parameter.HasOptions)
             {
                 var options = parameter.Options.Select(x => x.Description).ToList();
                 var optionKeys = parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList();
 
                 string script =
-                    Invariant($"<script> const {currentControlValueId}_option = [{string.Join(",", optionKeys)}];</script>");
-                var selectListView = new SelectListView(currentControlValueId,
+                    Invariant($"<script> const {id}_option = [{string.Join(",", optionKeys)}];</script>");
+                var selectListView = new SelectListView(id,
                                                            string.Empty,
                                                            options,
                                                            optionKeys,
                                                            ESelectListType.DropDown);
-                return script + selectListView.ToHtml();
+                return scriptBitmask + script + selectListView.ToHtml();
             }
             else
             {
@@ -145,12 +149,7 @@ namespace Hspi
                 stb.Append("Value");
 
                 stb.Append('(');
-
-                // Range is not correct if there is bitmask
-                if (!parameter.HasMultipleValues)
-                {
-                    stb.Append(Invariant($" {parameter.Minimum}-{parameter.Maximum} "));
-                }
+                stb.Append(Invariant($" {parameter.Minimum}-{parameter.Maximum} "));
 
                 if (!string.IsNullOrWhiteSpace(parameter.Units))
                 {
@@ -158,8 +157,8 @@ namespace Hspi
                 }
                 stb.Append(')');
 
-                return (new InputView(currentControlValueId, stb.ToString(),
-                                                             EInputType.Number)).ToHtml();
+                InputView inputView = new InputView(id, stb.ToString(), EInputType.Number);
+                return scriptBitmask + inputView.ToHtml();
             }
         }
 
@@ -175,45 +174,37 @@ namespace Hspi
             throw new ArgumentException("Not a ZWave Parameter", nameof(idParameter));
         }
 
-        private static string ZWaveParameterId(int parameter)
+        private static string CreateZWaveParameterId(int parameter)
         {
             return Invariant($"{ZWaveParameterPrefix}{parameter}");
         }
 
         private PageFactory AddParameters(PageFactory page, OpenZWaveDBInformation openZWaveData,
-                                                                            string homeId, byte nodeId)
+                                             string homeId, byte nodeId)
         {
             if (openZWaveData.Data?.Parameters != null && openZWaveData.Data.Parameters.Count > 0)
             {
-                page = page.WithLabel(NewId(), string.Empty, HtmlSnippets.PostForRefreshScript);
-
                 var parametersView = new GridView(NewId(), string.Empty);
-                var allButtonId = NewId();
-                string allButton =
-                    string.Format("<button id=\"{1}\" type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshAllZWaveParameters('{0}')\"> Refresh all parameters</button>",
-                                   parametersView.Id, allButtonId);
-
-                page = page.WithLabel(NewId(), string.Empty, (HtmlSnippets.AllParametersScript + allButton));
+                page = CreateAllParameterRefreshButton(page, parametersView.Id, out var allButtonId);
 
                 foreach (var parameter in openZWaveData.Data.Parameters)
                 {
-                    var elementId = ZWaveParameterId(parameter.Id);
+                    var elementId = CreateZWaveParameterId(parameter.Id);
                     string currentMessageValueId = elementId + "_message";
                     string currentWrapperControlValueId = elementId + "_wrapper";
-                    string currentControlValueId = elementId;
 
                     string refreshButton =
                       string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\"> Refresh</button>",
-                              homeId, nodeId, parameter.Id, currentMessageValueId, currentWrapperControlValueId, currentControlValueId);
+                              homeId, nodeId, parameter.ParameterId, currentMessageValueId, currentWrapperControlValueId, elementId);
 
-                    string label = Invariant($"{BootstrapHtmlHelper.MakeBold(parameter.Label ?? string.Empty)}(#{parameter.Id})");
+                    string label = Invariant($"{BootstrapHtmlHelper.MakeBold(parameter.Label ?? string.Empty)}(#{parameter.ParameterId})");
 
                     var row1 = new GridRow();
                     string current;
                     if (parameter.WriteOnly == "1")
                     {
                         string writeOnlyMessage = BootstrapHtmlHelper.MakeItalic(Invariant($"<span id=\"{currentMessageValueId}\">Write Only property</span>"));
-                        string currentControlValue = CreateParameterValueControl(parameter, currentControlValueId);
+                        string currentControlValue = CreateParameterValueControl(parameter, elementId);
                         string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\">{currentControlValue}</span>");
 
                         current = BootstrapHtmlHelper.MakeMultipleRows(label,
@@ -223,7 +214,7 @@ namespace Hspi
                     else
                     {
                         string notRetrievedMessage = BootstrapHtmlHelper.MakeItalic(Invariant($"<span id=\"{currentMessageValueId}\">Value not retrieved</span>"));
-                        string currentControlValue = CreateParameterValueControl(parameter, currentControlValueId);
+                        string currentControlValue = CreateParameterValueControl(parameter, elementId);
                         string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
 
                         current = BootstrapHtmlHelper.MakeMultipleRows(label,
@@ -250,6 +241,19 @@ namespace Hspi
             return page;
         }
 
+        private PageFactory CreateAllParameterRefreshButton(PageFactory page, string containerToClickButtonId, out string allButtonId)
+        {
+            page = page.WithLabel(NewId(), string.Empty, HtmlSnippets.PostForRefreshScript);
+
+            allButtonId = NewId();
+            string allButton =
+                string.Format("<button id=\"{1}\" type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshAllZWaveParameters('{0}')\"> Refresh all parameters</button>",
+                                containerToClickButtonId, allButtonId);
+
+            page = page.WithLabel(NewId(), string.Empty, (HtmlSnippets.AllParametersScript + allButton));
+            return page;
+        }
+
         private LabelView AddRawHtml(string value, string? id = null)
         {
             var label = new LabelView(id ?? NewId(), string.Empty, value)
@@ -261,7 +265,7 @@ namespace Hspi
 
         private string NewId()
         {
-            return Invariant($"z_wave_{id++}");
+            return Invariant($"z_wave_paramater_{id++}");
         }
 
         private const string ZWaveParameterPrefix = "zw_parameter_";

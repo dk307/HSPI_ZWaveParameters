@@ -34,14 +34,16 @@ namespace Hspi
 
             var nodeId = GetValueFromExtraData<Byte>(plugInData, "node_id");
             var homeId = plugInData["homeid"];
+            var firmware = plugInData["node_version_app"];
 
             if (!manufacturerId.HasValue || !productType.HasValue ||
-                    !productId.HasValue || !nodeId.HasValue || homeId == null)
+                    !productId.HasValue || !nodeId.HasValue || homeId == null || string.IsNullOrWhiteSpace(firmware))
             {
                 throw new Exception("Device Z-Wave plugin data is not valid");
             }
 
-            var zwaveData = new ZWaveData(manufacturerId.Value, productId.Value, productType.Value, nodeId.Value, homeId);
+            var zwaveData = new ZWaveData(manufacturerId.Value, productId.Value, 
+                                            productType.Value, nodeId.Value, homeId, new Version(firmware));
             return zwaveData;
         }
 
@@ -70,7 +72,7 @@ namespace Hspi
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
         private const string ZWaveInterface = "Z-Wave";
-        public record ZWaveData(int ManufactureId, ushort ProductId, ushort ProductType, byte NodeId, string HomeId);
+        public record ZWaveData(int ManufactureId, ushort ProductId, ushort ProductType, byte NodeId, string HomeId, Version Firmware);
         private readonly IHsController HomeSeerSystem;
     }
 }

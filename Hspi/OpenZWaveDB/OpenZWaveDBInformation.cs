@@ -112,7 +112,7 @@ namespace Hspi.OpenZWaveDB
 
             if (id == null)
             {
-                logger.Warn(Invariant($"No Firmware matching found for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}. Picking first in list"));
+                logger.Warn(Invariant($"No matching firmware found for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}. Picking first in list"));
                 id = devices.First().Id;
             }
 
@@ -126,7 +126,6 @@ namespace Hspi.OpenZWaveDB
             result.EnsureSuccessStatusCode();
 
             var json = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
-
             return json;
         }
 

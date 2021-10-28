@@ -201,7 +201,7 @@ namespace Hspi
 
                     var row1 = new GridRow();
                     string current;
-                    if (parameter.WriteOnly == "1")
+                    if (parameter.WriteOnly)
                     {
                         string writeOnlyMessage = BootstrapHtmlHelper.MakeItalic(Invariant($"<span id=\"{currentMessageValueId}\">Write Only property</span>"));
                         string currentControlValue = CreateParameterValueControl(parameter, elementId);

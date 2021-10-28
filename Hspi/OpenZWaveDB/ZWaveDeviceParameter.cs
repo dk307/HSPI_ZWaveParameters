@@ -27,12 +27,18 @@ namespace Hspi.OpenZWaveDB
         public int Default { get; init; }
 
         [JsonProperty("read_only")]
-        public string? ReadOnly { get; init; }
+        private string? ReadOnlyJson { get; init; }
 
         [JsonProperty("write_only")]
-        public string? WriteOnly { get; init; }
+        private string? WriteOnlyJson { get; init; }
 
         public IReadOnlyList<ZWaveDeviceParameterOption>? Options { get; init; }
+
+        [JsonIgnore]
+        public bool WriteOnly => WriteOnlyJson == "1";
+
+        [JsonIgnore]
+        public bool ReadOnly => ReadOnlyJson == "1";
 
         [JsonIgnore]
         public string LongerDescription
@@ -59,7 +65,6 @@ namespace Hspi.OpenZWaveDB
                 }
             }
         }
-
 
         [JsonIgnore]
         public bool HasOptions => Options != null && Options.Count > 0;

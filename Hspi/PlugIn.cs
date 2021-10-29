@@ -43,7 +43,7 @@ namespace Hspi
 
         public override bool HasJuiDeviceConfigPage(int devOrFeatRef)
         {
-            ZWaveConnection connection = new ZWaveConnection(HomeSeerSystem);
+            var connection = new ZWaveConnection(HomeSeerSystem);
             return connection.IsZwaveDevice(devOrFeatRef);
         }
 

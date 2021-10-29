@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -31,10 +32,10 @@ namespace Hspi.OpenZWaveDB
             string deviceUrl = string.Format(deviceUrlFormat, id);
             var deviceJson = await GetCall(deviceUrl, cancellationToken).ConfigureAwait(false);
 
-            JsonSerializer serializer = new JsonSerializer();
+            var serializer = new JsonSerializer();
 
-            using StringReader stringReader = new StringReader(deviceJson);
-            using JsonTextReader reader = new JsonTextReader(stringReader);
+            using var stringReader = new StringReader(deviceJson);
+            using var reader = new JsonTextReader(stringReader);
             var obj = serializer.Deserialize<ZWaveInformation>(reader);
             if (obj == null)
             {
@@ -44,46 +45,45 @@ namespace Hspi.OpenZWaveDB
             // process parameters
             var map = obj.Parameters.GroupBy(x => x.ParameterId);
 
-            //var finalParameters = new List<ZWaveDeviceParameter>();
+            var finalParameters = new List<ZWaveDeviceParameter>();
 
-            //foreach (var group in map)
-            //{
-            //    if (group.Count() == 1)
-            //    {
-            //        finalParameters.Add(group.First());
-            //    }
-            //    else
-            //    {
-            //        var result = group.First();
+            foreach (var group in map)
+            {
+                if (group.Count() == 1)
+                {
+                    finalParameters.Add(group.First());
+                }
+                else
+                {
+                    var result = group.First();
 
-            //        List<string> extra = new List<string>();
-            //        foreach (var item in group)
-            //        {
-            //            if (item == result)
-            //            {
-            //                continue;
-            //            }
-            //            extra.Add(
-            //                string.Format(CultureInfo.InvariantCulture, "Bitmask:{0:x}: {1}", item.Bitmask, item.Label));
-            //        }
-            //        string extraDescription = NewLine + string.Join(NewLine, extra);
+                    //var extra = new List<string>();
+                    //foreach (var item in group)
+                    //{
+                    //    if (item == result)
+                    //    {
+                    //        continue;
+                    //    }
+                    //    extra.Add(
+                    //        string.Format(CultureInfo.InvariantCulture, "Bitmask:{0:x}: {1}", item.Bitmask, item.Label));
+                    //}
 
-            //        string overview = result.Overview ?? string.Empty;
-            //        string description = result.Description ?? string.Empty;
+                    //string extraDescription = NewLine + string.Join(NewLine, extra);
 
-            //        overview += extraDescription;
-            //        description += extraDescription;
+                    //string overview = result.Overview ?? string.Empty;
+                    //string description = result.Description ?? string.Empty;
 
-            //        finalParameters.Add(result with
-            //        {
-            //            Overview = overview,
-            //            Description = description,
-            //            HasMultipleValues = true
-            //        });
-            //    }
-            //}
+                    //overview += extraDescription;
+                    //description += extraDescription;
 
-            data = obj with { ParametersById = map.ToList().AsReadOnly() };
+                    finalParameters.Add(result with
+                    {
+                        SubParameters = group.Skip(1).ToList().AsReadOnly(),
+                    });
+                }
+            }
+
+            data = obj with { Parameters = finalParameters.AsReadOnly() };
         }
 
         private async Task<int> GetDeviceId(CancellationToken cancellationToken)
@@ -132,7 +132,7 @@ namespace Hspi.OpenZWaveDB
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
         private const string NewLine = "<BR>";
-        private static readonly HttpClient httpClient = new HttpClient();
+        private static readonly HttpClient httpClient = new();
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int manufactureId;
         private readonly int productId;

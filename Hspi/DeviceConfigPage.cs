@@ -3,6 +3,7 @@ using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
 using Hspi.OpenZWaveDB;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -63,9 +64,9 @@ namespace Hspi
 
             foreach (var view in changes.Views)
             {
-                byte parameter = checked((byte)ZWaveParameterFromId(view.Id));
+                byte id = checked((byte)ZWaveParameterFromId(view.Id));
 
-                var parameterInfo = data.Parameters.FirstOrDefault(x => x.ParameterId == parameter);
+                var parameterInfo = data.Parameters.FirstOrDefault(x => x.Id == id);
                 if ((parameterInfo == null) || (parameterInfo.Size == 0))
                 {
                     throw new Exception("Z-wave paramater information not found");
@@ -100,7 +101,7 @@ namespace Hspi
                 {
                     zwaveConnection.UpdateDeviceParameter(zwaveData.HomeId,
                                                           zwaveData.NodeId,
-                                                          parameter,
+                                                          parameterInfo.ParameterId,
                                                           parameterInfo.Size,
                                                           value.Value);
                 }
@@ -115,7 +116,7 @@ namespace Hspi
         {
             if (parameter.HasOptions)
             {
-                StringBuilder stb = new StringBuilder();
+                var stb = new StringBuilder();
                 stb.Append("Options:<BR>");
                 foreach (var option in parameter.Options!)
                 {
@@ -123,44 +124,54 @@ namespace Hspi
                 }
                 return stb.ToString();
             }
-            return null; ;
+            return null;
         }
 
         private static string CreateParameterValueControl(ZWaveDeviceParameter parameter, string id)
         {
-            string scriptBitmask =
-                Invariant($"<script> const {id}_mask = 0x{parameter.Bitmask:x};</script>");
-            if (parameter.HasOptions)
+            var stb = new StringBuilder();
+
+            stb.Append(Invariant($"<script> const {id}_mask = 0x{parameter.Bitmask:x};</script>"));
+
+            if (parameter.HasOptions && !parameter.HasSubParameters)
             {
                 var options = parameter.Options.Select(x => x.Description).ToList();
                 var optionKeys = parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList();
 
-                string script =
-                    Invariant($"<script> const {id}_option = [{string.Join(",", optionKeys)}];</script>");
+                stb.Append(Invariant($"<script> const {id}_optionkeys = [{string.Join(",", optionKeys)}];</script>"));
+
                 var selectListView = new SelectListView(id,
-                                                           string.Empty,
-                                                           options,
-                                                           optionKeys,
-                                                           ESelectListType.DropDown);
-                return scriptBitmask + script + selectListView.ToHtml();
+                                                        string.Empty,
+                                                        options,
+                                                        ESelectListType.DropDown);
+                stb.Append(selectListView.ToHtml());
+
+                // Have not found a away to make it readonly
             }
             else
             {
-                var stb = new StringBuilder();
-                stb.Append("Value");
+                var stb2 = new StringBuilder();
+                stb2.Append("Value");
 
-                stb.Append('(');
-                stb.Append(Invariant($" {parameter.Minimum}-{parameter.Maximum} "));
+                stb2.Append('(');
+                stb2.Append(Invariant($" {parameter.Minimum}-{parameter.Maximum} "));
 
                 if (!string.IsNullOrWhiteSpace(parameter.Units))
                 {
-                    stb.Append(parameter.Units);
+                    stb2.Append(parameter.Units);
                 }
-                stb.Append(')');
+                stb2.Append(')');
 
-                InputView inputView = new InputView(id, stb.ToString(), EInputType.Number);
-                return scriptBitmask + inputView.ToHtml();
+                var inputView = new InputView(id, stb2.ToString(), EInputType.Number);
+                stb.Append(inputView.ToHtml());
+
+                if (parameter.ReadOnly)
+                {
+                    stb.Append(Invariant($"<script>$(\"#{id}\").attr('readonly', 'readonly');</script>"));
+                }
             }
+
+            return stb.ToString();
         }
 
         private static int ZWaveParameterFromId(string idParameter)
@@ -190,48 +201,15 @@ namespace Hspi
 
                 foreach (var parameter in openZWaveData.Data.Parameters)
                 {
-                    var elementId = CreateZWaveParameterId(parameter.Id);
-                    string currentMessageValueId = elementId + "_message";
-                    string currentWrapperControlValueId = elementId + "_wrapper";
+                    var row = new GridRow();
 
-                    string refreshButton =
-                      string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\"> Refresh</button>",
-                              homeId, nodeId, parameter.ParameterId, currentMessageValueId, currentWrapperControlValueId, elementId);
+                    var current = CreateGetSetView(parameter, homeId, nodeId);
+                    row.AddItem(current);
 
-                    string label = Invariant($"{BootstrapHtmlHelper.MakeBold(parameter.Label ?? string.Empty)}(#{parameter.ParameterId})");
+                    var detailsLabel = CreateDescriptionView(parameter);
+                    row.AddItem(detailsLabel);
 
-                    var row1 = new GridRow();
-                    string current;
-                    if (parameter.WriteOnly)
-                    {
-                        string writeOnlyMessage = BootstrapHtmlHelper.MakeItalic(Invariant($"<span id=\"{currentMessageValueId}\">Write Only property</span>"));
-                        string currentControlValue = CreateParameterValueControl(parameter, elementId);
-                        string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\">{currentControlValue}</span>");
-
-                        current = BootstrapHtmlHelper.MakeMultipleRows(label,
-                                                                       writeOnlyMessage,
-                                                                       currentControlValueWrapper);
-                    }
-                    else
-                    {
-                        string notRetrievedMessage = BootstrapHtmlHelper.MakeItalic(Invariant($"<span id=\"{currentMessageValueId}\">Value not retrieved</span>"));
-                        string currentControlValue = CreateParameterValueControl(parameter, elementId);
-                        string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
-
-                        current = BootstrapHtmlHelper.MakeMultipleRows(label,
-                                                                        Invariant($"Default: {parameter.DefaultValueDescription}"),
-                                                                        notRetrievedMessage,
-                                                                        currentControlValueWrapper,
-                                                                        refreshButton);
-                    }
-                    row1.AddItem(AddRawHtml(current));
-
-                    var options = CreateOptionsDescription(parameter);
-                    var detailsLabel = AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(parameter.LongerDescription,
-                                                                                           Invariant($"Size: {parameter.Size} Byte(s)"),
-                                                                                           options ?? Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}")));
-                    row1.AddItem(detailsLabel);
-                    parametersView.AddRow(row1);
+                    parametersView.AddRow(row);
                 }
 
                 page = page.WithView(parametersView);
@@ -240,6 +218,53 @@ namespace Hspi
             }
 
             return page;
+        }
+
+        private LabelView CreateGetSetView(ZWaveDeviceParameter parameter, string homeId, byte nodeId)
+        {
+            var elementId = CreateZWaveParameterId(parameter.Id);
+            string currentMessageValueId = elementId + "_message";
+            string currentWrapperControlValueId = elementId + "_wrapper";
+
+            string refreshButton =
+              string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\">Refresh</button>",
+                      homeId, nodeId, parameter.ParameterId, currentMessageValueId, currentWrapperControlValueId, elementId);
+
+            var list = new List<string>
+            {
+                Invariant($"{BootstrapHtmlHelper.MakeBold(parameter.Label ?? string.Empty)}(#{parameter.ParameterId})")
+            };
+
+            var topMessage = parameter.WriteOnly ? "Write Only parameter" : "Value not retrieved";
+            string notRetrievedMessage = Invariant($"<span id=\"{currentMessageValueId}\">{topMessage}</span>");
+            list.Add(BootstrapHtmlHelper.MakeItalic(notRetrievedMessage));
+
+            string currentControlValue = CreateParameterValueControl(parameter, elementId);
+            if (parameter.ReadOnly)
+            {
+                string readonlyMessage = BootstrapHtmlHelper.MakeItalic("Read only parameter");
+                currentControlValue = BootstrapHtmlHelper.MakeMultipleRows(readonlyMessage, currentControlValue);
+            }
+
+            string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
+            list.Add(currentControlValueWrapper);
+
+            if (!parameter.WriteOnly)
+            {
+                list.Add(refreshButton);
+            }
+
+            var current = BootstrapHtmlHelper.MakeMultipleRows(list.ToArray());
+            return AddRawHtml(current);
+        }
+
+        private LabelView CreateDescriptionView(ZWaveDeviceParameter parameter)
+        {
+            var options = CreateOptionsDescription(parameter);
+            var detailsLabel = AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(parameter.LongerDescription,
+                                                                                   Invariant($"Size: {parameter.Size} Byte(s)"),
+                                                                                   options ?? Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}")));
+            return detailsLabel;
         }
 
         private PageFactory CreateAllParameterRefreshButton(PageFactory page, string containerToClickButtonId, out string allButtonId)

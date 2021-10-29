@@ -10,7 +10,7 @@ namespace Hspi.OpenZWaveDB
     internal record ZWaveDeviceParameter
     {
         [JsonProperty("param_id")]
-        public int ParameterId { get; init; }
+        public byte ParameterId { get; init; }
 
         [JsonProperty("id")]
         public int Id { get; init; }
@@ -32,10 +32,19 @@ namespace Hspi.OpenZWaveDB
         [JsonProperty("write_only")]
         private string? WriteOnlyJson { get; init; }
 
+        [JsonProperty("limit_options")]
+        private string? LimitOptionsJson { get; init; }
+
         public IReadOnlyList<ZWaveDeviceParameterOption>? Options { get; init; }
 
         [JsonIgnore]
         public bool WriteOnly => WriteOnlyJson == "1";
+
+        [JsonIgnore]
+        public bool LimitOptions => LimitOptionsJson == "1";
+
+        [JsonIgnore]
+        public IReadOnlyList<ZWaveDeviceParameter>? SubParameters { get; init; }
 
         [JsonIgnore]
         public bool ReadOnly => ReadOnlyJson == "1";
@@ -68,5 +77,8 @@ namespace Hspi.OpenZWaveDB
 
         [JsonIgnore]
         public bool HasOptions => Options != null && Options.Count > 0;
+
+        [JsonIgnore]
+        public bool HasSubParameters => SubParameters != null && SubParameters.Count > 0;
     }
 }

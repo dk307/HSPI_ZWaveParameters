@@ -168,13 +168,17 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 		if (bitmask != 0) {
 			parameterValue &amp;= bitmask;
 		}
+		
+		var obj = $('#' + idValue);
 
-		if ($('#' + idValue).find('option').length &gt; 0) {		
+		// select
+		if (obj.find('option').length &gt; 0) {		
 			// look up the option js array and set value
-			var index = eval( idValue + '_option').indexOf(parseInt(parameterValue));
-			$('#' + idValue).val(index);		
+			var index = eval(idValue + '_optionkeys').indexOf(parseInt(parameterValue));
+			obj.val(index);		
 		} else {
-			$('#' + idValue).val(parameterValue);	
+			//input	
+			obj.val(parameterValue);	
 		}
 	})
     .fail(function() {

@@ -17,24 +17,25 @@ namespace Hspi.OpenZWaveDB
         public ZWaveDeviceManufacturer? Manufacturer { get; init; }
         public IReadOnlyList<ZWaveDeviceParameter>? Parameters { get; init; }
 
-        public IReadOnlyList<IGrouping<int, ZWaveDeviceParameter>>? ParametersById { get; init; }
 
         [JsonIgnore]
         public string FullName
         {
             get
             {
-                var listName = new List<string?>();
-                listName.Add(Manufacturer?.Label);
-                listName.Add(Description);
-                listName.Add("(" + Label + ")");
+                var listName = new List<string?>
+                {
+                    Manufacturer?.Label,
+                    Description,
+                    "(" + Label + ")"
+                };
 
                 return string.Join(" ", listName.Where(s => !string.IsNullOrEmpty(s)));
             }
         }
 
         [JsonIgnore]
-        public Uri WebUrl => new Uri(string.Format(webUrlFormat, Id), UriKind.Absolute);
+        public Uri WebUrl => new(string.Format(webUrlFormat, Id), UriKind.Absolute);
 
         private const string webUrlFormat = "https://www.opensmarthouse.org/zwavedatabase/{0}";
     }

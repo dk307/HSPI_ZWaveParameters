@@ -89,6 +89,15 @@ namespace HSPI_ZWaveParametersTest {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {&quot;search_filter&quot;:{&quot;manufacturer&quot;:12,&quot;filter&quot;:&quot;4447:3036&quot;},&quot;total&quot;:2,&quot;devices&quot;:[{&quot;label&quot;:&quot;HS-WD200+&quot;,&quot;description&quot;:&quot;Scene Capable Wall Dimmer Switch&quot;,&quot;manufacturer_name&quot;:&quot;HomeSeer Technologies&quot;,&quot;id&quot;:806,&quot;version_min&quot;:&quot;0.000&quot;,&quot;version_max&quot;:&quot;5.009&quot;,&quot;protocol_version&quot;:&quot;4.061&quot;,&quot;manufacturer_ref&quot;:12,&quot;uuid&quot;:&quot;hswd200&quot;,&quot;category&quot;:&quot;Battery&quot;},{&quot;label&quot;:&quot;HS-WD200+&quot;,&quot;description&quot;:&quot;Scene Capable Wall Dimmer Switch&quot;,&quot;manufacturer_name&quot;:&quot;HomeSeer Technologies&quot;,&quot;id&quot;:1040,&quot;version_min&quot;:&quot;5.011&quot;,&quot;version_max&quot;:&quot;255.255&quot;,&quot;protoco [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string HomeseerDimmerOpenZWaveDBDeviceListJson {
+            get {
+                return ResourceManager.GetString("HomeseerDimmerOpenZWaveDBDeviceListJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {
         ///  &quot;approval_requested&quot;: 0,
         ///  &quot;approved&quot;: 1,
@@ -106,6 +115,15 @@ namespace HSPI_ZWaveParametersTest {
         internal static string HomeseerDimmerOpenZWaveDBFullJson {
             get {
                 return ResourceManager.GetString("HomeseerDimmerOpenZWaveDBFullJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;approval_requested&quot;:0,&quot;approved&quot;:1,&quot;beaming&quot;:&quot;1&quot;,&quot;database_id&quot;:806,&quot;db_version&quot;:12,&quot;deleted&quot;:0,&quot;description&quot;:&quot;Scene Capable Wall Dimmer Switch&quot;,&quot;device_ref&quot;:&quot;4447:3036&quot;,&quot;exclusion&quot;:&quot;&lt;p&gt;Put your Z-Wave controller into exclusion mode, tap the paddle of your new HomeSeer dimmer to begin the inclusion process. This will take a few moments to complete.&lt;\/p&gt;&quot;,&quot;first_approval_time&quot;:&quot;2018-03-21 20:58:27&quot;,&quot;frequently_listening&quot;:&quot;0&quot;,&quot;inclusion&quot;:&quot;&lt;p&gt;Put your Z-Wave controller into inclusion mode, tap the paddle of y [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string HomeseerDimmerOpenZWaveDBFullOlderJson {
+            get {
+                return ResourceManager.GetString("HomeseerDimmerOpenZWaveDBFullOlderJson", resourceCulture);
             }
         }
         

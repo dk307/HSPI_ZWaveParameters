@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Hspi\BootstrapHtmlHelper.cs" />
     <Compile Include="Hspi\DeviceConfigPage.cs" />
+    <Compile Include="Hspi\Exceptions\ShowErrorMessageException.cs" />
     <Compile Include="Hspi\HSPI.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveDevice.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveDeviceManufacturer.cs" />
@@ -112,10 +113,6 @@
     </None>
     <None Include="appveyor.yml" />
     <None Include="README.md" />
-    <None Include="Shared\HS4PlugInHelper.projitems" />
-    <None Include="Shared\HS4PlugInHelper.shproj" />
-    <None Include="Shared\LICENSE" />
-    <None Include="Shared\README.md" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -172,7 +169,7 @@
       <Version>2.2.1</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.7.11</Version>
+      <Version>4.7.12</Version>
     </PackageReference>
     <PackageReference Include="NullGuard.Fody">
       <Version>3.0.0</Version>
@@ -207,7 +204,6 @@
     <Content Include="install.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Shared\HS4PlugInHelper.sln" />
     <Content Include="updater_override.tt" />
   </ItemGroup>
   <ItemGroup>

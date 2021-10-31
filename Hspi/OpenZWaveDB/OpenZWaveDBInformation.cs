@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Hspi.Exceptions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -15,12 +16,14 @@ namespace Hspi.OpenZWaveDB
 {
     internal class OpenZWaveDBInformation
     {
-        public OpenZWaveDBInformation(int manufactureId, int productType, int productId, Version firmware)
+        public OpenZWaveDBInformation(int manufactureId, int productType, int productId, Version firmware,
+                                      HttpClient? httpClient = null)
         {
             this.manufactureId = manufactureId;
             this.productType = productType;
             this.productId = productId;
             this.firmware = firmware;
+            this.httpClient = httpClient ?? httpClientGlobal;
         }
 
         public ZWaveInformation? Data => data;
@@ -74,12 +77,12 @@ namespace Hspi.OpenZWaveDB
             var obj = serializer.Deserialize<ZWaveInformation>(reader);
             if ((obj == null) || string.IsNullOrWhiteSpace(obj.Id))
             {
-                throw new Exception("Json invalid from database");
+                throw new ShowErrorMessageException("Json invalid from database");
             }
             return obj;
         }
 
-        private static async Task<string> GetCall(string deviceUrl, CancellationToken cancellationToken)
+        private async Task<string> GetCall(string deviceUrl, CancellationToken cancellationToken)
         {
             logger.Info("Getting data from " + deviceUrl);
             var result = await httpClient.GetAsync(new Uri(deviceUrl, UriKind.Absolute), cancellationToken).ConfigureAwait(false);
@@ -95,7 +98,12 @@ namespace Hspi.OpenZWaveDB
             var listJson = await GetCall(listUrl, cancellationToken).ConfigureAwait(false);
 
             var jobject = JObject.Parse(listJson);
-            var devices = jobject?["devices"]?.ToObject<ZWaveDevice[]>() ?? throw new Exception("Device not found in z-wave database");
+            var devices = jobject?["devices"]?.ToObject<ZWaveDevice[]>();
+
+            if (devices == null || devices.Length == 0)
+            {
+               throw new ShowErrorMessageException("Device not found in z-wave database");
+            }
 
             logger.Debug(Invariant($"Found {devices.Length} devices for manufactureId:{manufactureId} productType:{productType} productId:{productId}"));
 
@@ -119,12 +127,13 @@ namespace Hspi.OpenZWaveDB
                 id = devices.First().Id;
             }
 
-            return id ?? throw new Exception("Device not found in the database");
+            return id ?? throw new ShowErrorMessageException("Device not found in the database");
         }
 
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
-        private static readonly HttpClient httpClient = new();
+        private static readonly HttpClient httpClientGlobal = new();
+        private readonly HttpClient httpClient;
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly Version firmware;
         private readonly int manufactureId;

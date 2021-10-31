@@ -74,15 +74,6 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="HS4PlugInHelper\Hspi\CompilerHelper.cs" />
-    <Compile Include="HS4PlugInHelper\Hspi\HSPIBase.cs" />
-    <Compile Include="HS4PlugInHelper\Hspi\Logger.cs" />
-    <Compile Include="HS4PlugInHelper\Hspi\PluginConfigBase.cs" />
-    <Compile Include="HS4PlugInHelper\Hspi\Utils\EnumHelper.cs" />
-    <Compile Include="HS4PlugInHelper\Hspi\Utils\ExceptionHelper.cs" />
-    <Compile Include="HS4PlugInHelper\Hspi\Utils\MiscHelper.cs" />
-    <Compile Include="HS4PlugInHelper\Hspi\Utils\ObjectSerialize.cs" />
-    <Compile Include="HS4PlugInHelper\Hspi\Utils\TaskHelper.cs" />
     <Compile Include="Hspi\BootstrapHtmlHelper.cs" />
     <Compile Include="Hspi\DeviceConfigPage.cs" />
     <Compile Include="Hspi\HSPI.cs" />
@@ -104,6 +95,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>HtmlSnippets.resx</DependentUpon>
     </Compile>
+    <Compile Include="Shared\Hspi\CompilerHelper.cs" />
+    <Compile Include="Shared\Hspi\HSPIBase.cs" />
+    <Compile Include="Shared\Hspi\Logger.cs" />
+    <Compile Include="Shared\Hspi\PluginConfigBase.cs" />
+    <Compile Include="Shared\Hspi\Utils\EnumHelper.cs" />
+    <Compile Include="Shared\Hspi\Utils\ExceptionHelper.cs" />
+    <Compile Include="Shared\Hspi\Utils\MiscHelper.cs" />
+    <Compile Include="Shared\Hspi\Utils\ObjectSerialize.cs" />
+    <Compile Include="Shared\Hspi\Utils\TaskHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
@@ -112,6 +112,10 @@
     </None>
     <None Include="appveyor.yml" />
     <None Include="README.md" />
+    <None Include="Shared\HS4PlugInHelper.projitems" />
+    <None Include="Shared\HS4PlugInHelper.shproj" />
+    <None Include="Shared\LICENSE" />
+    <None Include="Shared\README.md" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -203,6 +207,7 @@
     <Content Include="install.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Shared\HS4PlugInHelper.sln" />
     <Content Include="updater_override.tt" />
   </ItemGroup>
   <ItemGroup>

@@ -34,14 +34,7 @@ namespace Hspi.OpenZWaveDB
                 string deviceUrl = string.Format(deviceUrlFormat, id);
                 var deviceJson = await GetCall(deviceUrl, cancellationToken).ConfigureAwait(false);
 
-                var serializer = new JsonSerializer();
-                using var stringReader = new StringReader(deviceJson);
-                using var reader = new JsonTextReader(stringReader);
-                var obj = serializer.Deserialize<ZWaveInformation>(reader);
-                if (obj == null)
-                {
-                    throw new Exception("Json invalid from database");
-                }
+                ZWaveInformation obj = ParseJson(deviceJson);
 
                 // process parameters
                 var map = obj.Parameters.GroupBy(x => x.ParameterId);
@@ -71,6 +64,29 @@ namespace Hspi.OpenZWaveDB
             {
                 throw new Exception("Failed to get Data from Open Z-Wave DB", ex);
             }
+        }
+
+        public static ZWaveInformation ParseJson(string deviceJson)
+        {
+            var serializer = new JsonSerializer();
+            using var stringReader = new StringReader(deviceJson);
+            using var reader = new JsonTextReader(stringReader);
+            var obj = serializer.Deserialize<ZWaveInformation>(reader);
+            if ((obj == null) || string.IsNullOrWhiteSpace(obj.Id))
+            {
+                throw new Exception("Json invalid from database");
+            }
+            return obj;
+        }
+
+        private static async Task<string> GetCall(string deviceUrl, CancellationToken cancellationToken)
+        {
+            logger.Info("Getting data from " + deviceUrl);
+            var result = await httpClient.GetAsync(new Uri(deviceUrl, UriKind.Absolute), cancellationToken).ConfigureAwait(false);
+            result.EnsureSuccessStatusCode();
+
+            var json = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
+            return json;
         }
 
         private async Task<int> GetDeviceId(CancellationToken cancellationToken)
@@ -106,23 +122,13 @@ namespace Hspi.OpenZWaveDB
             return id ?? throw new Exception("Device not found in the database");
         }
 
-        private static async Task<string> GetCall(string deviceUrl, CancellationToken cancellationToken)
-        {
-            logger.Info("Getting data from " + deviceUrl);
-            var result = await httpClient.GetAsync(new Uri(deviceUrl, UriKind.Absolute), cancellationToken).ConfigureAwait(false);
-            result.EnsureSuccessStatusCode();
-
-            var json = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return json;
-        }
-
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
         private static readonly HttpClient httpClient = new();
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private readonly Version firmware;
         private readonly int manufactureId;
         private readonly int productId;
-        private readonly Version firmware;
         private readonly int productType;
         private ZWaveInformation? data;
     }

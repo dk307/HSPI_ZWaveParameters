@@ -49,9 +49,6 @@ namespace Hspi.OpenZWaveDB
         [JsonIgnore]
         public bool ReadOnly => ReadOnlyJson == "1";
 
-         
-         
-
         [JsonIgnore]
         public string DefaultValueDescription
         {

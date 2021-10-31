@@ -82,7 +82,6 @@
     <Compile Include="HS4PlugInHelper\Hspi\Utils\ExceptionHelper.cs" />
     <Compile Include="HS4PlugInHelper\Hspi\Utils\MiscHelper.cs" />
     <Compile Include="HS4PlugInHelper\Hspi\Utils\ObjectSerialize.cs" />
-    <Compile Include="HS4PlugInHelper\Hspi\Utils\ScribanHelper.cs" />
     <Compile Include="HS4PlugInHelper\Hspi\Utils\TaskHelper.cs" />
     <Compile Include="Hspi\BootstrapHtmlHelper.cs" />
     <Compile Include="Hspi\DeviceConfigPage.cs" />

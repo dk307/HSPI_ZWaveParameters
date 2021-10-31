@@ -26,7 +26,7 @@ namespace Hspi
         {
             try
             {
-                DeviceConfigPage page = new DeviceConfigPage(HomeSeerSystem, deviceOrFeatureRef);
+                var page = new DeviceConfigPage(HomeSeerSystem, deviceOrFeatureRef);
                 var pageJson = page.BuildConfigPage(CancellationToken.None).ResultForSync();
 
                 cacheForUpdate[deviceOrFeatureRef] = page;
@@ -35,7 +35,10 @@ namespace Hspi
             catch (Exception ex)
             {
                 var page = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
-                page.WithLabel("exception", ex.GetFullMessage());
+                page = page.WithView(new LabelView("exception", string.Empty, ex.GetFullMessage())
+                {
+                       LabelType = HomeSeer.Jui.Types.ELabelType.Preformatted
+                });
                 return page.Page.ToJsonString();
             }
         }

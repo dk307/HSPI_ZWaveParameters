@@ -66,7 +66,7 @@ namespace Hspi.OpenZWaveDB
 
         public ZWaveCommandClassChannel? GetCommandClassChannelForParameter(int parameter)
         {
-            return EndPoints.FirstOrDefault()?.CommandClass?.
+            return EndPoints?.FirstOrDefault()?.CommandClass?.
                         FirstOrDefault(x => x.IsSetCommand)?.
                         Channels.FirstOrDefault(x => x.ParameterId == parameter);
         }

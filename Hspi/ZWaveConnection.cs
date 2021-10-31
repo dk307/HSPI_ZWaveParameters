@@ -63,6 +63,8 @@ namespace Hspi
         public void UpdateDeviceParameter(string homeId, byte nodeId, byte param, int size, int value)
         {
             logger.Info(Invariant($"Updating HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value}"));
+            var result = HomeSeerSystem.LegacyPluginFunction("Z-Wave", "", "SetDeviceParameterValue", new object[5] { homeId, nodeId, param, size, value }) as string;
+
         }
         private static T? GetValueFromExtraData<T>(PlugExtraData plugInData, string name) where T : struct
         {

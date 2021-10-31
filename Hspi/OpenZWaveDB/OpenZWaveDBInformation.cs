@@ -27,44 +27,51 @@ namespace Hspi.OpenZWaveDB
 
         public async Task Update(CancellationToken cancellationToken)
         {
-            var id = await GetDeviceId(cancellationToken).ConfigureAwait(false);
-
-            string deviceUrl = string.Format(deviceUrlFormat, id);
-            var deviceJson = await GetCall(deviceUrl, cancellationToken).ConfigureAwait(false);
-
-            var serializer = new JsonSerializer();
-
-            using var stringReader = new StringReader(deviceJson);
-            using var reader = new JsonTextReader(stringReader);
-            var obj = serializer.Deserialize<ZWaveInformation>(reader);
-            if (obj == null)
+            try
             {
-                throw new Exception("Json invalid from database");
-            }
+                var id = await GetDeviceId(cancellationToken).ConfigureAwait(false);
 
-            // process parameters
-            var map = obj.Parameters.GroupBy(x => x.ParameterId);
+                string deviceUrl = string.Format(deviceUrlFormat, id);
+                var deviceJson = await GetCall(deviceUrl, cancellationToken).ConfigureAwait(false);
 
-            var finalParameters = new List<ZWaveDeviceParameter>();
+                var serializer = new JsonSerializer();
 
-            foreach (var group in map)
-            {
-                if (group.Count() == 1)
+                using var stringReader = new StringReader(deviceJson);
+                using var reader = new JsonTextReader(stringReader);
+                var obj = serializer.Deserialize<ZWaveInformation>(reader);
+                if (obj == null)
                 {
-                    finalParameters.Add(group.First());
+                    throw new Exception("Json invalid from database");
                 }
-                else
-                {
-                    var result = group.First();
 
-                    finalParameters.Add(result with
+                // process parameters
+                var map = obj.Parameters.GroupBy(x => x.ParameterId);
+
+                var finalParameters = new List<ZWaveDeviceParameter>();
+
+                foreach (var group in map)
+                {
+                    if (group.Count() == 1)
                     {
-                        SubParameters = group.Skip(1).ToList().AsReadOnly(),
-                    });
-                }
-            }
+                        finalParameters.Add(group.First());
+                    }
+                    else
+                    {
+                        var result = group.First();
 
-            data = obj with { Parameters = finalParameters.AsReadOnly() };
+                        finalParameters.Add(result with
+                        {
+                            SubParameters = group.Skip(1).ToList().AsReadOnly(),
+                        });
+                    }
+                }
+
+                data = obj with { Parameters = finalParameters.AsReadOnly() };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to get Data from Open Z-Wave DB", ex);
+            }
         }
 
         private async Task<int> GetDeviceId(CancellationToken cancellationToken)
@@ -110,9 +117,8 @@ namespace Hspi.OpenZWaveDB
             return json;
         }
 
-        private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
+        private const string deviceUrlFormat = "https://opensmarthouse.org1/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
-        private const string NewLine = "<BR>";
         private static readonly HttpClient httpClient = new();
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int manufactureId;

@@ -29,7 +29,7 @@ namespace Hspi
 
         public static string MakeMultipleRows(params string[] values)
         {
-            StringBuilder stb = new StringBuilder();
+            var stb = new StringBuilder();
             stb.Append("<div class=\"container pt-0\">");
             foreach (var value in values)
             {

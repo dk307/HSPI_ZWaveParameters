@@ -80,6 +80,8 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(obj.Parameters[0].Options[0].Label, "Prior State");
             Assert.AreEqual(obj.Parameters[0].Options[1].Label, "On");
             Assert.AreEqual(obj.Parameters[0].Options[2].Label, "Off");
+
+            Assert.IsNull(obj.Parameters[0].SubParameters);
         }
 
         [TestMethod]
@@ -106,6 +108,7 @@ namespace HSPI_ZWaveParametersTest
             //Options
             Assert.AreEqual(obj.Parameters[0].HasOptions, false);
             Assert.AreEqual(obj.Parameters[0].Options.Count, 0);
+            Assert.IsNull(obj.Parameters[0].SubParameters);
         }
 
         [TestMethod]
@@ -128,6 +131,24 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(obj.Parameters.Count, 1);
 
             Assert.AreEqual(obj.Parameters[0].ReadOnly, true);
+        }
+
+        [TestMethod]
+        public void EndPointsAreParsed()
+        {
+            var obj = OpenZWaveDBInformation.ParseJson(Resource.HomeseerDimmerOpenZWaveDBFullJson);
+
+            Assert.IsNotNull(obj.EndPoints);
+            Assert.AreEqual(obj.EndPoints.Count, 1);
+
+            Assert.AreEqual(obj.EndPoints[0].CommandClass.Count, 16);
+
+            // check set command class
+            Assert.AreEqual(obj.EndPoints[0].CommandClass[10].IsSetCommand, true);
+            Assert.AreEqual(obj.EndPoints[0].CommandClass[10].Channels.Count, 13);
+
+            Assert.AreEqual(obj.EndPoints[0].CommandClass[10].Channels[12].ParameterId, 31);
+            Assert.AreEqual(obj.EndPoints[0].CommandClass[10].Channels[12].Label, "Status mode LEDs Blink status (Bitmask)");
         }
     }
 }

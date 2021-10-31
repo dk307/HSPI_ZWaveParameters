@@ -90,6 +90,27 @@ namespace HSPI_ZWaveParametersTest {
         
         /// <summary>
         ///   Looks up a localized string similar to {
+        ///  &quot;approval_requested&quot;: 0,
+        ///  &quot;approved&quot;: 1,
+        ///  &quot;beaming&quot;: &quot;1&quot;,
+        ///  &quot;database_id&quot;: 1040,
+        ///  &quot;db_version&quot;: 8,
+        ///  &quot;deleted&quot;: 0,
+        ///  &quot;description&quot;: &quot;Scene Capable Wall Dimmer Switch&quot;,
+        ///  &quot;device_ref&quot;: &quot;4447:3036&quot;,
+        ///  &quot;exclusion&quot;: &quot;&lt;p&gt;Put your Z-Wave controller into exclusion mode, tap the paddle of your new HomeSeer dimmer to begin the inclusion process. This will take a few moments to complete.&lt;/p&gt;&quot;,
+        ///  &quot;first_approval_time&quot;: &quot;0000-00-00 00:00:00&quot;,
+        ///  &quot;frequently_listening&quot;: &quot;0&quot;,
+        ///  &quot;inclusion&quot;: &quot;&lt;p&gt;Put your Z-Wave cont [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string HomeseerDimmerOpenZWaveDBFullJson {
+            get {
+                return ResourceManager.GetString("HomeseerDimmerOpenZWaveDBFullJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
         /// 
         ///  &quot;database_id&quot;: 5623, 
         ///  &quot;parameters&quot;: [

@@ -2,7 +2,6 @@
 using HomeSeer.PluginSdk;
 using Hspi.Utils;
 using Newtonsoft.Json.Linq;
-using Nito.AsyncEx;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -64,7 +63,8 @@ namespace Hspi
                         throw new Exception("Input not valid");
                     }
 
-                    int value = GetConfiguration(homeId, nodeId.Value, parameter.Value);
+                    var connection = new ZWaveConnection(HomeSeerSystem);
+                    int value = connection.GetConfiguration(homeId, nodeId.Value, parameter.Value);
 
                     return value.ToString(CultureInfo.InvariantCulture);
                 }
@@ -131,19 +131,6 @@ namespace Hspi
                 logger.Error(Invariant($"Failed to process OnDeviceConfigChange for {devOrFeatRef} with error {ex.GetFullMessage()}"));
                 return false;
             }
-        }
-
-        private int GetConfiguration(string homeId, byte nodeId, byte param)
-        {
-            logger.Debug(Invariant($"Getting HomeId:{homeId} NodeId:{nodeId} Parameter:{param}"));
-            var value = (int)HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
-            logger.Debug(Invariant($"For HomeId:{homeId} NodeId:{nodeId} Parameter:{param} got {value}"));
-            return value;
-        }
-
-        private void PluginConfigChanged()
-        {
-            UpdateDebugLevel();
         }
 
         private void UpdateDebugLevel()

@@ -1,6 +1,6 @@
-﻿HSPI_ZWaveInformation.exe,.,0
-HSPI_ZWaveInformation.exe.config,.,0
-.,[DELALL],\html\Tasmota
-html.zip,[UNZIP],.\html\Tasmota
+﻿HSPI_ZWaveParameters.exe,.,0
+HSPI_ZWaveParameters.exe.config,.,0
+.,[DELALL],\html\ZWaveParameters
+html.zip,[UNZIP],.\html\ZWaveParameters
 
  

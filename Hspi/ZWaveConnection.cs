@@ -15,6 +15,14 @@ namespace Hspi
             this.HomeSeerSystem = hsController;
         }
 
+        public int GetConfiguration(string homeId, byte nodeId, byte param)
+        {
+            logger.Debug(Invariant($"Getting HomeId:{homeId} NodeId:{nodeId} Parameter:{param}"));
+            var value = (int)HomeSeerSystem.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
+            logger.Debug(Invariant($"For HomeId:{homeId} NodeId:{nodeId} Parameter:{param} got {value}"));
+            return value;
+        }
+
         public ZWaveData GetDeviceZWaveData(int deviceOrFeatureRef)
         {
             if (!IsZwaveDevice(deviceOrFeatureRef))
@@ -47,16 +55,15 @@ namespace Hspi
             return zwaveData;
         }
 
-        public void UpdateDeviceParameter(string homeId, byte nodeId, byte param, int size, int value)
-        {
-            logger.Info(Invariant($"Updating HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value}"));
-        }
-
         public bool IsZwaveDevice(int devOrFeatRef)
         {
             return ((string)HomeSeerSystem.GetPropertyByRef(devOrFeatRef, EProperty.Interface) == ZWaveInterface);
         }
 
+        public void UpdateDeviceParameter(string homeId, byte nodeId, byte param, int size, int value)
+        {
+            logger.Info(Invariant($"Updating HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value}"));
+        }
         private static T? GetValueFromExtraData<T>(PlugExtraData plugInData, string name) where T : struct
         {
             if (plugInData.ContainsNamed(name))
@@ -69,9 +76,8 @@ namespace Hspi
             }
         }
 
-        private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-
         private const string ZWaveInterface = "Z-Wave";
+        private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         public record ZWaveData(int ManufactureId, ushort ProductId, ushort ProductType, byte NodeId, string HomeId, Version Firmware);
         private readonly IHsController HomeSeerSystem;
     }

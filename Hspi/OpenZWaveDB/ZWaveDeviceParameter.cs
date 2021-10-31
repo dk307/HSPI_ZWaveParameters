@@ -49,15 +49,8 @@ namespace Hspi.OpenZWaveDB
         [JsonIgnore]
         public bool ReadOnly => ReadOnlyJson == "1";
 
-        [JsonIgnore]
-        public string LongerDescription
-        {
-            get
-            {
-                var list = new[] { Description, Overview, Label };
-                return list.OrderByDescending(x => x?.Length ?? 0).First() ?? string.Empty;
-            }
-        }
+         
+         
 
         [JsonIgnore]
         public string DefaultValueDescription

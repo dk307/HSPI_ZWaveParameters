@@ -43,14 +43,13 @@ namespace Hspi
 
             // Label
             page = page.WithLabel(NewId(),
-                    BootstrapHtmlHelper.MakeInfoHyperlinkInAnotherTab(BootstrapHtmlHelper.MakeBolder(data.FullName),
+                    BootstrapHtmlHelper.MakeInfoHyperlinkInAnotherTab(BootstrapHtmlHelper.MakeBolder(data.DisplayFullName()),
                                                                       data.WebUrl));
 
             //Parameters
             page = AddParameters(page, openZWaveData, zwaveData.HomeId, zwaveData.NodeId);
 
-            var createdPage = page.Page;
-            return createdPage.ToJsonString();
+            return page.Page.ToJsonString();
         }
 
         public void OnDeviceConfigChange(Page changes)
@@ -112,21 +111,6 @@ namespace Hspi
             }
         }
 
-        private static string? CreateOptionsDescription(ZWaveDeviceParameter parameter)
-        {
-            if (parameter.HasOptions)
-            {
-                var stb = new StringBuilder();
-                stb.Append("Options:<BR>");
-                foreach (var option in parameter.Options!)
-                {
-                    stb.Append(Invariant($"{option.Value} - {option.Label}<BR>"));
-                }
-                return stb.ToString();
-            }
-            return null;
-        }
-
         private static string CreateParameterValueControl(ZWaveDeviceParameter parameter, string id)
         {
             var stb = new StringBuilder();
@@ -146,21 +130,24 @@ namespace Hspi
                                                         ESelectListType.DropDown);
                 stb.Append(selectListView.ToHtml());
 
-                // Have not found a away to make it readonly
+                // Have not found a away to make it readonly on UI
             }
             else
             {
                 var stb2 = new StringBuilder();
+
                 stb2.Append("Value");
-
-                stb2.Append('(');
-                stb2.Append(Invariant($" {parameter.Minimum}-{parameter.Maximum} "));
-
-                if (!string.IsNullOrWhiteSpace(parameter.Units))
+                if (!parameter.HasSubParameters)
                 {
-                    stb2.Append(parameter.Units);
+                    stb2.Append('(');
+                    stb2.Append(Invariant($" {parameter.Minimum}-{parameter.Maximum} "));
+
+                    if (!string.IsNullOrWhiteSpace(parameter.Units))
+                    {
+                        stb2.Append(parameter.Units);
+                    }
+                    stb2.Append(')');
                 }
-                stb2.Append(')');
 
                 var inputView = new InputView(id, stb2.ToString(), EInputType.Number);
                 stb.Append(inputView.ToHtml());
@@ -202,11 +189,10 @@ namespace Hspi
                 foreach (var parameter in openZWaveData.Data.Parameters)
                 {
                     var row = new GridRow();
-
-                    var current = CreateGetSetView(parameter, homeId, nodeId);
+                    var current = CreateGetSetViewForParameter(openZWaveData.Data, parameter, homeId, nodeId);
                     row.AddItem(current);
 
-                    var detailsLabel = CreateDescriptionView(parameter);
+                    var detailsLabel = CreateDescriptionViewForParameter(openZWaveData.Data, parameter.ParameterId);
                     row.AddItem(detailsLabel);
 
                     parametersView.AddRow(row);
@@ -220,7 +206,8 @@ namespace Hspi
             return page;
         }
 
-        private LabelView CreateGetSetView(ZWaveDeviceParameter parameter, string homeId, byte nodeId)
+        private LabelView CreateGetSetViewForParameter(ZWaveInformation data,
+                                                       ZWaveDeviceParameter parameter, string homeId, byte nodeId)
         {
             var elementId = CreateZWaveParameterId(parameter.Id);
             string currentMessageValueId = elementId + "_message";
@@ -232,7 +219,7 @@ namespace Hspi
 
             var list = new List<string>
             {
-                Invariant($"{BootstrapHtmlHelper.MakeBold(parameter.Label ?? string.Empty)}(#{parameter.ParameterId})")
+                Invariant($"{BootstrapHtmlHelper.MakeBold(data.LabelForParameter(parameter.ParameterId))}(#{parameter.ParameterId})")
             };
 
             var topMessage = parameter.WriteOnly ? "Write Only parameter" : "Value not retrieved";
@@ -246,7 +233,7 @@ namespace Hspi
                 currentControlValue = BootstrapHtmlHelper.MakeMultipleRows(readonlyMessage, currentControlValue);
             }
 
-            string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" hidden>{currentControlValue}</span>");
+            string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" {(!parameter.WriteOnly ? "hidden" : string.Empty)}>{currentControlValue}</span>");
             list.Add(currentControlValueWrapper);
 
             if (!parameter.WriteOnly)
@@ -258,12 +245,10 @@ namespace Hspi
             return AddRawHtml(current);
         }
 
-        private LabelView CreateDescriptionView(ZWaveDeviceParameter parameter)
+        private LabelView CreateDescriptionViewForParameter(ZWaveInformation data, int parameterId)
         {
-            var options = CreateOptionsDescription(parameter);
-            var detailsLabel = AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(parameter.LongerDescription,
-                                                                                   Invariant($"Size: {parameter.Size} Byte(s)"),
-                                                                                   options ?? Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}")));
+            var list = data.DescriptionForParameter(parameterId);
+            var detailsLabel = AddRawHtml(BootstrapHtmlHelper.MakeMultipleRows(list.ToArray()));
             return detailsLabel;
         }
 
@@ -282,11 +267,7 @@ namespace Hspi
 
         private LabelView AddRawHtml(string value, string? id = null)
         {
-            var label = new LabelView(id ?? NewId(), string.Empty, value)
-            {
-                LabelType = ELabelType.Default
-            };
-            return label;
+            return new LabelView(id ?? NewId(), string.Empty, value);
         }
 
         private string NewId()

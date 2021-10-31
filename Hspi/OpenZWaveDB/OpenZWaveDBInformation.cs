@@ -57,25 +57,6 @@ namespace Hspi.OpenZWaveDB
                 {
                     var result = group.First();
 
-                    //var extra = new List<string>();
-                    //foreach (var item in group)
-                    //{
-                    //    if (item == result)
-                    //    {
-                    //        continue;
-                    //    }
-                    //    extra.Add(
-                    //        string.Format(CultureInfo.InvariantCulture, "Bitmask:{0:x}: {1}", item.Bitmask, item.Label));
-                    //}
-
-                    //string extraDescription = NewLine + string.Join(NewLine, extra);
-
-                    //string overview = result.Overview ?? string.Empty;
-                    //string description = result.Description ?? string.Empty;
-
-                    //overview += extraDescription;
-                    //description += extraDescription;
-
                     finalParameters.Add(result with
                     {
                         SubParameters = group.Skip(1).ToList().AsReadOnly(),

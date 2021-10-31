@@ -1,4 +1,5 @@
-﻿using Hspi.OpenZWaveDB;
+﻿using Hspi.Exceptions;
+using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
@@ -10,13 +11,13 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public void EmptyThrowsException()
         {
-            Assert.ThrowsException<Exception>(() => OpenZWaveDBInformation.ParseJson(string.Empty));
+            Assert.ThrowsException<ShowErrorMessageException>(() => OpenZWaveDBInformation.ParseJson(string.Empty));
         }
 
         [TestMethod]
         public void EmptyObjectThrowsException()
         {
-            Assert.ThrowsException<Exception>(() => OpenZWaveDBInformation.ParseJson("{}"));
+            Assert.ThrowsException<ShowErrorMessageException>(() => OpenZWaveDBInformation.ParseJson("{}"));
         }
 
         [TestMethod]

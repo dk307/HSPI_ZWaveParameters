@@ -27,6 +27,25 @@ namespace HSPI_ZWaveParametersTest
         }
 
         [TestMethod]
+        public async Task DownloadForSingleSelection()
+        {
+            var handler = new Mock<HttpMessageHandler>();
+            var httpclient = handler.CreateClient();
+
+            handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006")
+                               .ReturnsResponse(Resource.AeonLabsOpenZWaveDBDeviceListJson, "application/json");
+
+            handler.SetupRequest(HttpMethod.Get, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75")
+                               .ReturnsResponse(Resource.AeonLabsOpenZWaveDBDeviceJson, "application/json");
+
+            var obj1 = new OpenZWaveDBInformation(134, 3, 6, new Version(1, 43, 0), httpclient);
+            await obj1.Update(CancellationToken.None);
+            Assert.AreEqual(obj1.Data.Id, "75");
+
+            handler.Verify();
+        }
+
+        [TestMethod]
         public async Task CorrectFirmwareIsSelected()
         {
             var handler = new Mock<HttpMessageHandler>();
@@ -53,6 +72,25 @@ namespace HSPI_ZWaveParametersTest
         }
 
         [TestMethod]
+        public async Task FirstDeviceIsSelectedIfNoMatchingFirmware()
+        {
+            var handler = new Mock<HttpMessageHandler>();
+            var httpclient = handler.CreateClient();
+
+            handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036")
+                               .ReturnsResponse(Resource.HomeseerDimmerOpenZWaveDBDeviceListJson, "application/json");
+
+            handler.SetupRequest(HttpMethod.Get, " https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=806")
+                               .ReturnsResponse(Resource.HomeseerDimmerOpenZWaveDBFullOlderJson, "application/json");
+
+            var obj1 = new OpenZWaveDBInformation(12, 17479, 12342, new Version(5, 10, 0), httpclient);
+            await obj1.Update(CancellationToken.None);
+            Assert.AreEqual(obj1.Data.Id, "806");
+
+            handler.Verify();
+        }
+
+        [TestMethod]
         public async Task NoDeviceThrowsException()
         {
             var handler = new Mock<HttpMessageHandler>();
@@ -68,7 +106,7 @@ namespace HSPI_ZWaveParametersTest
             {
                 await obj1.Update(CancellationToken.None).ConfigureAwait(false);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 thrown = true;
                 Assert.IsInstanceOfType(ex.InnerException, typeof(ShowErrorMessageException));
@@ -76,6 +114,30 @@ namespace HSPI_ZWaveParametersTest
 
             Assert.IsTrue(thrown);
 
+            handler.Verify();
+        }
+
+        [TestMethod]
+        public async Task ParameterWithSameIdAreGrouped()
+        {
+            var handler = new Mock<HttpMessageHandler>();
+            var httpclient = handler.CreateClient();
+
+            handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036")
+                               .ReturnsResponse(Resource.HomeseerDimmerOpenZWaveDBDeviceListJson, "application/json");
+
+            handler.SetupRequest(HttpMethod.Get, " https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040")
+                               .ReturnsResponse(Resource.HomeseerDimmerOpenZWaveDBFullJson, "application/json");
+
+            var obj2 = new OpenZWaveDBInformation(12, 17479, 12342, new Version(5, 14, 0), httpclient);
+            await obj2.Update(CancellationToken.None);
+
+            Assert.IsNotNull(obj2.Data.Parameters);
+            Assert.AreEqual(obj2.Data.Parameters.Count, 15);
+
+            Assert.AreEqual(obj2.Data.Parameters[14].ParameterId, 31);
+            Assert.AreEqual(obj2.Data.Parameters[14].HasSubParameters, true);
+            Assert.AreEqual(obj2.Data.Parameters[14].SubParameters.Count, 6);
 
             handler.Verify();
         }

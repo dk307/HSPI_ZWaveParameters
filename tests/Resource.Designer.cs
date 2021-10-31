@@ -61,6 +61,24 @@ namespace HSPI_ZWaveParametersTest {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {&quot;approval_requested&quot;:0,&quot;approved&quot;:1,&quot;beaming&quot;:&quot;1&quot;,&quot;database_id&quot;:75,&quot;db_version&quot;:6,&quot;deleted&quot;:0,&quot;description&quot;:&quot;Smart Energy Switch&quot;,&quot;device_ref&quot;:&quot;0003:0006&quot;,&quot;exclusion&quot;:&quot;&lt;ol&gt;&lt;li&gt;Put the controller in exclusion mode&lt;\/li&gt; &lt;li&gt;Press the button located between the LED&lt;\/li&gt; &lt;\/ol&gt;&lt;p&gt;If the Aeon Labs Smart Energy Switch was removed from the Z-Wave network, the LED will be blinking. If the Aeon Labs Smart Energy Switch was not successfully removed from the Z-Wave network, the LED will either be on or off (dependi [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AeonLabsOpenZWaveDBDeviceJson {
+            get {
+                return ResourceManager.GetString("AeonLabsOpenZWaveDBDeviceJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;search_filter&quot;:{&quot;manufacturer&quot;:134,&quot;filter&quot;:&quot;0003:0006&quot;},&quot;total&quot;:1,&quot;devices&quot;:[{&quot;label&quot;:&quot;DSC06&quot;,&quot;description&quot;:&quot;Smart Energy Switch&quot;,&quot;manufacturer_name&quot;:&quot;AEON Labs&quot;,&quot;id&quot;:75,&quot;version_min&quot;:&quot;0.000&quot;,&quot;version_max&quot;:&quot;255.255&quot;,&quot;protocol_version&quot;:&quot;2.078&quot;,&quot;manufacturer_ref&quot;:134,&quot;uuid&quot;:&quot;dsc06&quot;,&quot;category&quot;:&quot;Battery&quot;}]}.
+        /// </summary>
+        internal static string AeonLabsOpenZWaveDBDeviceListJson {
+            get {
+                return ResourceManager.GetString("AeonLabsOpenZWaveDBDeviceListJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {
         ///  &quot;approval_requested&quot;: 0,
         ///  &quot;approved&quot;: 1,

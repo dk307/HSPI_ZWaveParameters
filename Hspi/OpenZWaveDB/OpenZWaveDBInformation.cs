@@ -127,7 +127,7 @@ namespace Hspi.OpenZWaveDB
                 id = devices.First().Id;
             }
 
-            return id ?? throw new ShowErrorMessageException("Device not found in the database");
+            return id ?? throw new ShowErrorMessageException("Device not found in the open zwave database");
         }
 
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";

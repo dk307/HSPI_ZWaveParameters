@@ -63,7 +63,7 @@ namespace Hspi
 
             foreach (var view in changes.Views)
             {
-                byte id = checked((byte)ZWaveParameterFromId(view.Id));
+                var id = ZWaveParameterFromId(view.Id);
 
                 var parameterInfo = data.Parameters.FirstOrDefault(x => x.Id == id);
                 if ((parameterInfo == null) || (parameterInfo.Size == 0))

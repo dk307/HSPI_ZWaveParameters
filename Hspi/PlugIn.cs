@@ -1,11 +1,11 @@
 ﻿using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
 using Hspi.Utils;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Threading;
 using static System.FormattableString;
 
@@ -26,18 +26,18 @@ namespace Hspi
         {
             try
             {
-                var page = new DeviceConfigPage(HomeSeerSystem, deviceOrFeatureRef);
-                var pageJson = page.BuildConfigPage(CancellationToken.None).ResultForSync();
+                var page = new DeviceConfigPage(new ZWaveConnection(HomeSeerSystem), deviceOrFeatureRef);
+                var pageView = page.BuildConfigPage(CancellationToken.None).ResultForSync();
 
                 cacheForUpdate[deviceOrFeatureRef] = page;
-                return pageJson;
+                return pageView.ToJsonString();
             }
             catch (Exception ex)
             {
                 var page = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
                 page = page.WithView(new LabelView("exception", string.Empty, ex.GetFullMessage())
                 {
-                       LabelType = HomeSeer.Jui.Types.ELabelType.Preformatted
+                    LabelType = HomeSeer.Jui.Types.ELabelType.Preformatted
                 });
                 return page.Page.ToJsonString();
             }
@@ -51,31 +51,9 @@ namespace Hspi
 
         public override string PostBackProc(string page, string data, string user, int userRights)
         {
-            try
+            if (page == "Update")
             {
-                var input = JObject.Parse(data);
-
-                if (input["operation"]?.ToString() == "GET")
-                {
-                    var homeId = input["homeId"]?.ToString();
-                    var nodeId = (byte?)input["nodeId"];
-                    var parameter = (byte?)input["parameter"];
-
-                    if ((homeId == null) || !nodeId.HasValue || !parameter.HasValue)
-                    {
-                        throw new Exception("Input not valid");
-                    }
-
-                    var connection = new ZWaveConnection(HomeSeerSystem);
-                    int value = connection.GetConfiguration(homeId, nodeId.Value, parameter.Value);
-
-                    return value.ToString(CultureInfo.InvariantCulture);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(Invariant($"Failed to process PostBackProc for {page} with {data} with error {ex.GetFullMessage()}"));
-                return ex.GetFullMessage();
+                return HandleDeviceConfigPostBackProc(data);
             }
             return base.PostBackProc(page, data, user, userRights);
         }
@@ -136,10 +114,53 @@ namespace Hspi
             }
         }
 
+        private string HandleDeviceConfigPostBackProc(string data)
+        {
+            try
+            {
+                var input = JObject.Parse(data);
+
+                if (input["operation"]?.ToString() == "GET")
+                {
+                    var homeId = input["homeId"]?.ToString();
+                    var nodeId = (byte?)input["nodeId"];
+                    var parameter = (byte?)input["parameter"];
+
+                    if ((homeId == null) || !nodeId.HasValue || !parameter.HasValue)
+                    {
+                        throw new Exception("Input not valid");
+                    }
+
+                    var connection = new ZWaveConnection(HomeSeerSystem);
+                    int value = connection.GetConfiguration(homeId, nodeId.Value, parameter.Value).ResultForSync();
+
+                    return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
+                    {
+                        Value = value
+                    });
+                }
+                throw new Exception("Unknown operation");
+            }
+            catch (Exception ex)
+            {
+                logger.Error(Invariant($"Failed to process PostBackProc for Update with {data} with error {ex.GetFullMessage()}"));
+                return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
+                {
+                    ErrorMessage = ex.GetFullMessage()
+                });
+            }
+        }
+
         private void UpdateDebugLevel()
         {
             this.LogDebug = pluginConfig!.DebugLogging;
             Logger.ConfigureLogging(LogDebug, pluginConfig.LogToFile, HomeSeerSystem);
+        }
+
+        private struct ZWaveParameterGetResult
+        {
+            public string? ErrorMessage { get; init; }
+            public int? Value { get; init; }
         }
 
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();

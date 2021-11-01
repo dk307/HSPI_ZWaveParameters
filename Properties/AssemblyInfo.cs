@@ -16,6 +16,7 @@ using NullGuard;
 [assembly: AssemblyCulture("")]
 [assembly: NullGuard(ValidationFlags.All)]
 [assembly: InternalsVisibleTo("HSPI_ZWaveParametersTest")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

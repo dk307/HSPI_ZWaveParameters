@@ -20,7 +20,7 @@ namespace Hspi.OpenZWaveDB
         public string? Overview { get; init; }
         public string? Units { get; init; }
         public int Advanced { get; init; }
-        public int Size { get; init; }
+        public byte Size { get; init; }
         public int Bitmask { get; init; }
         public int Minimum { get; init; }
         public int Maximum { get; init; }

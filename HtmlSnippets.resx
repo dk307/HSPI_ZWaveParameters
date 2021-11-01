@@ -156,35 +156,45 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 		cache: false,
 		data: JSON.stringify(formObject)
 	})  
-	.done(function(parameterValue) {
+	.done(function(resultJson) {
 		$('#' + idMessage).removeClass("spinner-border");	
-		$('#' + idMessage).hide();
-		$('#' + idValueWrapper).attr("hidden",false);
 		
-		
-		// apply mask
-		var bitmask = eval( idValue + '_mask');
+		var result = JSON.parse(resultJson);
+			
+		if (result.ErrorMessage == null) {	
+			$('#' + idMessage).hide();
+			$('#' + idValueWrapper).attr("hidden",false);
+			
+			var parameterValue = result.Value;
+			// alert(parameterValue);
+			
+			// apply mask
+			var bitmask = eval( idValue + '_mask');
 
-		if (bitmask != 0) {
-			parameterValue &amp;= bitmask;
-		}
-		
-		var obj = $('#' + idValue);
+			if (bitmask != 0) {
+				parameterValue &amp;= bitmask;
+			}
+			
+			var obj = $('#' + idValue);
 
-		// select
-		if (obj.find('option').length &gt; 0) {		
-			// look up the option js array and set value
-			var index = eval(idValue + '_optionkeys').indexOf(parseInt(parameterValue));
-			obj.val(index);		
+			// select
+			if (obj.find('option').length &gt; 0) {		
+				// look up the option js array and set value
+				var index = eval(idValue + '_optionkeys').indexOf(parseInt(parameterValue));
+				obj.val(index);		
+			} else {
+				//input	
+				obj.val(parameterValue);	
+			}
 		} else {
-			//input	
-			obj.val(parameterValue);	
+			$('#' + idValueWrapper).attr("hidden",true);
+			$('#' + idMessage).html(result.ErrorMessage);
 		}
 	})
     .fail(function() {
 		$('#' + idMessage).removeClass("spinner-border");	
 		$('#' + idValueWrapper).attr("hidden",true);
-		$('#' + idMessage).html("Failed to get");	
+		$('#' + idMessage).html("Failed to get value");	
 	})
     .always(function() {
 		$('#' + idMessage).removeClass("spinner-border");	

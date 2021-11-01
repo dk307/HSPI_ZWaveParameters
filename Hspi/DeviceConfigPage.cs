@@ -1,11 +1,11 @@
 ﻿using HomeSeer.Jui.Types;
 using HomeSeer.Jui.Views;
-using HomeSeer.PluginSdk;
 using Hspi.OpenZWaveDB;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,20 +17,21 @@ namespace Hspi
 {
     internal class DeviceConfigPage
     {
-        public DeviceConfigPage(IHsController hsController, int deviceOrFeatureRef)
+        public DeviceConfigPage(IZWaveConnection zwaveConnection, int deviceOrFeatureRef, HttpClient? httpClient = null)
         {
             logger.Debug(Invariant($"Creating Page for {deviceOrFeatureRef}"));
-            this.zwaveConnection = new ZWaveConnection(hsController);
+            this.zwaveConnection = zwaveConnection;
             this.deviceOrFeatureRef = deviceOrFeatureRef;
+            this.httpClient = httpClient;
         }
 
-        public async Task<string> BuildConfigPage(CancellationToken cancellationToken)
+        public async Task<Page> BuildConfigPage(CancellationToken cancellationToken)
         {
             var page = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
             var zwaveData = zwaveConnection.GetDeviceZWaveData(this.deviceOrFeatureRef);
 
             var openZWaveData = new OpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType,
-                                                           zwaveData.ProductId, zwaveData.Firmware);
+                                                           zwaveData.ProductId, zwaveData.Firmware, httpClient);
 
             await openZWaveData.Update(cancellationToken);
 
@@ -49,7 +50,7 @@ namespace Hspi
             //Parameters
             page = AddParameters(page, openZWaveData, zwaveData.HomeId, zwaveData.NodeId);
 
-            return page.Page.ToJsonString();
+            return page.Page;
         }
 
         public void OnDeviceConfigChange(Page changes)
@@ -278,8 +279,9 @@ namespace Hspi
         private const string ZWaveParameterPrefix = "zw_parameter_";
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int deviceOrFeatureRef;
+        private readonly HttpClient? httpClient;
         private ZWaveInformation? data;
         private int id = 0;
-        private readonly ZWaveConnection zwaveConnection;
+        private readonly IZWaveConnection zwaveConnection;
     }
 }

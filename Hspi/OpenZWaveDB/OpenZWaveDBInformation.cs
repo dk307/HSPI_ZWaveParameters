@@ -17,7 +17,7 @@ namespace Hspi.OpenZWaveDB
     internal class OpenZWaveDBInformation
     {
         public OpenZWaveDBInformation(int manufactureId, int productType, int productId, Version firmware,
-                                      HttpClient? httpClient = null)
+                                      HttpClient? httpClient)
         {
             this.manufactureId = manufactureId;
             this.productType = productType;

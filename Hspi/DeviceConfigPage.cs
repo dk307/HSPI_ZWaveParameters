@@ -47,7 +47,7 @@ namespace Hspi
             // Label
             string labelText0 = Bootstrap.ApplyStyle(data.DisplayFullName(), Bootstrap.Style.TextBolder, Bootstrap.Style.TextWrap);
             string labelText = Bootstrap.MakeInfoHyperlinkInAnotherTab(labelText0, data.WebUrl);
-            page = page.WithView(AddRawHtml(Invariant($"<h6>{labelText}</h6>")));
+            page = page.WithView(AddRawHtml(Invariant($"<h6>{labelText}</h6>"), false));
 
             //Parameters
             page = AddParameters(page, openZWaveData, zwaveData.HomeId, zwaveData.NodeId);
@@ -209,9 +209,12 @@ namespace Hspi
             return page;
         }
 
-        private LabelView AddRawHtml(string value, string? id = null)
+        private LabelView AddRawHtml(string value, bool asTitle = true, string? id = null)
         {
-            return new LabelView(id ?? NewId(), Invariant($"<span style=\"font-size: medium\">{value}</span>"));
+            string html = Invariant($"<span style=\"font-size:medium;\">{value}</span>");
+            return new LabelView(id ?? NewId(),
+                                 asTitle ? html : string.Empty,
+                                 asTitle ? string.Empty : value);
         }
 
         private PageFactory CreateAllParameterRefreshButton(PageFactory page, string containerToClickButtonId, out string allButtonId)
@@ -231,8 +234,9 @@ namespace Hspi
         {
             var list = data.DescriptionForParameter(parameterId);
             string rows = Bootstrap.MakeMultipleRows(list.ToArray());
-            var detailsLabel = AddRawHtml(Bootstrap.ApplyStyle(rows,
-                                                    Bootstrap.Style.TextLight, Bootstrap.Style.TextWrap));
+            string description = Bootstrap.ApplyStyle(rows,
+                                                      Bootstrap.Style.TextLight, Bootstrap.Style.TextWrap);
+            var detailsLabel = AddRawHtml(description);
             return detailsLabel;
         }
 
@@ -263,7 +267,7 @@ namespace Hspi
                 currentControlValue = Bootstrap.MakeMultipleRows(readonlyMessage, currentControlValue);
             }
 
-            string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" class=\"text-wrap\" {(!parameter.WriteOnly ? "hidden" : string.Empty)}>{currentControlValue}</span>");
+            string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" {(!parameter.WriteOnly ? "hidden" : string.Empty)}>{currentControlValue}</span>");
             list.Add(currentControlValueWrapper);
 
             if (!parameter.WriteOnly)
@@ -272,7 +276,7 @@ namespace Hspi
             }
 
             var current = Bootstrap.MakeMultipleRows(list.ToArray());
-            return AddRawHtml(current);
+            return AddRawHtml(current, false);
         }
 
         private string NewId()

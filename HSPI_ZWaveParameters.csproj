@@ -82,11 +82,14 @@
     <Compile Include="Hspi\Exceptions\ZWavePlugInDataInvalidException.cs" />
     <Compile Include="Hspi\HSPI.cs" />
     <Compile Include="Hspi\IZWaveConnection.cs" />
+    <Compile Include="Hspi\OpenZWaveDB\ZWaveCommandClass.cs" />
+    <Compile Include="Hspi\OpenZWaveDB\ZWaveCommandClassChannel.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveDevice.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveDeviceManufacturer.cs" />
     <Compile Include="Hspi\OpenZWaveDB\OpenZWaveDBInformation.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveDeviceParameter.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveDeviceParameterOption.cs" />
+    <Compile Include="Hspi\OpenZWaveDB\ZWaveEndPoints.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveInformation.cs" />
     <Compile Include="Hspi\PlugIn.cs" />
     <Compile Include="Hspi\PluginConfig.cs" />

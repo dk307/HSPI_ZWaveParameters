@@ -74,6 +74,7 @@ namespace Hspi
                 }
                 else if (!parameter.HasSubParameters)
                 {
+                    list.Add(sizeString);
                     list.Add(Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}"));
                 }
             }

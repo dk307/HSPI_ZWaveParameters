@@ -74,7 +74,7 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Hspi\BootstrapHtmlHelper.cs" />
+    <Compile Include="Hspi\Bootstrap.cs" />
     <Compile Include="Hspi\DeviceConfigPage.cs" />
     <Compile Include="Hspi\Exceptions\ShowErrorMessageException.cs" />
     <Compile Include="Hspi\HSPI.cs" />

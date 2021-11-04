@@ -15,23 +15,12 @@ namespace HSPI_ZWaveParametersTest
     public class DeviceConfigPageTest
     {
         [TestMethod]
-        public async Task SupportsDeviceConfigPage()
+        public async Task SupportsDeviceConfigPageForAeonLabsSwitch()
         {
             int deviceRef = 34;
             var httpclient = CreateMockHttpClientForAeonLabsSwitch();
-
-            var zwaveData = new ZWaveData(
-
-               ManufactureId: 0x0086,
-               ProductId: 6,
-               ProductType: 3,
-               NodeId: 67,
-               HomeId: "485F5",
-               Firmware: new Version(5, 0)
-           );
-
-            var mock = new Mock<IZWaveConnection>();
-            mock.Setup(x => x.GetDeviceZWaveData(deviceRef)).Returns(zwaveData);
+            var zwaveData = CreateAeonLabsZWaveData();
+            var mock = SetupZWaveConnection(deviceRef, zwaveData);
 
             var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpclient);
             var page = await deviceConfigPage.BuildConfigPage(CancellationToken.None);
@@ -58,6 +47,46 @@ namespace HSPI_ZWaveParametersTest
             Mock.VerifyAll(mock);
         }
 
+        [TestMethod]
+        public async Task SupportsDeviceConfigPageForMinPage()
+        {
+            int deviceRef = 334;
+            var handler = new Mock<HttpMessageHandler>();
+            var httpclient = handler.CreateClient();
+
+            handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006")
+                               .ReturnsResponse(Resource.AeonLabsOpenZWaveDBDeviceListJson, "application/json");
+
+            handler.SetupRequest(HttpMethod.Get, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75")
+                               .ReturnsResponse("{ database_id:1034}", "application/json");
+
+            var zwaveData = CreateAeonLabsZWaveData();
+            var mock = SetupZWaveConnection(deviceRef, zwaveData);
+
+            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpclient);
+            var page = await deviceConfigPage.BuildConfigPage(CancellationToken.None);
+
+            Assert.AreEqual(page.Views.Count, 1);
+
+            // verify header link
+            VerifyHeader(deviceConfigPage, page.Views[0]);
+
+            Mock.VerifyAll(mock, handler);
+        }
+
+        private static ZWaveData CreateAeonLabsZWaveData()
+        {
+            return new ZWaveData(
+
+               ManufactureId: 0x0086,
+               ProductId: 6,
+               ProductType: 3,
+               NodeId: 67,
+               HomeId: "485F5",
+               Firmware: new Version(5, 0)
+           );
+        }
+
         private static HttpClient CreateMockHttpClientForAeonLabsSwitch()
         {
             var handler = new Mock<HttpMessageHandler>();
@@ -69,6 +98,13 @@ namespace HSPI_ZWaveParametersTest
             handler.SetupRequest(HttpMethod.Get, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75")
                                .ReturnsResponse(Resource.AeonLabsOpenZWaveDBDeviceJson, "application/json");
             return httpclient;
+        }
+
+        private static Mock<IZWaveConnection> SetupZWaveConnection(int deviceRef, ZWaveData zwaveData)
+        {
+            var mock = new Mock<IZWaveConnection>();
+            mock.Setup(x => x.GetDeviceZWaveData(deviceRef)).Returns(zwaveData);
+            return mock;
         }
 
         private static void VerifyHeader(DeviceConfigPage deviceConfigPage, AbstractView view)
@@ -101,7 +137,7 @@ namespace HSPI_ZWaveParametersTest
             // int section = 0;
             // foreach( var parameter in deviceConfigPage.Data.Parameters)
             // {
-            //   
+            //
             // }
         }
 

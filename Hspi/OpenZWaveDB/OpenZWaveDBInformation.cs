@@ -37,27 +37,29 @@ namespace Hspi.OpenZWaveDB
                 string deviceUrl = string.Format(deviceUrlFormat, id);
                 var deviceJson = await GetCall(deviceUrl, cancellationToken).ConfigureAwait(false);
 
-                ZWaveInformation obj = ParseJson(deviceJson);
-
-                // process parameters
-                var map = obj.Parameters.GroupBy(x => x.ParameterId);
+                var obj = ParseJson(deviceJson);
 
                 var finalParameters = new List<ZWaveDeviceParameter>();
-
-                foreach (var group in map)
+                if (obj.Parameters != null)
                 {
-                    if (group.Count() == 1)
-                    {
-                        finalParameters.Add(group.First());
-                    }
-                    else
-                    {
-                        var result = group.First();
+                    // process parameters
+                    var map = obj.Parameters.GroupBy(x => x.ParameterId);
 
-                        finalParameters.Add(result with
+                    foreach (var group in map)
+                    {
+                        if (group.Count() == 1)
                         {
-                            SubParameters = group.Skip(1).ToList().AsReadOnly(),
-                        });
+                            finalParameters.Add(group.First());
+                        }
+                        else
+                        {
+                            var result = group.First();
+
+                            finalParameters.Add(result with
+                            {
+                                SubParameters = group.Skip(1).ToList().AsReadOnly(),
+                            });
+                        }
                     }
                 }
 
@@ -102,7 +104,7 @@ namespace Hspi.OpenZWaveDB
 
             if (devices == null || devices.Length == 0)
             {
-               throw new ShowErrorMessageException("Device not found in z-wave database");
+                throw new ShowErrorMessageException("Device not found in z-wave database");
             }
 
             logger.Debug(Invariant($"Found {devices.Length} devices for manufactureId:{manufactureId} productType:{productType} productId:{productId}"));

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace Hspi.Exceptions
 {
+
+
     internal class ShowErrorMessageException : Exception
     {
         public ShowErrorMessageException()

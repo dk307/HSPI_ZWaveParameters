@@ -76,7 +76,9 @@
   <ItemGroup>
     <Compile Include="Hspi\Bootstrap.cs" />
     <Compile Include="Hspi\DeviceConfigPage.cs" />
+    <Compile Include="Hspi\Exceptions\NotAZWaveDeviceException.cs" />
     <Compile Include="Hspi\Exceptions\ShowErrorMessageException.cs" />
+    <Compile Include="Hspi\Exceptions\ZWavePlugInDataInvalidException.cs" />
     <Compile Include="Hspi\HSPI.cs" />
     <Compile Include="Hspi\IZWaveConnection.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveDevice.cs" />

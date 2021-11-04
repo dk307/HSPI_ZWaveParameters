@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="CompilerHelper.cs" />
     <Compile Include="DeviceConfigPageTest.cs" />
+    <Compile Include="ZWaveInformationTest.cs" />
     <Compile Include="PluginTest.cs" />
     <Compile Include="OpenZWaveDBInformationTest.cs" />
     <Compile Include="OpenZWaveDBJsonParseTest.cs" />

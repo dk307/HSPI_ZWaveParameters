@@ -1,5 +1,6 @@
 ﻿using HomeSeer.PluginSdk;
 using HomeSeer.PluginSdk.Devices;
+using Hspi.Exceptions;
 using Nito.AsyncEx;
 using System;
 using System.Globalization;
@@ -41,22 +42,22 @@ namespace Hspi
         {
             if (!IsZwaveDevice(deviceOrFeatureRef))
             {
-                throw new Exception("Device is not a Z-Wave device");
+                throw new NotAZWaveDeviceException("Device is not a Z-Wave device");
             }
 
             var plugInData = (PlugExtraData)HomeSeerSystem.GetPropertyByRef(deviceOrFeatureRef, EProperty.PlugExtraData);
             if (plugInData == null)
             {
-                throw new Exception("Device Plugin extra data is not valid");
+                throw new ZWavePlugInDataInvalidException("Device Plugin extra data is not valid");
             }
 
-            var manufacturerId = GetValueFromExtraData<Int32>(plugInData, "manufacturer_id");
-            var productId = GetValueFromExtraData<UInt16>(plugInData, "manufacturer_prod_id");
-            var productType = GetValueFromExtraData<UInt16>(plugInData, "manufacturer_prod_type");
+            var manufacturerId = GetValueFromExtraDataWithTrim<Int32>(plugInData, "manufacturer_id");
+            var productId = GetValueFromExtraDataWithTrim<UInt16>(plugInData, "manufacturer_prod_id");
+            var productType = GetValueFromExtraDataWithTrim<UInt16>(plugInData, "manufacturer_prod_type");
 
-            var nodeId = GetValueFromExtraData<Byte>(plugInData, "node_id");
-            var homeId = plugInData["homeid"];
-            var firmware = plugInData["node_version_app"];
+            var nodeId = GetValueFromExtraDataWithTrim<Byte>(plugInData, "node_id");
+            var homeId = GetValueFromExtraData(plugInData, "homeid");
+            var firmware = GetValueFromExtraData(plugInData, "node_version_app");
 
             if (!manufacturerId.HasValue
                 || !productType.HasValue
@@ -65,7 +66,7 @@ namespace Hspi
                 || homeId == null
                 || string.IsNullOrWhiteSpace(firmware))
             {
-                throw new Exception("Device Z-Wave plugin data is not valid");
+                throw new ZWavePlugInDataInvalidException("Device Z-Wave plugin data is not valid");
             }
 
             Version firmwareVersion;
@@ -97,7 +98,7 @@ namespace Hspi
             var validResults = new string[4] { "Unknown", "Success", "Queued", "Failed" };
         }
 
-        private static T? GetValueFromExtraData<T>(PlugExtraData plugInData, string name) where T : struct
+        private static T? GetValueFromExtraDataWithTrim<T>(PlugExtraData plugInData, string name) where T : struct
         {
             if (plugInData.ContainsNamed(name))
             {
@@ -107,6 +108,11 @@ namespace Hspi
             {
                 return null;
             }
+        }
+
+        private static string? GetValueFromExtraData(PlugExtraData plugInData, string name)
+        {
+            return plugInData.ContainsNamed(name) ? plugInData[name] : null;
         }
 
         private const string ZWaveInterface = "Z-Wave";

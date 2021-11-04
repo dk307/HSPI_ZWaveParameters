@@ -37,9 +37,7 @@ namespace HSPI_ZWaveParametersTest
             VeryHtmlValid(page.Views[2].ToHtml());
 
             // verify parameters
-            VeryHtmlValid(page.Views[3].ToHtml());
-
-            VerifyParametersView(deviceConfigPage, page.Views[3]);
+            VerifyParametersView(deviceConfigPage, (GridView)page.Views[3]);
 
             // verify auto click refresh all
             VeryHtmlValid(page.Views[4].ToHtml());
@@ -123,11 +121,17 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(node.Attributes["href"].Value, deviceConfigPage.Data.WebUrl.ToString());
         }
 
-        private static void VerifyParametersView(DeviceConfigPage deviceConfigPage, AbstractView view)
+        private static void VerifyParametersView(DeviceConfigPage deviceConfigPage, GridView view)
         {
+            foreach(var subView in view.Views)
+            {
+                VeryHtmlValid(subView.ToHtml());
+            }
+
+
             HtmlAgilityPack.HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(view.ToHtml());
-            Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0);
+            Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0, "Parameters HTML is ill formed");
 
             // not write only should have refresh buttons
             var refreshButtonNodes = htmlDocument.DocumentNode.SelectNodes("//*/button");

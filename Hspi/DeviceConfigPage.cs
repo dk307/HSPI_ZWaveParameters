@@ -47,7 +47,7 @@ namespace Hspi
             // Label
             string labelText0 = Bootstrap.ApplyStyle(data.DisplayFullName(), Bootstrap.Style.TextBolder, Bootstrap.Style.TextWrap);
             string labelText = Bootstrap.MakeInfoHyperlinkInAnotherTab(labelText0, data.WebUrl);
-            page = page.WithView(AddRawHtml(Invariant($"<h6>{labelText}</h6>"), false));
+            page = page.WithView(AddRawHtml(Invariant($"<h6>{labelText}</h6>"), true));
 
             //Parameters
             page = AddParameters(page, openZWaveData, zwaveData.HomeId, zwaveData.NodeId);
@@ -114,7 +114,7 @@ namespace Hspi
             }
         }
 
-        private static string CreateParameterValueControl(ZWaveDeviceParameter parameter, string id)
+        private static string CreateParameterValueControl(ZWaveDeviceParameter parameter, string label, string id)
         {
             var stb = new StringBuilder();
 
@@ -128,7 +128,7 @@ namespace Hspi
                 stb.Append(Invariant($"<script> const {id}_optionkeys = [{string.Join(",", optionKeys)}];</script>"));
 
                 var selectListView = new SelectListView(id,
-                                                        string.Empty,
+                                                        label,
                                                         options,
                                                         ESelectListType.DropDown);
                 stb.Append(selectListView.ToHtml());
@@ -139,7 +139,7 @@ namespace Hspi
             {
                 var stb2 = new StringBuilder();
 
-                stb2.Append("Value");
+                stb2.Append(label);
                 if (!parameter.HasSubParameters)
                 {
                     stb2.Append('(');
@@ -209,9 +209,9 @@ namespace Hspi
             return page;
         }
 
-        private LabelView AddRawHtml(string value, bool asTitle = true, string? id = null)
+        private LabelView AddRawHtml(string value, bool asTitle, string? id = null)
         {
-            string html = Invariant($"<span style=\"font-size:medium;\">{value}</span>");
+            var html = Invariant($"<span style=\"font-size:small;\">{value}</span>");
             return new LabelView(id ?? NewId(),
                                  asTitle ? html : string.Empty,
                                  asTitle ? string.Empty : value);
@@ -233,10 +233,12 @@ namespace Hspi
         private LabelView CreateDescriptionViewForParameter(ZWaveInformation data, int parameterId)
         {
             var list = data.DescriptionForParameter(parameterId);
-            string rows = Bootstrap.MakeMultipleRows(list.ToArray());
+            string rows = Bootstrap.MakeMultipleRows(list);
             string description = Bootstrap.ApplyStyle(rows,
-                                                      Bootstrap.Style.TextLight, Bootstrap.Style.TextWrap);
-            var detailsLabel = AddRawHtml(description);
+                                                      Bootstrap.Style.TextLight, 
+                                                      Bootstrap.Style.TextWrap, 
+                                                      Bootstrap.Style.AlignMiddle);
+            var detailsLabel = AddRawHtml(description, true);
             return detailsLabel;
         }
 
@@ -248,34 +250,32 @@ namespace Hspi
             string currentWrapperControlValueId = elementId + "_wrapper";
 
             string refreshButton =
-              string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\">Refresh</button>",
+              string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave waves-effect waves-light\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\">Refresh</button>",
                       homeId, nodeId, parameter.ParameterId, currentMessageValueId, currentWrapperControlValueId, elementId);
 
-            var list = new List<string>
-            {
-                Invariant($"{Bootstrap.ApplyStyle(data.LabelForParameter(parameter.ParameterId), Bootstrap.Style.TextBold)}(#{parameter.ParameterId})")
-            };
+            string parameterLabel = Invariant($"{Bootstrap.ApplyStyle(data.LabelForParameter(parameter.ParameterId), Bootstrap.Style.TextBold)}(#{parameter.ParameterId})");
+            var list = new List<string>();
 
             var topMessage = parameter.WriteOnly ? "Write Only parameter" : "Value not retrieved";
-            string notRetrievedMessage = Invariant($"<span id=\"{currentMessageValueId}\">{topMessage}</span>");
-            list.Add(Bootstrap.ApplyStyle(notRetrievedMessage, Bootstrap.Style.TextItalic));
+            string notRetrievedMessage = Invariant($"<span id=\"{currentMessageValueId}\">{topMessage}{NewLine}</span>");
 
-            string currentControlValue = CreateParameterValueControl(parameter, elementId);
+            string currentControlValue = CreateParameterValueControl(parameter, parameterLabel, elementId);
             if (parameter.ReadOnly)
             {
                 string readonlyMessage = Bootstrap.ApplyStyle("Read only parameter", Bootstrap.Style.TextItalic);
-                currentControlValue = Bootstrap.MakeMultipleRows(readonlyMessage, currentControlValue);
+                currentControlValue = currentControlValue + NewLine + readonlyMessage;
             }
 
             string currentControlValueWrapper = Invariant($"<span id=\"{currentWrapperControlValueId}\" {(!parameter.WriteOnly ? "hidden" : string.Empty)}>{currentControlValue}</span>");
             list.Add(currentControlValueWrapper);
+            list.Add(Bootstrap.ApplyStyle(notRetrievedMessage, Bootstrap.Style.TextItalic));
 
             if (!parameter.WriteOnly)
             {
                 list.Add(refreshButton);
             }
 
-            var current = Bootstrap.MakeMultipleRows(list.ToArray());
+            var current = Bootstrap.ApplyStyle(string.Join(string.Empty, list), Bootstrap.Style.AlignMiddle);
             return AddRawHtml(current, false);
         }
 
@@ -284,6 +284,7 @@ namespace Hspi
             return Invariant($"z_wave_parameter_{id++}");
         }
 
+        private const string NewLine = "<BR>";
         private const string ZWaveParameterPrefix = "zw_parameter_";
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int deviceOrFeatureRef;

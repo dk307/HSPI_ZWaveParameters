@@ -19,6 +19,7 @@ namespace Hspi
             TextLight,
             TextWrap,
             TextNoWrap,
+            AlignMiddle,
         }
 
         public static string ApplyStyle(string data, params Style[] styles)
@@ -32,14 +33,13 @@ namespace Hspi
             return Invariant($"<a href=\"{link}\" class=\"link-info\" target=\"_blank\">{data}</a>");
         }
 
-        public static string MakeMultipleRows(params string[] values)
+        public static string MakeMultipleRows(IEnumerable<string> values)
         {
             var stb = new StringBuilder();
             foreach (var value in values)
             {
-                stb.Append("<article>");
                 stb.Append(value);
-                stb.Append("</article>");
+                stb.Append("<br>");
             }
             return stb.ToString();
         }
@@ -53,6 +53,7 @@ namespace Hspi
             { Style.TextLight, "font-weight-light" },
             { Style.TextWrap, "text-wrap" },
             { Style.TextNoWrap, "text-nowrap" },
+            { Style.AlignMiddle, "align-middle" },
         };
     }
 }

@@ -5,49 +5,63 @@ using Hspi.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Threading.Tasks;
 
 namespace HSPI_ZWaveParametersTest
 {
     [TestClass]
     public class ZWaveInformationTest
     {
-        private const string ZWaveInterface = "Z-Wave";
-
         [TestMethod]
-        public void GetDeviceZWaveDataThrowsForNonZWaveDevice()
+        public async Task GetConfiguration()
         {
-            int deviceRef = 9384;
-            var mock = new Mock<IHsController>();
-            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns("Something");
+            string homeId = "4567f";
+            byte nodeId = 234;
+            byte param = 45;
+            int value = 42;
 
-            ZWaveConnection connection = new ZWaveConnection(mock.Object);
-            Assert.ThrowsException<NotAZWaveDeviceException>(() => connection.GetDeviceZWaveData(deviceRef));
+            var mock = new Mock<IHsController>();
+            mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param }))
+                .Returns(value);
+
+            mock.Setup(x => x.LegacyPluginPropertyGet(ZWaveInterface, string.Empty, "Configuration_Get_Result"))
+                .Returns(true);
+
+            ZWaveConnection connection = new(mock.Object);
+            Assert.AreEqual(await connection.GetConfiguration(homeId, nodeId, param), value);
         }
 
         [TestMethod]
-        public void GetDeviceZWaveDataThrowsForNoPlugInData()
+        public async Task GetConfigurationFails()
         {
-            int deviceRef = 9384;
-            var mock = new Mock<IHsController>();
-            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(ZWaveInterface);
-            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(null);
+            string homeId = "4567f";
+            byte nodeId = 234;
+            byte param = 45;
 
-            ZWaveConnection connection = new ZWaveConnection(mock.Object);
-            Assert.ThrowsException<ZWavePlugInDataInvalidException>(() => connection.GetDeviceZWaveData(deviceRef));
+            var mock = new Mock<IHsController>();
+            mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param }))
+                .Returns(34);
+
+            mock.Setup(x => x.LegacyPluginPropertyGet(ZWaveInterface, string.Empty, "Configuration_Get_Result"))
+                .Returns(false);
+
+            ZWaveConnection connection = new(mock.Object);
+            await Assert.ThrowsExceptionAsync<ZWaveGetConfigurationFailedException>(() => connection.GetConfiguration(homeId, nodeId, param));
         }
 
         [TestMethod]
-        public void GetDeviceZWaveDataThrowsForInValidPlugInData()
+        public async Task GetConfigurationFailWithHomeSeerException()
         {
-            int deviceRef = 9384;
+            string homeId = "4567f";
+            byte nodeId = 234;
+            byte param = 45;
+
             var mock = new Mock<IHsController>();
-            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(ZWaveInterface);
+            mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param }))
+                .Throws(new TimeoutException());
 
-            var plugInExtraData = new PlugExtraData();
-            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(plugInExtraData);
-
-            ZWaveConnection connection = new ZWaveConnection(mock.Object);
-            Assert.ThrowsException<ZWavePlugInDataInvalidException>(() => connection.GetDeviceZWaveData(deviceRef));
+            ZWaveConnection connection = new(mock.Object);
+            await Assert.ThrowsExceptionAsync<ZWaveGetConfigurationFailedException>(() => connection.GetConfiguration(homeId, nodeId, param));
         }
 
         [TestMethod]
@@ -81,8 +95,45 @@ namespace HSPI_ZWaveParametersTest
 
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(plugInExtraData);
 
-            ZWaveConnection connection = new ZWaveConnection(mock.Object);
+            ZWaveConnection connection = new(mock.Object);
             Assert.AreEqual(connection.GetDeviceZWaveData(deviceRef), zwaveData);
+        }
+
+        [TestMethod]
+        public void GetDeviceZWaveDataThrowsForInValidPlugInData()
+        {
+            int deviceRef = 9384;
+            var mock = new Mock<IHsController>();
+            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(ZWaveInterface);
+
+            var plugInExtraData = new PlugExtraData();
+            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(plugInExtraData);
+
+            ZWaveConnection connection = new ZWaveConnection(mock.Object);
+            Assert.ThrowsException<ZWavePlugInDataInvalidException>(() => connection.GetDeviceZWaveData(deviceRef));
+        }
+
+        [TestMethod]
+        public void GetDeviceZWaveDataThrowsForNonZWaveDevice()
+        {
+            int deviceRef = 9384;
+            var mock = new Mock<IHsController>();
+            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns("Something");
+
+            ZWaveConnection connection = new ZWaveConnection(mock.Object);
+            Assert.ThrowsException<NotAZWaveDeviceException>(() => connection.GetDeviceZWaveData(deviceRef));
+        }
+
+        [TestMethod]
+        public void GetDeviceZWaveDataThrowsForNoPlugInData()
+        {
+            int deviceRef = 9384;
+            var mock = new Mock<IHsController>();
+            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(ZWaveInterface);
+            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(null);
+
+            ZWaveConnection connection = new ZWaveConnection(mock.Object);
+            Assert.ThrowsException<ZWavePlugInDataInvalidException>(() => connection.GetDeviceZWaveData(deviceRef));
         }
 
         private static Mock<IHsController> CreateMockForHsController(int deviceRef, ZWaveData zwaveData)
@@ -101,5 +152,7 @@ namespace HSPI_ZWaveParametersTest
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(plugInExtraData);
             return mock;
         }
+
+        private const string ZWaveInterface = "Z-Wave";
     }
 }

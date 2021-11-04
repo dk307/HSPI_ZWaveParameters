@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Hspi.Exceptions
 {
-    class ZWavePlugInDataInvalidException : Exception
+    internal class ZWavePlugInDataInvalidException : Exception
     {
         public ZWavePlugInDataInvalidException()
         {

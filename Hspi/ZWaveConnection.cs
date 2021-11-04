@@ -20,22 +20,29 @@ namespace Hspi
 
         public async Task<int> GetConfiguration(string homeId, byte nodeId, byte param)
         {
-            // we use lock because we read status later from another variable
-            using var readLock = await getConfiguationLock.LockAsync().ConfigureAwait(false);
-            logger.Debug(Invariant($"Getting HomeId:{homeId} NodeId:{nodeId} Parameter:{param}"));
-            var value = (int)HomeSeerSystem.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
-
-            bool wasSuccessful = (bool)HomeSeerSystem.LegacyPluginPropertyGet(ZWaveInterface, string.Empty, "Configuration_Get_Result");
-
-            readLock.Dispose();
-
-            if (!wasSuccessful)
+            try
             {
-                throw new Exception("Failed to get parameter");
-            }
+                // we use lock because we read status later from another variable
+                using var readLock = await getConfiguationLock.LockAsync().ConfigureAwait(false);
+                logger.Debug(Invariant($"Getting HomeId:{homeId} NodeId:{nodeId} Parameter:{param}"));
+                var value = (int)HomeSeerSystem.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
 
-            logger.Debug(Invariant($"For HomeId:{homeId} NodeId:{nodeId} Parameter:{param} got {value}"));
-            return value;
+                bool wasSuccessful = (bool)HomeSeerSystem.LegacyPluginPropertyGet(ZWaveInterface, string.Empty, "Configuration_Get_Result");
+
+                readLock.Dispose();
+
+                if (!wasSuccessful)
+                {
+                    throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for NodeId {nodeId} "));
+                }
+
+                logger.Debug(Invariant($"For HomeId:{homeId} NodeId:{nodeId} Parameter:{param} got {value}"));
+                return value;
+            }
+            catch (Exception ex)
+            {
+                throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for NodeId {nodeId} "), ex);
+            }
         }
 
         public ZWaveData GetDeviceZWaveData(int deviceOrFeatureRef)
@@ -98,6 +105,11 @@ namespace Hspi
             var validResults = new string[4] { "Unknown", "Success", "Queued", "Failed" };
         }
 
+        private static string? GetValueFromExtraData(PlugExtraData plugInData, string name)
+        {
+            return plugInData.ContainsNamed(name) ? plugInData[name] : null;
+        }
+
         private static T? GetValueFromExtraDataWithTrim<T>(PlugExtraData plugInData, string name) where T : struct
         {
             if (plugInData.ContainsNamed(name))
@@ -108,11 +120,6 @@ namespace Hspi
             {
                 return null;
             }
-        }
-
-        private static string? GetValueFromExtraData(PlugExtraData plugInData, string name)
-        {
-            return plugInData.ContainsNamed(name) ? plugInData[name] : null;
         }
 
         private const string ZWaveInterface = "Z-Wave";

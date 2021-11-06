@@ -23,7 +23,7 @@ after_build:
  - ps: Get-ChildItem bin\Release\HSPI_ZWaveParameters*.zip | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 
 test_script:
-  - vstest.console /logger:Appveyor  HSPI_ZWaveParameters\tests\bin\Release\HSPI_ZWaveParametersTest.dll
+  - vstest.console /logger:Appveyor  tests\bin\Release\HSPI_ZWaveParametersTest.dll
 
 artifacts:
 - path: bin\Release\updater_override.json

@@ -21,30 +21,34 @@ namespace HSPI_ZWaveParametersTest
 
         public static IEnumerable<object[]> GetSupportsDeviceConfigPageData()
         {
-            yield return new object[] { AeonLabsZWaveData,
-                              CreateMockHttpClient("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006",
-                                                    Resource.AeonLabsOpenZWaveDBDeviceListJson,
-                                                    "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75",
-                                                    Resource.AeonLabsOpenZWaveDBDeviceJson)
-            };
+            yield return new object[] { AeonLabsZWaveData, CreateAeonLabsSwitchHttpHandler() };
             yield return new object[] { HomeseerSwitchZWaveData,
-                              CreateMockHttpClient("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
+                              CreateMockHttpHandler("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
                                                     Resource.HomeseerDimmerOpenZWaveDBDeviceListJson,
                                                     "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040",
                                                     Resource.AeonLabsOpenZWaveDBDeviceJson)
             };
         }
 
+        [TestMethod]
+        public async Task OnDeviceConfigChangeWithNoChange()
+        {
+            DeviceConfigPage deviceConfigPage = await CreateAeonLabsSwitchDeviceConfigPage();
+            deviceConfigPage.OnDeviceConfigChange(PageFactory.CreateGenericPage("id", "name").Page);
+        }
+
         [DataTestMethod]
         [DynamicData(nameof(GetSupportsDeviceConfigPageData), DynamicDataSourceType.Method)]
-        public async Task SupportsDeviceConfigPage(ZWaveData zWaveData, Mock<HttpMessageHandler> httpHandler)
+        public async Task SupportsDeviceConfigPage(ZWaveData zwaveData, Mock<HttpMessageHandler> httpHandler)
         {
             int deviceRef = 34;
-            var mock = SetupZWaveConnection(deviceRef, zWaveData);
+            var mock = SetupZWaveConnection(deviceRef, zwaveData);
 
             var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpHandler.CreateClient());
             await deviceConfigPage.BuildConfigPage(CancellationToken.None);
             var page = deviceConfigPage.Page;
+
+            Assert.IsNotNull(page);
 
             Assert.AreEqual(page.Views.Count, 4);
 
@@ -91,7 +95,26 @@ namespace HSPI_ZWaveParametersTest
             Mock.VerifyAll(mock, handler);
         }
 
-        private static Mock<HttpMessageHandler> CreateMockHttpClient(string deviceListUrl, string deviceListJson, string deviceUrl, string deviceJson)
+        private static async Task<DeviceConfigPage> CreateAeonLabsSwitchDeviceConfigPage()
+        {
+            int deviceRef = 3746;
+            ZWaveData zwaveData = AeonLabsZWaveData;
+            var httpHandler = CreateAeonLabsSwitchHttpHandler();
+
+            var mock = SetupZWaveConnection(deviceRef, zwaveData);
+            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpHandler.CreateClient());
+            await deviceConfigPage.BuildConfigPage(CancellationToken.None);
+            return deviceConfigPage;
+        }
+        private static Mock<HttpMessageHandler> CreateAeonLabsSwitchHttpHandler()
+        {
+            return CreateMockHttpHandler("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006",
+                                                                Resource.AeonLabsOpenZWaveDBDeviceListJson,
+                                                                "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75",
+                                                                Resource.AeonLabsOpenZWaveDBDeviceJson);
+        }
+
+        private static Mock<HttpMessageHandler> CreateMockHttpHandler(string deviceListUrl, string deviceListJson, string deviceUrl, string deviceJson)
         {
             var handler = new Mock<HttpMessageHandler>();
 

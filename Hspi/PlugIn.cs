@@ -26,7 +26,7 @@ namespace Hspi
         {
             try
             {
-                var page = new DeviceConfigPage(new ZWaveConnection(HomeSeerSystem), deviceOrFeatureRef);
+                var page = new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef);
 
                 page.BuildConfigPage(CancellationToken.None).ResultForSync();
 
@@ -46,8 +46,13 @@ namespace Hspi
 
         public override bool HasJuiDeviceConfigPage(int devOrFeatRef)
         {
-            var connection = new ZWaveConnection(HomeSeerSystem);
+            var connection = CreateZWaveConnection();
             return connection.IsZwaveDevice(devOrFeatRef);
+        }
+
+        protected virtual IZWaveConnection CreateZWaveConnection()
+        {
+            return new ZWaveConnection(HomeSeerSystem);
         }
 
         public override string PostBackProc(string page, string data, string user, int userRights)
@@ -132,7 +137,7 @@ namespace Hspi
                         throw new Exception("Input not valid");
                     }
 
-                    var connection = new ZWaveConnection(HomeSeerSystem);
+                    var connection = CreateZWaveConnection();
                     int value = connection.GetConfiguration(homeId, nodeId.Value, parameter.Value).ResultForSync();
 
                     return JsonConvert.SerializeObject(new ZWaveParameterGetResult()

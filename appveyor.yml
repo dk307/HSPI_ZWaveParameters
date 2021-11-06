@@ -21,6 +21,10 @@ build_script:
     msbuild "C:\projects\hspi-zwaveparameters\HSPI_ZWaveParameters.sln" /m /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:Platform="Any CPU"
 after_build:
  - ps: Get-ChildItem bin\Release\HSPI_ZWaveParameters*.zip | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+
+test_script:
+  - vstest.console /logger:Appveyor  HSPI_ZWaveParameters\tests\bin\Release\HSPI_ZWaveParametersTest.dll
+
 artifacts:
 - path: bin\Release\updater_override.json
   name: config

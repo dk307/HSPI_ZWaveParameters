@@ -1,4 +1,5 @@
 ﻿using Hspi;
+using Hspi.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
@@ -45,7 +46,7 @@ namespace HSPI_ZWaveParametersTest
         }
 
         [TestMethod]
-        public void PostBackProcforUpdatePage()
+        public void PostBackProcforGetConfiguration()
         {
             CreatePlugInWithZWaveConnection(out var zwaveConnectionMock, out var pluginMock);
 
@@ -68,6 +69,28 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(result.Value, parameterValue);
         }
 
+        [TestMethod]
+        public void PostBackProcGetConfigurationFailure()
+        {
+            CreatePlugInWithZWaveConnection(out var zwaveConnectionMock, out var pluginMock);
+            var input = new
+            {
+                operation = "GET",
+                homeId = "23434",
+                nodeId = (byte)232,
+                parameter = (byte)23
+            };
+            zwaveConnectionMock
+                 .Setup(x => x.GetConfiguration(input.homeId, input.nodeId, input.parameter))
+                 .ThrowsAsync(new ZWaveGetConfigurationFailedException());
+
+            var value = pluginMock.Object.PostBackProc("Update", JsonConvert.SerializeObject(input), "user", 0);
+
+            var result = JsonConvert.DeserializeObject<ZWaveParameterGetResult>(value);
+            Assert.IsNotNull(result.ErrorMessage);
+            Assert.IsNull(result.Value);
+        }
+
         [DataTestMethod]
         [DataRow(false)]
         [DataRow(true)]
@@ -79,7 +102,6 @@ namespace HSPI_ZWaveParametersTest
             zwaveConnectionMock.Setup(x => x.IsZwaveDevice(devOrFeatRef)).Returns(supports);
 
             var plugIn = pluginMock.Object;
-
             bool expected = plugIn.HasJuiDeviceConfigPage(devOrFeatRef);
             Assert.AreEqual(expected, supports);
 

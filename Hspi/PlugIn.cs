@@ -132,9 +132,9 @@ namespace Hspi
                     var nodeId = (byte?)input["nodeId"];
                     var parameter = (byte?)input["parameter"];
 
-                    if ((homeId == null) || !nodeId.HasValue || !parameter.HasValue)
+                    if (string.IsNullOrWhiteSpace(homeId) || !nodeId.HasValue || !parameter.HasValue)
                     {
-                        throw new Exception("Input not valid");
+                        throw new ArgumentException("Input not valid");
                     }
 
                     var connection = CreateZWaveConnection();
@@ -145,7 +145,7 @@ namespace Hspi
                         Value = value
                     });
                 }
-                throw new Exception("Unknown operation");
+                throw new ArgumentException("Unknown operation");
             }
             catch (Exception ex)
             {
@@ -163,7 +163,7 @@ namespace Hspi
             Logger.ConfigureLogging(LogDebug, pluginConfig.LogToFile, HomeSeerSystem);
         }
 
-        private struct ZWaveParameterGetResult
+        internal struct ZWaveParameterGetResult
         {
             public string? ErrorMessage { get; init; }
             public int? Value { get; init; }

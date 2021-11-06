@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -28,6 +29,7 @@ namespace Hspi.OpenZWaveDB
 
         public ZWaveInformation? Data => data;
 
+ 
         public async Task Update(CancellationToken cancellationToken)
         {
             try

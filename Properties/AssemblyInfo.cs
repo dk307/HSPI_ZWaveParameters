@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using NullGuard;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -14,7 +13,6 @@ using NullGuard;
 [assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: NullGuard(ValidationFlags.All)]
 [assembly: InternalsVisibleTo("HSPI_ZWaveParametersTest")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

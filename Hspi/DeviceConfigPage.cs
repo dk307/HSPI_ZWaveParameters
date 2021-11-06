@@ -3,6 +3,7 @@ using HomeSeer.Jui.Views;
 using Hspi.OpenZWaveDB;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -25,9 +26,9 @@ namespace Hspi
             this.httpClient = httpClient;
         }
 
-        public ZWaveInformation? Data => data;
+        public ZWaveInformation? Data { get; private set; }
 
-        public Page Page { get; private set; }
+        public Page? Page { get; private set; }
 
         public async Task BuildConfigPage(CancellationToken cancellationToken)
         {
@@ -37,20 +38,20 @@ namespace Hspi
             var openZWaveData = new OpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType,
                                                            zwaveData.ProductId, zwaveData.Firmware, httpClient);
 
-            await openZWaveData.Update(cancellationToken);
+            await openZWaveData.Update(cancellationToken).ConfigureAwait(false);
 
             if (openZWaveData.Data == null)
             {
                 throw new Exception("Failed to get data from website");
             }
 
-            data = openZWaveData.Data;
+            Data = openZWaveData.Data;
 
             var scripts = new List<string>();
 
             // Label
-            string labelText0 = Bootstrap.ApplyStyle(data.DisplayFullName(), Bootstrap.Style.TextBolder, Bootstrap.Style.TextWrap);
-            string labelText = Bootstrap.MakeInfoHyperlinkInAnotherTab(labelText0, data.WebUrl);
+            string labelText0 = Bootstrap.ApplyStyle(Data.DisplayFullName(), Bootstrap.Style.TextBolder, Bootstrap.Style.TextWrap);
+            string labelText = Bootstrap.MakeInfoHyperlinkInAnotherTab(labelText0, Data.WebUrl);
             pageFactory = pageFactory.WithView(AddRawHtml(Invariant($"<h6>{labelText}</h6>"), true));
 
             //Parameters
@@ -63,12 +64,22 @@ namespace Hspi
             Page = pageFactory.Page;
         }
 
-        public void OnDeviceConfigChange(Page changes)
+        [MemberNotNull(nameof(Data), nameof(Page))]
+        private void CheckInitialized()
         {
-            if (data == null)
+            if (Data == null)
             {
                 throw new Exception("Existing ZWave data is null");
             }
+            if (Page == null)
+            {
+                throw new Exception("Existing Page is null");
+            }
+        }
+
+        public void OnDeviceConfigChange(Page changes)
+        {
+            CheckInitialized();
 
             var zwaveData = zwaveConnection.GetDeviceZWaveData(this.deviceOrFeatureRef);
 
@@ -76,7 +87,7 @@ namespace Hspi
             {
                 var id = ZWaveParameterFromId(view.Id);
 
-                var parameterInfo = data.Parameters.FirstOrDefault(x => x.Id == id);
+                var parameterInfo = Data.Parameters.FirstOrDefault(x => x.Id == id);
                 if ((parameterInfo == null) || (parameterInfo.Size == 0))
                 {
                     throw new Exception("Z-wave parameter information not found");
@@ -142,14 +153,14 @@ namespace Hspi
         private PageFactory AddParameters(PageFactory page, List<string> scripts,
                                           string homeId, byte nodeId)
         {
-            if (data?.Parameters != null && data?.Parameters.Count > 0)
+            if (Data?.Parameters != null && Data?.Parameters.Count > 0)
             {
                 var parametersView = new ViewGroup(NewId(), string.Empty);
                 page = CreateAllParameterRefreshButton(page, scripts, parametersView.Id, out var allButtonId);
 
-                foreach (var parameter in data.Parameters)
+                foreach (var parameter in Data.Parameters)
                 {
-                    string parameterLabel = Invariant($"{Bootstrap.ApplyStyle(data.LabelForParameter(parameter.ParameterId), Bootstrap.Style.TextBold)}(#{parameter.ParameterId})");
+                    string parameterLabel = Invariant($"{Bootstrap.ApplyStyle(Data.LabelForParameter(parameter.ParameterId), Bootstrap.Style.TextBold)}(#{parameter.ParameterId})");
 
                     var currentViews = CreateGetSetViewsForParameter(scripts, parameter, homeId, nodeId);
                     var detailsLabel = CreateDescriptionViewForParameter(parameter.ParameterId);
@@ -164,7 +175,7 @@ namespace Hspi
 
                 page = page.WithView(parametersView);
 
-                scripts.Add(string.Format(HtmlSnippets.ClickRefreshButtonScript, parametersView.Id, allButtonId)); 
+                scripts.Add(string.Format(HtmlSnippets.ClickRefreshButtonScript, parametersView.Id, allButtonId));
             }
 
             return page;
@@ -196,7 +207,7 @@ namespace Hspi
 
         private LabelView? CreateDescriptionViewForParameter(int parameterId)
         {
-            var list = data.DescriptionForParameter(parameterId);
+            var list = Data.DescriptionForParameter(parameterId);
             if (list.Count > 0)
             {
                 string rows = Bootstrap.MakeMultipleRows(list);
@@ -312,7 +323,6 @@ namespace Hspi
         private readonly int deviceOrFeatureRef;
         private readonly HttpClient? httpClient;
         private readonly IZWaveConnection zwaveConnection;
-        private ZWaveInformation? data;
         private int id = 0;
     }
 }

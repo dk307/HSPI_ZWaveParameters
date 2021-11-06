@@ -27,9 +27,7 @@ namespace Hspi
             try
             {
                 var page = new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef);
-
                 page.BuildConfigPage(CancellationToken.None).ResultForSync();
-
                 cacheForUpdate[deviceOrFeatureRef] = page;
                 return page.Page.ToJsonString();
             }

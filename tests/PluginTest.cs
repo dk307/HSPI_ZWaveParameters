@@ -34,7 +34,7 @@ namespace HSPI_ZWaveParametersTest
         [DataRow("GET", null, (byte)232, null)]
         public void PostBackProcforUpdatePageWithError(string operation, string homeId, byte? nodeId, byte? parameter)
         {
-            var input = new { operation = operation, homeId = homeId, nodeId = nodeId, parameter = parameter };
+            var input = new { operation, homeId, nodeId, parameter };
 
             var plugin = new PlugIn();
             var value = plugin.PostBackProc("Update", JsonConvert.SerializeObject(input), "user", 0);

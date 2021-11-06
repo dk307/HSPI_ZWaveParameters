@@ -98,7 +98,7 @@ namespace Hspi {
         ///		   operation: &quot;GET&quot;
         ///	   };
         ///	   
-        ///	$(&apos;#&apos; + idValueWrapper).attr(&quot;hidden&quot;,true);
+        ///	$(&apos;#&apos; + idValueWrapper).hide();
         ///	$(&apos;#&apos; + idMessage).html(&apos;&apos;)
         ///	$(&apos;#&apos; + idMessage).addClass(&quot;spinner-border&quot;);
         ///	$(&apos;#&apos; + idMessage).show();	
@@ -108,7 +108,7 @@ namespace Hspi {
         ///		async: &quot;true&quot;,
         ///		url: &apos;/ZWaveParameters/Update&apos;,
         ///		cache: false,
-        ///		data: JSON.strin [rest of string was truncated]&quot;;.
+        ///		data: JSON.stringify(formObje [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PostForRefreshScript {
             get {

@@ -27,7 +27,7 @@ namespace HSPI_ZWaveParametersTest
         }
 
         [TestMethod]
-        public async Task DownloadForSingleSelection()
+        public async Task DownloadForSingleDevice()
         {
             var handler = new Mock<HttpMessageHandler>();
             var httpclient = handler.CreateClient();
@@ -54,7 +54,7 @@ namespace HSPI_ZWaveParametersTest
             handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036")
                                .ReturnsResponse(Resource.HomeseerDimmerOpenZWaveDBDeviceListJson, "application/json");
 
-            handler.SetupRequest(HttpMethod.Get, " https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040")
+            handler.SetupRequest(HttpMethod.Get, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040")
                                .ReturnsResponse(Resource.HomeseerDimmerOpenZWaveDBFullJson, "application/json");
 
             handler.SetupRequest(HttpMethod.Get, " https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=806")

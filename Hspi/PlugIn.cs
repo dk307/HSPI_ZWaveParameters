@@ -27,10 +27,11 @@ namespace Hspi
             try
             {
                 var page = new DeviceConfigPage(new ZWaveConnection(HomeSeerSystem), deviceOrFeatureRef);
-                var pageView = page.BuildConfigPage(CancellationToken.None).ResultForSync();
+
+                page.BuildConfigPage(CancellationToken.None).ResultForSync();
 
                 cacheForUpdate[deviceOrFeatureRef] = page;
-                return pageView.ToJsonString();
+                return page.Page.ToJsonString();
             }
             catch (Exception ex)
             {

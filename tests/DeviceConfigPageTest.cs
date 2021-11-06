@@ -4,45 +4,63 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Contrib.HttpClient;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.FormattableString;
 
 namespace HSPI_ZWaveParametersTest
 {
     [TestClass]
     public class DeviceConfigPageTest
     {
-        [TestMethod]
-        public async Task SupportsDeviceConfigPageForAeonLabsSwitch()
+        private static ZWaveData AeonLabsZWaveData => new(0x0086, 6, 3, 67, "Dr5", new Version(5, 0));
+        private static ZWaveData HomeseerSwitchZWaveData => new(0x000C, 0x3036, 0x4447, 23, "Drw5", new Version(5, 15));
+
+        public static IEnumerable<object[]> GetSupportsDeviceConfigPageData()
+        {
+            yield return new object[] { AeonLabsZWaveData,
+                              CreateMockHttpClient("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006",
+                                                    Resource.AeonLabsOpenZWaveDBDeviceListJson,
+                                                    "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75",
+                                                    Resource.AeonLabsOpenZWaveDBDeviceJson)
+            };
+            yield return new object[] { HomeseerSwitchZWaveData,
+                              CreateMockHttpClient("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
+                                                    Resource.HomeseerDimmerOpenZWaveDBDeviceListJson,
+                                                    "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040",
+                                                    Resource.AeonLabsOpenZWaveDBDeviceJson)
+            };
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(GetSupportsDeviceConfigPageData), DynamicDataSourceType.Method)]
+        public async Task SupportsDeviceConfigPage(ZWaveData zWaveData, Mock<HttpMessageHandler> httpHandler)
         {
             int deviceRef = 34;
-            var httpclient = CreateMockHttpClientForAeonLabsSwitch();
-            var zwaveData = CreateAeonLabsZWaveData();
-            var mock = SetupZWaveConnection(deviceRef, zwaveData);
+            var mock = SetupZWaveConnection(deviceRef, zWaveData);
 
-            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpclient);
-            var page = await deviceConfigPage.BuildConfigPage(CancellationToken.None);
+            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpHandler.CreateClient());
+            await deviceConfigPage.BuildConfigPage(CancellationToken.None);
+            var page = deviceConfigPage.Page;
 
-            Assert.AreEqual(page.Views.Count, 5);
+            Assert.AreEqual(page.Views.Count, 4);
 
             // verify header link
             VerifyHeader(deviceConfigPage, page.Views[0]);
 
-            // verify refresh script block
+            // verify refresh button
             VeryHtmlValid(page.Views[1].ToHtml());
 
-            // verify refresh all button
-            VeryHtmlValid(page.Views[2].ToHtml());
-
             // verify parameters
-            VerifyParametersView(deviceConfigPage, (GridView)page.Views[3]);
+            VerifyParametersView(deviceConfigPage, (ViewGroup)page.Views[2]);
 
-            // verify auto click refresh all
-            VeryHtmlValid(page.Views[4].ToHtml());
+            // verify script
+            VeryHtmlValid(page.Views[3].ToHtml());
 
-            Mock.VerifyAll(mock);
+            Mock.VerifyAll(mock, httpHandler);
         }
 
         [TestMethod]
@@ -58,11 +76,12 @@ namespace HSPI_ZWaveParametersTest
             handler.SetupRequest(HttpMethod.Get, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75")
                                .ReturnsResponse("{ database_id:1034}", "application/json");
 
-            var zwaveData = CreateAeonLabsZWaveData();
+            var zwaveData = AeonLabsZWaveData;
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
 
             var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpclient);
-            var page = await deviceConfigPage.BuildConfigPage(CancellationToken.None);
+            await deviceConfigPage.BuildConfigPage(CancellationToken.None);
+            var page = deviceConfigPage.Page;
 
             Assert.AreEqual(page.Views.Count, 1);
 
@@ -72,30 +91,16 @@ namespace HSPI_ZWaveParametersTest
             Mock.VerifyAll(mock, handler);
         }
 
-        private static ZWaveData CreateAeonLabsZWaveData()
-        {
-            return new ZWaveData(
-
-               ManufactureId: 0x0086,
-               ProductId: 6,
-               ProductType: 3,
-               NodeId: 67,
-               HomeId: "485F5",
-               Firmware: new Version(5, 0)
-           );
-        }
-
-        private static HttpClient CreateMockHttpClientForAeonLabsSwitch()
+        private static Mock<HttpMessageHandler> CreateMockHttpClient(string deviceListUrl, string deviceListJson, string deviceUrl, string deviceJson)
         {
             var handler = new Mock<HttpMessageHandler>();
-            var httpclient = handler.CreateClient();
 
-            handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006")
-                               .ReturnsResponse(Resource.AeonLabsOpenZWaveDBDeviceListJson, "application/json");
+            handler.SetupRequest(HttpMethod.Get, deviceListUrl)
+                               .ReturnsResponse(deviceListJson, "application/json");
 
-            handler.SetupRequest(HttpMethod.Get, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75")
-                               .ReturnsResponse(Resource.AeonLabsOpenZWaveDBDeviceJson, "application/json");
-            return httpclient;
+            handler.SetupRequest(HttpMethod.Get, deviceUrl)
+                               .ReturnsResponse(deviceJson, "application/json");
+            return handler;
         }
 
         private static Mock<IZWaveConnection> SetupZWaveConnection(int deviceRef, ZWaveData zwaveData)
@@ -121,28 +126,41 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(node.Attributes["href"].Value, deviceConfigPage.Data.WebUrl.ToString());
         }
 
-        private static void VerifyParametersView(DeviceConfigPage deviceConfigPage, GridView view)
+        private static void VerifyParametersView(DeviceConfigPage deviceConfigPage, ViewGroup view)
         {
-            foreach(var subView in view.Views)
-            {
-                VeryHtmlValid(subView.ToHtml());
-            }
-
-
             HtmlAgilityPack.HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(view.ToHtml());
             Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0, "Parameters HTML is ill formed");
 
+            // check each parameter is present
+            foreach (var parameter in deviceConfigPage.Data.Parameters)
+            {
+                //label
+                var labelNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/*[.=\"{deviceConfigPage.Data.LabelForParameter(parameter.ParameterId)}\"]"));
+
+                Assert.IsNotNull(labelNodes);
+                Assert.AreEqual(labelNodes.Count, 1);
+
+                // input
+                var dropDownNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/select[@id=\"{ZWaveParameterPrefix}{parameter.Id}\"]"));
+
+                if (parameter.HasOptions && !parameter.HasSubParameters)
+                {
+                    Assert.IsNotNull(dropDownNodes);
+                    Assert.AreEqual(dropDownNodes.Count, 1);
+                }
+                else
+                {
+                    var inputNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/input[@id=\"{ZWaveParameterPrefix}{parameter.Id}\"]"));
+
+                    Assert.IsNotNull(inputNodes);
+                    Assert.AreEqual(inputNodes.Count, 1);
+                }
+            }
+
             // not write only should have refresh buttons
             var refreshButtonNodes = htmlDocument.DocumentNode.SelectNodes("//*/button");
             Assert.AreEqual(refreshButtonNodes.Count, deviceConfigPage.Data.Parameters.Count(x => !x.WriteOnly));
-
-            // check each parameter is present
-            // int section = 0;
-            // foreach( var parameter in deviceConfigPage.Data.Parameters)
-            // {
-            //
-            // }
         }
 
         private static void VeryHtmlValid(string html)
@@ -151,5 +169,7 @@ namespace HSPI_ZWaveParametersTest
             htmlDocument.LoadHtml(html);
             Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0);
         }
+
+        private const string ZWaveParameterPrefix = "zw_parameter_";
     }
 }

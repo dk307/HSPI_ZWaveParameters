@@ -59,18 +59,15 @@ namespace Hspi
             }
             else
             {
-                var descList = new[] { parameter.Description, parameter.Overview, parameter.Label };
-                list.Add(descList.OrderByDescending(x => x?.Length ?? 0).First() ?? string.Empty);
+                var descList = new[] { parameter.Description, parameter.Overview};
+                string? longerOne = descList.OrderByDescending(x => x?.Length ?? 0).FirstOrDefault();
+
+                if (!string.IsNullOrWhiteSpace(longerOne) && longerOne != parameter.Label) {
+                    list.Add(longerOne);
+                }
 
                 if (parameter.HasOptions)
                 {
-                    var stb = new StringBuilder();
-                    stb.Append("Options:<BR>");
-                    foreach (var option in parameter.Options!)
-                    {
-                        stb.Append(Invariant($"{option.Value} - {option.Label}<BR>"));
-                    }
-                    list.Add(stb.ToString());
                 }
                 else if (!parameter.HasSubParameters)
                 {

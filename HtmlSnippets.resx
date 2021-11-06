@@ -144,7 +144,7 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 		   operation: "GET"
 	   };
 	   
-	$('#' + idValueWrapper).attr("hidden",true);
+	$('#' + idValueWrapper).hide();
 	$('#' + idMessage).html('')
 	$('#' + idMessage).addClass("spinner-border");
 	$('#' + idMessage).show();	
@@ -163,7 +163,7 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 			
 		if (result.ErrorMessage == null) {	
 			$('#' + idMessage).hide();
-			$('#' + idValueWrapper).attr("hidden",false);
+			$('#' + idValueWrapper).show();
 			
 			var parameterValue = result.Value;
 			// alert(parameterValue);
@@ -187,13 +187,13 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 				obj.val(parameterValue);	
 			}
 		} else {
-			$('#' + idValueWrapper).attr("hidden",true);
+			$('#' + idValueWrapper).hide();
 			$('#' + idMessage).html(result.ErrorMessage);
 		}
 	})
     .fail(function() {
 		$('#' + idMessage).removeClass("spinner-border");	
-		$('#' + idValueWrapper).attr("hidden",true);
+		$('#' + idValueWrapper).hide();
 		$('#' + idMessage).html("Failed to get value");	
 	})
     .always(function() {

@@ -20,6 +20,7 @@ namespace Hspi
             TextWrap,
             TextNoWrap,
             AlignMiddle,
+            HideOnXS,
         }
 
         public static string ApplyStyle(string data, params Style[] styles)
@@ -35,13 +36,7 @@ namespace Hspi
 
         public static string MakeMultipleRows(IEnumerable<string> values)
         {
-            var stb = new StringBuilder();
-            foreach (var value in values)
-            {
-                stb.Append(value);
-                stb.Append("<br>");
-            }
-            return stb.ToString();
+            return string.Join("<BR>", values);
         }
 
         private static readonly Dictionary<Style, string> styleClass = new()
@@ -54,6 +49,7 @@ namespace Hspi
             { Style.TextWrap, "text-wrap" },
             { Style.TextNoWrap, "text-nowrap" },
             { Style.AlignMiddle, "align-middle" },
+            { Style.HideOnXS, "d-none d-sm-block" },
         };
     }
 }

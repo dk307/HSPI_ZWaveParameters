@@ -16,12 +16,13 @@ namespace HSPI_ZWaveParametersTest
     [TestClass]
     public class DeviceConfigPageTest
     {
-        private static ZWaveData AeonLabsZWaveData => new(0x0086, 6, 3, 67, "Dr5", new Version(5, 0),true);
-        private static ZWaveData HomeseerSwitchZWaveData => new(0x000C, 0x3036, 0x4447, 23, "Drw5", new Version(5, 15),true );
+        private static ZWaveData AeonLabsZWaveData => new(0x0086, 6, 3, 67, "Dr5", new Version(5, 0), true);
+        private static ZWaveData HomeseerSwitchZWaveData => new(0x000C, 0x3036, 0x4447, 23, "Drw5", new Version(5, 15), true);
 
         public static IEnumerable<object[]> GetSupportsDeviceConfigPageData()
         {
             yield return new object[] { AeonLabsZWaveData, CreateAeonLabsSwitchHttpHandler() };
+            yield return new object[] { AeonLabsZWaveData with { Listening = false }, CreateAeonLabsSwitchHttpHandler() };
             yield return new object[] { HomeseerSwitchZWaveData,
                               CreateMockHttpHandler("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
                                                     Resource.HomeseerDimmerOpenZWaveDBDeviceListJson,
@@ -62,9 +63,22 @@ namespace HSPI_ZWaveParametersTest
             VerifyParametersView(deviceConfigPage, (ViewGroup)page.Views[2]);
 
             // verify script
-            VeryHtmlValid(page.Views[3].ToHtml());
+            VerifyScript((LabelView)page.Views[3], zwaveData.Listening);
 
             Mock.VerifyAll(mock, httpHandler);
+        }
+
+        private void VerifyScript(LabelView view, bool listening)
+        {
+            HtmlAgilityPack.HtmlDocument htmlDocument = new();
+            htmlDocument.LoadHtml(view.ToHtml());
+            Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0, "Script HTML is ill formed");
+
+            var scriptNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/script"));
+            Assert.IsNotNull(scriptNodes);
+
+            string last = scriptNodes.Last().OuterHtml;
+            Assert.AreEqual(last.Contains(".ready(function() {"), listening);
         }
 
         [TestMethod]
@@ -106,6 +120,7 @@ namespace HSPI_ZWaveParametersTest
             await deviceConfigPage.BuildConfigPage(CancellationToken.None);
             return deviceConfigPage;
         }
+
         private static Mock<HttpMessageHandler> CreateAeonLabsSwitchHttpHandler()
         {
             return CreateMockHttpHandler("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006",

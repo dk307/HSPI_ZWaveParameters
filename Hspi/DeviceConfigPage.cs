@@ -55,7 +55,7 @@ namespace Hspi
             pageFactory = pageFactory.WithView(AddRawHtml(Invariant($"<h6>{labelText}</h6>"), true));
 
             //Parameters
-            pageFactory = AddParameters(pageFactory, scripts, zwaveData.HomeId, zwaveData.NodeId);
+            pageFactory = AddParameters(pageFactory, scripts, zwaveData.HomeId, zwaveData.NodeId, zwaveData.Listening);
 
             if (scripts.Count > 0)
             {
@@ -151,7 +151,7 @@ namespace Hspi
         }
 
         private PageFactory AddParameters(PageFactory page, List<string> scripts,
-                                          string homeId, byte nodeId)
+                                          string homeId, byte nodeId, bool listening)
         {
             if (Data?.Parameters != null && Data?.Parameters.Count > 0)
             {
@@ -175,7 +175,10 @@ namespace Hspi
 
                 page = page.WithView(parametersView);
 
-                scripts.Add(string.Format(HtmlSnippets.ClickRefreshButtonScript, parametersView.Id, allButtonId));
+                if (listening)
+                {
+                    scripts.Add(string.Format(HtmlSnippets.ClickRefreshButtonScript, parametersView.Id, allButtonId));
+                }
             }
 
             return page;

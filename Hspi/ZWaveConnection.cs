@@ -39,6 +39,10 @@ namespace Hspi
                 logger.Debug(Invariant($"For HomeId:{homeId} NodeId:{nodeId} Parameter:{param} got {value}"));
                 return value;
             }
+            catch (ZWaveGetConfigurationFailedException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for NodeId {nodeId} "), ex);

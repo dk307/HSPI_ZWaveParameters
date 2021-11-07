@@ -5,6 +5,7 @@ using Hspi.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HSPI_ZWaveParametersTest
@@ -64,36 +65,29 @@ namespace HSPI_ZWaveParametersTest
             await Assert.ThrowsExceptionAsync<ZWaveGetConfigurationFailedException>(() => connection.GetConfiguration(homeId, nodeId, param));
         }
 
-        [TestMethod]
-        public void GetDeviceZWaveData()
+        public static IEnumerable<object[]> GetDeviceZWaveDataData()
         {
-            int deviceRef = 9384;
-            var zwaveData = new ZWaveData(0x84, 74, 234, 234, "345", new Version(5, 3));
-
-            var mock = CreateMockForHsController(deviceRef, zwaveData);
-
-            ZWaveConnection connection = new(mock.Object);
-            Assert.AreEqual(connection.GetDeviceZWaveData(deviceRef), zwaveData);
+            yield return new object[] { new ZWaveData(0x84, 74, 20, 234, "3425", new Version(5, 0), false),
+                                                      0x84.ToString(), 74.ToString(), 20.ToString(), 234.ToString(), "3425", "5.0", "0", "0" };
+            yield return new object[] { new ZWaveData(0x84, 74, 23, 234, "345", new Version(5, 0), true),
+                                                      0x84.ToString(), 74.ToString(), 23.ToString(), 234.ToString(), "345", "5", 0x80.ToString(), "0" };
+            yield return new object[] { new ZWaveData(0x84, 74, 23, 234, "345", new Version(5, 0), true),
+                                                      0x84.ToString(), 74.ToString(), 23.ToString(), 234.ToString(), "345", "5.0", 0x80.ToString(), "0" };
+            yield return new object[] { new ZWaveData(0x84, 70, 23, 234, "345", new Version(5, 0), true),
+                                                      0x84.ToString(), 70.ToString(), 23.ToString(), 234.ToString(), "345", "5.0", "0", 0x20.ToString() };
+            yield return new object[] { new ZWaveData(0x80, 74, 23, 234, "345", new Version(5, 0), true),
+                                                      0x80.ToString(), 74.ToString(), 23.ToString(), 234.ToString(), "345", "5.0", "0", 0x40.ToString() };
         }
 
-        [TestMethod]
-        public void GetDeviceZWaveDataForSingleStringDigitFirmware()
+        [DataTestMethod]
+        [DynamicData(nameof(GetDeviceZWaveDataData), DynamicDataSourceType.Method)]
+        public void GetDeviceZWaveData(ZWaveData zwaveData, string manufactureId, string productId, string productType,
+                                       string nodeId, string homeId, string firmware, string capability, string security)
         {
             int deviceRef = 9384;
-            var zwaveData = new ZWaveData(0x84, 74, 234, 234, "345", new Version(5, 0));
 
-            var mock = new Mock<IHsController>();
-            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(ZWaveInterface);
-
-            var plugInExtraData = new PlugExtraData();
-            plugInExtraData.AddNamed("manufacturer_id", zwaveData.ManufactureId.ToString());
-            plugInExtraData.AddNamed("manufacturer_prod_id", zwaveData.ProductId.ToString());
-            plugInExtraData.AddNamed("manufacturer_prod_type", zwaveData.ProductType.ToString());
-            plugInExtraData.AddNamed("node_id", zwaveData.NodeId.ToString());
-            plugInExtraData.AddNamed("homeid", zwaveData.HomeId);
-            plugInExtraData.AddNamed("node_version_app", "5");
-
-            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(plugInExtraData);
+            var mock = CreateMockForHsController(deviceRef, manufactureId, productId, productType, nodeId, homeId,
+                                                 firmware, capability, security);
 
             ZWaveConnection connection = new(mock.Object);
             Assert.AreEqual(connection.GetDeviceZWaveData(deviceRef), zwaveData);
@@ -138,16 +132,39 @@ namespace HSPI_ZWaveParametersTest
 
         private static Mock<IHsController> CreateMockForHsController(int deviceRef, ZWaveData zwaveData)
         {
+            return CreateMockForHsController(deviceRef,
+                                             zwaveData.ManufactureId.ToString(),
+                                             zwaveData.ProductId.ToString(),
+                                             zwaveData.ProductType.ToString(),
+                                             zwaveData.HomeId.ToString(),
+                                             zwaveData.NodeId.ToString(),
+                                             zwaveData.Firmware.ToString(),
+                                             zwaveData.Listening ? 0x80.ToString() : "0",
+                                             "0");
+        }
+
+        private static Mock<IHsController> CreateMockForHsController(int deviceRef,
+                                                                     string manufactureId,
+                                                                     string productId,
+                                                                     string productType,
+                                                                     string nodeId,
+                                                                     string homeId,
+                                                                     string firmware,
+                                                                     string capability,
+                                                                     string security)
+        {
             var mock = new Mock<IHsController>();
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(ZWaveInterface);
 
             var plugInExtraData = new PlugExtraData();
-            plugInExtraData.AddNamed("manufacturer_id", zwaveData.ManufactureId.ToString());
-            plugInExtraData.AddNamed("manufacturer_prod_id", zwaveData.ProductId.ToString());
-            plugInExtraData.AddNamed("manufacturer_prod_type", zwaveData.ProductType.ToString());
-            plugInExtraData.AddNamed("node_id", zwaveData.NodeId.ToString());
-            plugInExtraData.AddNamed("homeid", zwaveData.HomeId);
-            plugInExtraData.AddNamed("node_version_app", zwaveData.Firmware.ToString());
+            plugInExtraData.AddNamed("manufacturer_id", manufactureId);
+            plugInExtraData.AddNamed("manufacturer_prod_id", productId);
+            plugInExtraData.AddNamed("manufacturer_prod_type", productType);
+            plugInExtraData.AddNamed("node_id", nodeId);
+            plugInExtraData.AddNamed("homeid", homeId);
+            plugInExtraData.AddNamed("node_version_app", firmware);
+            plugInExtraData.AddNamed("capability", capability);
+            plugInExtraData.AddNamed("security", security);
 
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(plugInExtraData);
             return mock;

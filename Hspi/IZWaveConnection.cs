@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Hspi
 {
-    public record ZWaveData(int ManufactureId, ushort ProductId, ushort ProductType, byte NodeId, string HomeId, Version Firmware);
+    public record ZWaveData(int ManufactureId, ushort ProductId, ushort ProductType, byte NodeId, string HomeId, Version Firmware, bool Listening);
 
     internal interface IZWaveConnection
     {

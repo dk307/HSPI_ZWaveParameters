@@ -16,8 +16,8 @@ namespace HSPI_ZWaveParametersTest
     [TestClass]
     public class DeviceConfigPageTest
     {
-        private static ZWaveData AeonLabsZWaveData => new(0x0086, 6, 3, 67, "Dr5", new Version(5, 0));
-        private static ZWaveData HomeseerSwitchZWaveData => new(0x000C, 0x3036, 0x4447, 23, "Drw5", new Version(5, 15));
+        private static ZWaveData AeonLabsZWaveData => new(0x0086, 6, 3, 67, "Dr5", new Version(5, 0),true);
+        private static ZWaveData HomeseerSwitchZWaveData => new(0x000C, 0x3036, 0x4447, 23, "Drw5", new Version(5, 15),true );
 
         public static IEnumerable<object[]> GetSupportsDeviceConfigPageData()
         {

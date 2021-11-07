@@ -76,6 +76,8 @@ namespace Hspi
                 throw new ZWavePlugInDataInvalidException("Device Z-Wave plugin data is not valid");
             }
 
+            bool listening = DetermineListeningDevice(plugInData);
+
             Version firmwareVersion;
             // some version are simple digits, version parse needs minor version too
             if (int.TryParse(firmware, NumberStyles.Integer, CultureInfo.InvariantCulture, out var singleDigit))
@@ -88,7 +90,7 @@ namespace Hspi
             }
 
             var zwaveData = new ZWaveData(manufacturerId.Value, productId.Value,
-                                          productType.Value, nodeId.Value, homeId, firmwareVersion);
+                                          productType.Value, nodeId.Value, homeId, firmwareVersion, listening);
             return zwaveData;
         }
 
@@ -103,6 +105,16 @@ namespace Hspi
             var result = HomeSeerSystem.LegacyPluginFunction("Z-Wave", "", "Configuration_Set", new object[5] { homeId, nodeId, param, size, value }) as string;
 
             var validResults = new string[4] { "Unknown", "Success", "Queued", "Failed" };
+        }
+
+        private static bool DetermineListeningDevice(PlugExtraData plugInData)
+        {
+            var capability = GetValueFromExtraDataWithTrim<int>(plugInData, "capability");
+            var security = GetValueFromExtraDataWithTrim<int>(plugInData, "security");
+
+            return (capability.HasValue && ((capability.Value & 0x80) != 0)) ||
+                (security.HasValue && ((security.Value & 0x20) == 0x20)) ||
+                (security.HasValue && ((security.Value & 0x40) == 0x40));
         }
 
         private static string? GetValueFromExtraData(PlugExtraData plugInData, string name)

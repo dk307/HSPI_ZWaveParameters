@@ -81,6 +81,7 @@
     <Compile Include="Hspi\Exceptions\ZWaveGetConfigurationFailedException.cs" />
     <Compile Include="Hspi\Exceptions\ZWavePlugInDataInvalidException.cs" />
     <Compile Include="Hspi\Exceptions\ZWavePluginNotRunningException.cs" />
+    <Compile Include="Hspi\Exceptions\ZWaveSetConfigurationFailedException.cs" />
     <Compile Include="Hspi\HSPI.cs" />
     <Compile Include="Hspi\IZWaveConnection.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveCommandClass.cs" />

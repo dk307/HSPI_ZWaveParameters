@@ -66,6 +66,7 @@ namespace Hspi
         {
             return new ZWaveConnection(HomeSeerSystem);
         }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -103,7 +104,7 @@ namespace Hspi
                 }
                 else
                 {
-                    throw new Exception("PlugIn was restarted after page was created");
+                    throw new Exception("Plugin was restarted after page was created. Please refresh.");
                 }
 
                 return true;
@@ -111,7 +112,8 @@ namespace Hspi
             catch (Exception ex)
             {
                 logger.Error(Invariant($"Failed to process OnDeviceConfigChange for {devOrFeatRef} with error {ex.GetFullMessage()}"));
-                return false;
+                string errorMessage = ex.GetFullMessage();
+                throw new Exception(errorMessage);
             }
         }
 

@@ -68,19 +68,6 @@ namespace HSPI_ZWaveParametersTest
             Mock.VerifyAll(mock, httpHandler);
         }
 
-        private void VerifyScript(LabelView view, bool listening)
-        {
-            HtmlAgilityPack.HtmlDocument htmlDocument = new();
-            htmlDocument.LoadHtml(view.ToHtml());
-            Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0, "Script HTML is ill formed");
-
-            var scriptNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/script"));
-            Assert.IsNotNull(scriptNodes);
-
-            string last = scriptNodes.Last().OuterHtml;
-            Assert.AreEqual(last.Contains(".ready(function() {"), listening);
-        }
-
         [TestMethod]
         public async Task SupportsDeviceConfigPageForMinPage()
         {
@@ -208,6 +195,18 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0);
         }
 
+        private void VerifyScript(LabelView view, bool listening)
+        {
+            HtmlAgilityPack.HtmlDocument htmlDocument = new();
+            htmlDocument.LoadHtml(view.ToHtml());
+            Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0, "Script HTML is ill formed");
+
+            var scriptNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/script"));
+            Assert.IsNotNull(scriptNodes);
+
+            string last = scriptNodes.Last().OuterHtml;
+            Assert.AreEqual(last.Contains(".ready(function() {"), listening);
+        }
         private const string ZWaveParameterPrefix = "zw_parameter_";
     }
 }

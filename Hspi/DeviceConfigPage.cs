@@ -64,19 +64,6 @@ namespace Hspi
             Page = pageFactory.Page;
         }
 
-        [MemberNotNull(nameof(Data), nameof(Page))]
-        private void CheckInitialized()
-        {
-            if (Data == null)
-            {
-                throw new Exception("Existing ZWave data is null");
-            }
-            if (Page == null)
-            {
-                throw new Exception("Existing Page is null");
-            }
-        }
-
         public void OnDeviceConfigChange(Page changes)
         {
             CheckInitialized();
@@ -120,6 +107,11 @@ namespace Hspi
 
                 if (value.HasValue)
                 {
+                    if (parameterInfo.Bitmask != 0)
+                    {
+                        value = value.Value & parameterInfo.Bitmask;
+                    }
+
                     zwaveConnection.UpdateDeviceParameter(zwaveData.HomeId,
                                                           zwaveData.NodeId,
                                                           parameterInfo.ParameterId,
@@ -131,6 +123,59 @@ namespace Hspi
                     throw new InvalidValueForTypeException("View not valid");
                 }
             }
+        }
+
+        private static List<AbstractView> CreateParameterValueControl(ZWaveDeviceParameter parameter, List<string> scripts, string id)
+        {
+            var views = new List<AbstractView>();
+
+            string label = "Value";
+
+            scripts.Add(Invariant($"<script> const {id}_mask = 0x{parameter.Bitmask:x};</script>"));
+
+            if (parameter.HasOptions && !parameter.HasSubParameters)
+            {
+                var options = parameter.Options.Select(x => x.Description).ToList();
+                var optionKeys = parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList();
+
+                scripts.Add(Invariant($"<script> const {id}_optionkeys = [{string.Join(",", optionKeys)}];</script>"));
+
+                var selectListView = new SelectListView(id,
+                                                        label,
+                                                        options,
+                                                        optionKeys,
+                                                        ESelectListType.DropDown);
+                views.Add(selectListView);
+
+                // Have not found a away to make it readonly on UI
+            }
+            else
+            {
+                var stb2 = new StringBuilder();
+
+                stb2.Append(label);
+                if (!parameter.HasSubParameters)
+                {
+                    stb2.Append('(');
+                    stb2.Append(Invariant($" {parameter.Minimum}-{parameter.Maximum} "));
+
+                    if (!string.IsNullOrWhiteSpace(parameter.Units))
+                    {
+                        stb2.Append(parameter.Units);
+                    }
+                    stb2.Append(')');
+                }
+
+                var inputView = new InputView(id, stb2.ToString(), EInputType.Number);
+                views.Add(inputView);
+
+                if (parameter.ReadOnly)
+                {
+                    scripts.Add(Invariant($"<script>$(\"#{id}\").attr('readonly', 'readonly');</script>"));
+                }
+            }
+
+            return views;
         }
 
         private static string CreateZWaveParameterId(int parameter)
@@ -192,6 +237,18 @@ namespace Hspi
                                  asTitle ? string.Empty : value);
         }
 
+        [MemberNotNull(nameof(Data), nameof(Page))]
+        private void CheckInitialized()
+        {
+            if (Data == null)
+            {
+                throw new Exception("Existing ZWave data is null");
+            }
+            if (Page == null)
+            {
+                throw new Exception("Existing Page is null");
+            }
+        }
         private PageFactory CreateAllParameterRefreshButton(PageFactory page,
                                                             List<string> scripts,
                                                             string containerToClickButtonId, out string allButtonId)
@@ -261,60 +318,6 @@ namespace Hspi
 
             return views;
         }
-
-        private List<AbstractView> CreateParameterValueControl(ZWaveDeviceParameter parameter, List<string> scripts, string id)
-        {
-            var views = new List<AbstractView>();
-
-            string label = "Value";
-
-            scripts.Add(Invariant($"<script> const {id}_mask = 0x{parameter.Bitmask:x};</script>"));
-
-            if (parameter.HasOptions && !parameter.HasSubParameters)
-            {
-                var options = parameter.Options.Select(x => x.Description).ToList();
-                var optionKeys = parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList();
-
-                scripts.Add(Invariant($"<script> const {id}_optionkeys = [{string.Join(",", optionKeys)}];</script>"));
-
-                var selectListView = new SelectListView(id,
-                                                        label,
-                                                        options,
-                                                        optionKeys,
-                                                        ESelectListType.DropDown);
-                views.Add(selectListView);
-
-                // Have not found a away to make it readonly on UI
-            }
-            else
-            {
-                var stb2 = new StringBuilder();
-
-                stb2.Append(label);
-                if (!parameter.HasSubParameters)
-                {
-                    stb2.Append('(');
-                    stb2.Append(Invariant($" {parameter.Minimum}-{parameter.Maximum} "));
-
-                    if (!string.IsNullOrWhiteSpace(parameter.Units))
-                    {
-                        stb2.Append(parameter.Units);
-                    }
-                    stb2.Append(')');
-                }
-
-                var inputView = new InputView(id, stb2.ToString(), EInputType.Number);
-                views.Add(inputView);
-
-                if (parameter.ReadOnly)
-                {
-                    scripts.Add(Invariant($"<script>$(\"#{id}\").attr('readonly', 'readonly');</script>"));
-                }
-            }
-
-            return views;
-        }
-
         private string NewId()
         {
             return Invariant($"z_wave_parameter_{id++}");

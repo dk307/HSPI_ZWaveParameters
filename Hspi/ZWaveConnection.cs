@@ -56,7 +56,7 @@ namespace Hspi
             {
                 HomeSeerSystem.GetPluginVersionById(ZWaveInterface);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new ZWavePluginNotRunningException("ZWave plugin not found", ex);
             }
@@ -119,9 +119,24 @@ namespace Hspi
         public void UpdateDeviceParameter(string homeId, byte nodeId, byte param, byte size, int value)
         {
             logger.Info(Invariant($"Updating HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value}"));
-            var result = HomeSeerSystem.LegacyPluginFunction("Z-Wave", "", "Configuration_Set", new object[5] { homeId, nodeId, param, size, value }) as string;
+            var result = HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "SetDeviceParameterValue", new object[5] { homeId, nodeId, param, size, value }) as string;
 
-            var validResults = new string[4] { "Unknown", "Success", "Queued", "Failed" };
+            switch (result)
+            {
+                case "Queued":
+                case "Success":
+                    logger.Info(Invariant($"Updated HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value} with result:{result}"));
+                    break;
+
+                case "Unknown":
+                case "Failed":
+                    throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for NodeId {nodeId}"));
+
+                default:
+                case null:
+                    CheckZWavePlugInRunning();
+                    throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for NodeId {nodeId}"));
+            }
         }
 
         private static bool DetermineListeningDevice(PlugExtraData plugInData)

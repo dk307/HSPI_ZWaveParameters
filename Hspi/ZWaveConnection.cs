@@ -45,7 +45,20 @@ namespace Hspi
             }
             catch (Exception ex)
             {
+                CheckZWavePlugInRunning();
                 throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for NodeId {nodeId} "), ex);
+            }
+        }
+
+        private void CheckZWavePlugInRunning()
+        {
+            try
+            {
+                HomeSeerSystem.GetPluginVersionById(ZWaveInterface);
+            }
+            catch(Exception ex)
+            {
+                throw new ZWavePluginNotRunningException("ZWave plugin not found", ex);
             }
         }
 

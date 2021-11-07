@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace HSPI_ZWaveParametersTest
 {
     [TestClass]
-    public class ZWaveInformationTest
+    public class ZWaveConnectionTest
     {
         [TestMethod]
         public async Task GetConfiguration()
@@ -48,6 +48,8 @@ namespace HSPI_ZWaveParametersTest
 
             ZWaveConnection connection = new(mock.Object);
             await Assert.ThrowsExceptionAsync<ZWaveGetConfigurationFailedException>(() => connection.GetConfiguration(homeId, nodeId, param));
+
+            mock.Verify();
         }
 
         [TestMethod]
@@ -61,8 +63,31 @@ namespace HSPI_ZWaveParametersTest
             mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param }))
                 .Throws(new TimeoutException());
 
+            mock.Setup(x => x.GetPluginVersionById(ZWaveInterface));
+
             ZWaveConnection connection = new(mock.Object);
             await Assert.ThrowsExceptionAsync<ZWaveGetConfigurationFailedException>(() => connection.GetConfiguration(homeId, nodeId, param));
+
+            mock.Verify();
+        }
+
+        [TestMethod]
+        public async Task GetConfigurationFailWithNoZwavePlugIn()
+        {
+            string homeId = "4567f";
+            byte nodeId = 234;
+            byte param = 45;
+
+            var mock = new Mock<IHsController>();
+            mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param }))
+                .Throws(new NullReferenceException());
+
+            mock.Setup(x => x.GetPluginVersionById(ZWaveInterface)).Throws(new KeyNotFoundException());
+
+            ZWaveConnection connection = new(mock.Object);
+            await Assert.ThrowsExceptionAsync<ZWavePluginNotRunningException>(() => connection.GetConfiguration(homeId, nodeId, param));
+
+            mock.Verify();
         }
 
         public static IEnumerable<object[]> GetDeviceZWaveDataData()

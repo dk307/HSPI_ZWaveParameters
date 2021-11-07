@@ -48,11 +48,6 @@ namespace Hspi
             return connection.IsZwaveDevice(devOrFeatRef);
         }
 
-        protected virtual IZWaveConnection CreateZWaveConnection()
-        {
-            return new ZWaveConnection(HomeSeerSystem);
-        }
-
         public override string PostBackProc(string page, string data, string user, int userRights)
         {
             if (page == "Update")
@@ -67,6 +62,10 @@ namespace Hspi
             this.Status = PluginStatus.Ok();
         }
 
+        protected virtual IZWaveConnection CreateZWaveConnection()
+        {
+            return new ZWaveConnection(HomeSeerSystem);
+        }
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -81,8 +80,6 @@ namespace Hspi
             {
                 pluginConfig = new PluginConfig(HomeSeerSystem);
                 UpdateDebugLevel();
-
-                logger.Info("Starting Plugin");
 
                 logger.Info("Plugin Started");
             }
@@ -150,7 +147,7 @@ namespace Hspi
                 logger.Error(Invariant($"Failed to process PostBackProc for Update with {data} with error {ex.GetFullMessage()}"));
                 return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
                 {
-                    ErrorMessage = ex.GetFullMessage()
+                    ErrorMessage = ex.GetFullMessage(HTMLEndline)
                 });
             }
         }
@@ -167,6 +164,7 @@ namespace Hspi
             public int? Value { get; init; }
         }
 
+        private const string HTMLEndline = "<BR>";
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IDictionary<int, DeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, DeviceConfigPage>();
         private PluginConfig? pluginConfig;

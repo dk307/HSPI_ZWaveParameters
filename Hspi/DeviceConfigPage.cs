@@ -16,7 +16,7 @@ using static System.FormattableString;
 
 namespace Hspi
 {
-    internal class DeviceConfigPage
+    internal class DeviceConfigPage : IDeviceConfigPage
     {
         public DeviceConfigPage(IZWaveConnection zwaveConnection, int deviceOrFeatureRef, HttpClient? httpClient = null)
         {
@@ -28,9 +28,7 @@ namespace Hspi
 
         public ZWaveInformation? Data { get; private set; }
 
-        public Page? Page { get; private set; }
-
-        public async Task BuildConfigPage(CancellationToken cancellationToken)
+        public virtual async Task BuildConfigPage(CancellationToken cancellationToken)
         {
             var pageFactory = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
             var zwaveData = zwaveConnection.GetDeviceZWaveData(this.deviceOrFeatureRef);
@@ -61,7 +59,12 @@ namespace Hspi
             {
                 pageFactory = pageFactory.WithLabel(NewId(), string.Empty, string.Join(Environment.NewLine, scripts));
             }
-            Page = pageFactory.Page;
+            SetPage(pageFactory.Page);
+        }
+
+        public Page? GetPage()
+        {
+            return page;
         }
 
         public void OnDeviceConfigChange(Page changes)
@@ -237,18 +240,15 @@ namespace Hspi
                                  asTitle ? string.Empty : value);
         }
 
-        [MemberNotNull(nameof(Data), nameof(Page))]
+        [MemberNotNull(nameof(Data))]
         private void CheckInitialized()
         {
             if (Data == null)
             {
                 throw new Exception("Existing ZWave data is null");
             }
-            if (Page == null)
-            {
-                throw new Exception("Existing Page is null");
-            }
         }
+
         private PageFactory CreateAllParameterRefreshButton(PageFactory page,
                                                             List<string> scripts,
                                                             string containerToClickButtonId, out string allButtonId)
@@ -318,9 +318,15 @@ namespace Hspi
 
             return views;
         }
+
         private string NewId()
         {
             return Invariant($"z_wave_parameter_{id++}");
+        }
+
+        private void SetPage(Page? value)
+        {
+            page = value;
         }
 
         private const string NewLine = "<BR>";
@@ -330,5 +336,6 @@ namespace Hspi
         private readonly HttpClient? httpClient;
         private readonly IZWaveConnection zwaveConnection;
         private int id = 0;
+        private Page? page;
     }
 }

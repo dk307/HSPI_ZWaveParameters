@@ -33,7 +33,7 @@ namespace Hspi
 
                 if (!wasSuccessful)
                 {
-                    throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for NodeId {nodeId} "));
+                    throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for node {nodeId} "));
                 }
 
                 logger.Debug(Invariant($"For HomeId:{homeId} NodeId:{nodeId} Parameter:{param} got {value}"));
@@ -46,7 +46,7 @@ namespace Hspi
             catch (Exception ex)
             {
                 CheckZWavePlugInRunning();
-                throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for NodeId {nodeId} "), ex);
+                throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for node {nodeId} "), ex);
             }
         }
 
@@ -130,12 +130,12 @@ namespace Hspi
 
                 case "Unknown":
                 case "Failed":
-                    throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for NodeId {nodeId}"));
+                    throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"));
 
                 default:
                 case null:
                     CheckZWavePlugInRunning();
-                    throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for NodeId {nodeId}"));
+                    throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"));
             }
         }
 

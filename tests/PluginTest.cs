@@ -1,9 +1,13 @@
-﻿using Hspi;
+﻿using HomeSeer.Jui.Views;
+using Hspi;
 using Hspi.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using static Hspi.PlugIn;
 
@@ -108,7 +112,68 @@ namespace HSPI_ZWaveParametersTest
             pluginMock.Verify();
         }
 
-        private static void CreatePlugInWithZWaveConnection(out Mock<IZWaveConnection> zwaveConnectionMock, out Mock<PlugIn> pluginMock)
+        [TestMethod]
+        public void GetJuiDeviceConfigPage()
+        {
+            int devOrFeatRef = 8374;
+            var pluginMock = new Mock<PlugIn>()
+            {
+                CallBase = true,
+            };
+
+            var deviceConfigPageMock = new Mock<IDeviceConfigPage>();
+
+            pluginMock.Protected()
+               .Setup<IDeviceConfigPage>("CreateDeviceConfigPage", devOrFeatRef)
+               .Returns(deviceConfigPageMock.Object);
+
+            var page = PageFactory.CreateDeviceConfigPage("id", "name");
+
+            deviceConfigPageMock.Setup(x => x.BuildConfigPage(Moq.It.IsAny<CancellationToken>()));
+            deviceConfigPageMock.Setup(x => x.GetPage()).Returns(page.Page);
+
+            var plugIn = pluginMock.Object;
+            string pageJson = plugIn.GetJuiDeviceConfigPage(devOrFeatRef);
+
+            Assert.AreEqual(pageJson, page.Page.ToJsonString());
+
+            deviceConfigPageMock.Verify();
+            pluginMock.Verify();
+        }
+
+        [TestMethod]
+        public void GetJuiDeviceConfigPageErrored()
+        {
+            int devOrFeatRef = 8374;
+            var pluginMock = new Mock<PlugIn>()
+            {
+                CallBase = true,
+            };
+
+            var deviceConfigPageMock = new Mock<IDeviceConfigPage>();
+
+            pluginMock.Protected()
+               .Setup<IDeviceConfigPage>("CreateDeviceConfigPage", devOrFeatRef)
+               .Returns(deviceConfigPageMock.Object);
+
+            string errorMessage = "sdfsd dfgdfg erter";
+            deviceConfigPageMock.Setup(x => x.BuildConfigPage(Moq.It.IsAny<CancellationToken>()))
+                .Throws(new Exception(errorMessage));
+
+            var plugIn = pluginMock.Object;
+            string pageJson = plugIn.GetJuiDeviceConfigPage(devOrFeatRef);
+
+            JObject result = JsonConvert.DeserializeObject<JObject>(pageJson);
+
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result["views"][0]["value"], errorMessage);
+
+            deviceConfigPageMock.Verify();
+            pluginMock.Verify();
+        }
+
+        private static void CreatePlugInWithZWaveConnection(out Mock<IZWaveConnection> zwaveConnectionMock,
+                                                            out Mock<PlugIn> pluginMock)
         {
             zwaveConnectionMock = new Mock<IZWaveConnection>();
             pluginMock = new Mock<PlugIn>()

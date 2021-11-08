@@ -47,7 +47,7 @@ namespace HSPI_ZWaveParametersTest
 
             var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpHandler.CreateClient());
             await deviceConfigPage.BuildConfigPage(CancellationToken.None);
-            var page = deviceConfigPage.Page;
+            var page = deviceConfigPage.GetPage();
 
             Assert.IsNotNull(page);
 
@@ -86,7 +86,7 @@ namespace HSPI_ZWaveParametersTest
 
             var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpclient);
             await deviceConfigPage.BuildConfigPage(CancellationToken.None);
-            var page = deviceConfigPage.Page;
+            var page = deviceConfigPage.GetPage();
 
             Assert.AreEqual(page.Views.Count, 1);
 

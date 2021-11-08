@@ -83,6 +83,7 @@
     <Compile Include="Hspi\Exceptions\ZWavePluginNotRunningException.cs" />
     <Compile Include="Hspi\Exceptions\ZWaveSetConfigurationFailedException.cs" />
     <Compile Include="Hspi\HSPI.cs" />
+    <Compile Include="Hspi\IDeviceConfigPage.cs" />
     <Compile Include="Hspi\IZWaveConnection.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveCommandClass.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveCommandClassChannel.cs" />
@@ -237,6 +238,7 @@
       <ReleaseFiles Include="$(OutputPath)\System.Collections.Immutable.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Memory.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Numerics.Vectors.dll" />
+      <ReleaseFiles Include="$(OutputPath)\System.Runtime.CompilerServices.Unsafe.dll" />
       <ReleaseFiles Include="$(OutputPath)\html.zip" />
       <ReleaseFiles Include="$(OutputPath)\install.txt" />
     </ItemGroup>

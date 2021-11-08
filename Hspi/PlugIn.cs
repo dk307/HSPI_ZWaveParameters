@@ -26,10 +26,10 @@ namespace Hspi
         {
             try
             {
-                var page = new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef);
+                var page = CreateDeviceConfigPage(deviceOrFeatureRef);
                 page.BuildConfigPage(CancellationToken.None).ResultForSync();
                 cacheForUpdate[deviceOrFeatureRef] = page;
-                return page.Page.ToJsonString();
+                return page.GetPage().ToJsonString();
             }
             catch (Exception ex)
             {
@@ -62,6 +62,10 @@ namespace Hspi
             this.Status = PluginStatus.Ok();
         }
 
+        protected virtual IDeviceConfigPage CreateDeviceConfigPage(int deviceOrFeatureRef)
+        {
+            return new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef);
+        }
         protected virtual IZWaveConnection CreateZWaveConnection()
         {
             return new ZWaveConnection(HomeSeerSystem);
@@ -168,7 +172,7 @@ namespace Hspi
 
         private const string HTMLEndline = "<BR>";
         private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-        private readonly IDictionary<int, DeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, DeviceConfigPage>();
+        private readonly IDictionary<int, IDeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, IDeviceConfigPage>();
         private PluginConfig? pluginConfig;
     }
 }

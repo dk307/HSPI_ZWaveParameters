@@ -7,6 +7,7 @@ using Moq.Protected;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using static Hspi.PlugIn;
@@ -113,21 +114,79 @@ namespace HSPI_ZWaveParametersTest
         }
 
         [TestMethod]
+        public void OnDeviceConfigChangeAfterRestart()
+        {
+            var pluginMock = CreatePlugInMock();
+            var page = PageFactory.CreateDeviceConfigPage("id", "name");
+            Assert.ThrowsException<ShowErrorMessageException>(() => pluginMock.Object.SaveJuiDeviceConfigPage(page.Page.ToJsonString(), 10));
+        }
+
+        [TestMethod]
+        public void OnDeviceConfigChangeWithInput()
+        {
+            int devOrFeatRef = 10;
+            CreatePlugInAndDeviceConfig(devOrFeatRef, out var pluginMock, out var deviceConfigPageMock);
+
+            var page = PageFactory.CreateDeviceConfigPage("id", "name");
+            page = page.WithInput("id1", "name2", "3", HomeSeer.Jui.Types.EInputType.Decimal);
+            page = page.WithDropDownSelectList("id2", "name2", new List<string> { "0", "1", "2" });
+
+            deviceConfigPageMock.Setup(x => x.BuildConfigPage(It.IsAny<CancellationToken>()));
+            deviceConfigPageMock.Setup(x => x.GetPage()).Returns(page.Page);
+
+            var plugIn = pluginMock.Object;
+            plugIn.GetJuiDeviceConfigPage(devOrFeatRef);
+
+            deviceConfigPageMock.Verify();
+
+            page.Page.Views[0].UpdateValue("34");
+            page.Page.Views[1].UpdateValue("1");
+
+            deviceConfigPageMock.Setup(x => x.OnDeviceConfigChange(It.IsAny<Page>()));
+
+            Assert.IsTrue(plugIn.SaveJuiDeviceConfigPage(page.Page.ToJsonString(), devOrFeatRef));
+
+            deviceConfigPageMock.Verify();
+            pluginMock.Verify();
+        }
+
+        [TestMethod]
+        public void OnDeviceConfigChangeThrowsError()
+        {
+            int devOrFeatRef = 10;
+            CreatePlugInAndDeviceConfig(devOrFeatRef, out var pluginMock, out var deviceConfigPageMock);
+
+            var page = PageFactory.CreateDeviceConfigPage("id", "name");
+            page = page.WithInput("id1", "name2", "3", HomeSeer.Jui.Types.EInputType.Decimal);
+
+            deviceConfigPageMock.Setup(x => x.BuildConfigPage(It.IsAny<CancellationToken>()));
+            deviceConfigPageMock.Setup(x => x.GetPage()).Returns(page.Page);
+
+            var plugIn = pluginMock.Object;
+            plugIn.GetJuiDeviceConfigPage(devOrFeatRef);
+
+            deviceConfigPageMock.Verify();
+
+            page.Page.Views[0].UpdateValue("34");
+
+            deviceConfigPageMock.Setup(x => x.OnDeviceConfigChange(It.IsAny<Page>()))
+                                .Throws(new ZWaveSetConfigurationFailedException());
+
+            Assert.ThrowsException<ShowErrorMessageException>(
+                            () => plugIn.SaveJuiDeviceConfigPage(page.Page.ToJsonString(), devOrFeatRef));
+
+            deviceConfigPageMock.Verify();
+            pluginMock.Verify();
+        }
+
+        [TestMethod]
         public void GetJuiDeviceConfigPage()
         {
             int devOrFeatRef = 8374;
-            var pluginMock = new Mock<PlugIn>()
-            {
-                CallBase = true,
-            };
-
-            var deviceConfigPageMock = new Mock<IDeviceConfigPage>();
-
-            pluginMock.Protected()
-               .Setup<IDeviceConfigPage>("CreateDeviceConfigPage", devOrFeatRef)
-               .Returns(deviceConfigPageMock.Object);
+            CreatePlugInAndDeviceConfig(devOrFeatRef, out var pluginMock, out var deviceConfigPageMock);
 
             var page = PageFactory.CreateDeviceConfigPage("id", "name");
+            page = page.WithInput("id1", "name2", "3", HomeSeer.Jui.Types.EInputType.Decimal);
 
             deviceConfigPageMock.Setup(x => x.BuildConfigPage(Moq.It.IsAny<CancellationToken>()));
             deviceConfigPageMock.Setup(x => x.GetPage()).Returns(page.Page);
@@ -141,14 +200,28 @@ namespace HSPI_ZWaveParametersTest
             pluginMock.Verify();
         }
 
+        private static void CreatePlugInAndDeviceConfig(int devOrFeatRef, out Mock<PlugIn> pluginMock, out Mock<IDeviceConfigPage> deviceConfigPageMock)
+        {
+            pluginMock = CreatePlugInMock();
+            deviceConfigPageMock = new Mock<IDeviceConfigPage>();
+            pluginMock.Protected()
+               .Setup<IDeviceConfigPage>("CreateDeviceConfigPage", devOrFeatRef)
+               .Returns(deviceConfigPageMock.Object);
+        }
+
+        private static Mock<PlugIn> CreatePlugInMock()
+        {
+            return new Mock<PlugIn>()
+            {
+                CallBase = true,
+            };
+        }
+
         [TestMethod]
         public void GetJuiDeviceConfigPageErrored()
         {
             int devOrFeatRef = 8374;
-            var pluginMock = new Mock<PlugIn>()
-            {
-                CallBase = true,
-            };
+            var pluginMock = CreatePlugInMock();
 
             var deviceConfigPageMock = new Mock<IDeviceConfigPage>();
 
@@ -176,10 +249,7 @@ namespace HSPI_ZWaveParametersTest
                                                             out Mock<PlugIn> pluginMock)
         {
             zwaveConnectionMock = new Mock<IZWaveConnection>();
-            pluginMock = new Mock<PlugIn>()
-            {
-                CallBase = true,
-            };
+            pluginMock = CreatePlugInMock();
             pluginMock.Protected()
                .Setup<IZWaveConnection>("CreateZWaveConnection")
                .Returns(zwaveConnectionMock.Object)

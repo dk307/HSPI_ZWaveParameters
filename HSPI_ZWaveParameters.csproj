@@ -110,10 +110,7 @@
     <Compile Include="Shared\Hspi\HSPIBase.cs" />
     <Compile Include="Shared\Hspi\Logger.cs" />
     <Compile Include="Shared\Hspi\PluginConfigBase.cs" />
-    <Compile Include="Shared\Hspi\Utils\EnumHelper.cs" />
     <Compile Include="Shared\Hspi\Utils\ExceptionHelper.cs" />
-    <Compile Include="Shared\Hspi\Utils\MiscHelper.cs" />
-    <Compile Include="Shared\Hspi\Utils\ObjectSerialize.cs" />
     <Compile Include="Shared\Hspi\Utils\TaskHelper.cs" />
   </ItemGroup>
   <ItemGroup>

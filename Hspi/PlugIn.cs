@@ -1,5 +1,6 @@
 ﻿using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
+using Hspi.Exceptions;
 using Hspi.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -66,6 +67,7 @@ namespace Hspi
         {
             return new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef);
         }
+
         protected virtual IZWaveConnection CreateZWaveConnection()
         {
             return new ZWaveConnection(HomeSeerSystem);
@@ -108,16 +110,20 @@ namespace Hspi
                 }
                 else
                 {
-                    throw new Exception("Plugin was restarted after page was created. Please refresh.");
+                    throw new ShowErrorMessageException("Plugin was restarted after page was created. Please refresh.");
                 }
 
                 return true;
+            }
+            catch (ShowErrorMessageException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
                 logger.Error(Invariant($"Failed to process OnDeviceConfigChange for {devOrFeatRef} with error {ex.GetFullMessage()}"));
                 string errorMessage = ex.GetFullMessage();
-                throw new Exception(errorMessage);
+                throw new ShowErrorMessageException(errorMessage);
             }
         }
 

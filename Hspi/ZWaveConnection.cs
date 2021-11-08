@@ -116,26 +116,33 @@ namespace Hspi
             return ((string)HomeSeerSystem.GetPropertyByRef(devOrFeatRef, EProperty.Interface) == ZWaveInterface);
         }
 
-        public void UpdateDeviceParameter(string homeId, byte nodeId, byte param, byte size, int value)
+        public void SetConfiguration(string homeId, byte nodeId, byte param, byte size, int value)
         {
-            logger.Info(Invariant($"Updating HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value}"));
-            var result = HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "SetDeviceParameterValue", new object[5] { homeId, nodeId, param, size, value }) as string;
-
-            switch (result)
+            try
             {
-                case "Queued":
-                case "Success":
-                    logger.Info(Invariant($"Updated HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value} with result:{result}"));
-                    break;
+                logger.Info(Invariant($"Updating HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value}"));
+                var result = HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "SetDeviceParameterValue", new object[5] { homeId, nodeId, param, size, value }) as string;
 
-                case "Unknown":
-                case "Failed":
-                    throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"));
+                switch (result)
+                {
+                    case "Queued":
+                    case "Success":
+                        logger.Info(Invariant($"Updated HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value} with result:{result}"));
+                        break;
 
-                default:
-                case null:
-                    CheckZWavePlugInRunning();
-                    throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"));
+                    case "Unknown":
+                    case "Failed":
+                        throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"));
+
+                    default:
+                    case null:
+                        CheckZWavePlugInRunning();
+                        throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"), ex);
             }
         }
 

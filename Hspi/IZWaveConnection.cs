@@ -10,6 +10,6 @@ namespace Hspi
         Task<int> GetConfiguration(string homeId, byte nodeId, byte param);
         ZWaveData GetDeviceZWaveData(int deviceOrFeatureRef);
         bool IsZwaveDevice(int devOrFeatRef);
-        void UpdateDeviceParameter(string homeId, byte nodeId, byte param, byte size, int value);
+        void SetConfiguration(string homeId, byte nodeId, byte param, byte size, int value);
     }
 }

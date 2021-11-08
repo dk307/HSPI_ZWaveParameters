@@ -115,7 +115,7 @@ namespace Hspi
                         value = value.Value & parameterInfo.Bitmask;
                     }
 
-                    zwaveConnection.UpdateDeviceParameter(zwaveData.HomeId,
+                    zwaveConnection.SetConfiguration(zwaveData.HomeId,
                                                           zwaveData.NodeId,
                                                           parameterInfo.ParameterId,
                                                           parameterInfo.Size,

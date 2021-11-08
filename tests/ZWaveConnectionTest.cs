@@ -195,6 +195,57 @@ namespace HSPI_ZWaveParametersTest
             return mock;
         }
 
+        [DataTestMethod]
+        [DataRow("Success", false)]
+        [DataRow("Queued", false)]
+        [DataRow(null, true)]
+        [DataRow("Errored", true)]
+        [DataRow("Unknown", true)]
+        public void SetConfiguration(string result, bool isError)
+        {
+            string homeId = "4567f";
+            byte nodeId = 234;
+            byte param = 45;
+            int value = 42;
+            byte size = 3;
+
+            var mock = new Mock<IHsController>();
+            mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "SetDeviceParameterValue",
+                                                   new object[5] { homeId, nodeId, param, size, value }))
+                .Returns(result);
+
+            ZWaveConnection connection = new(mock.Object);
+            if (!isError)
+            {
+                connection.SetConfiguration(homeId, nodeId, param, size, value);
+            }
+            else
+            {
+                Assert.ThrowsException<ZWaveSetConfigurationFailedException>(
+                    () => connection.SetConfiguration(homeId, nodeId, param, size, value));
+            }
+        }
+
+        [TestMethod]
+        public void SetConfigurationWithHomeSeerException()
+        {
+            string homeId = "4567f";
+            byte nodeId = 234;
+            byte param = 45;
+            int value = 42;
+            byte size = 3;
+
+            var mock = new Mock<IHsController>();
+            mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "SetDeviceParameterValue",
+                                                   new object[5] { homeId, nodeId, param, size, value }))
+                .Throws(new TimeoutException());
+
+            ZWaveConnection connection = new(mock.Object);
+
+            Assert.ThrowsException<ZWaveSetConfigurationFailedException>(
+                () => connection.SetConfiguration(homeId, nodeId, param, size, value));
+        }
+
         private const string ZWaveInterface = "Z-Wave";
     }
 }

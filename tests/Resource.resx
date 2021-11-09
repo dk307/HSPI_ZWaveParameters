@@ -1,0 +1,1586 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AeonLabsOpenZWaveDBDeviceJson" xml:space="preserve">
+    <value>{"approval_requested":0,"approved":1,"beaming":"1","database_id":75,"db_version":6,"deleted":0,"description":"Smart Energy Switch","device_ref":"0003:0006","exclusion":"&lt;ol&gt;&lt;li&gt;Put the controller in exclusion mode&lt;\/li&gt; &lt;li&gt;Press the button located between the LED&lt;\/li&gt; &lt;\/ol&gt;&lt;p&gt;If the Aeon Labs Smart Energy Switch was removed from the Z-Wave network, the LED will be blinking. If the Aeon Labs Smart Energy Switch was not successfully removed from the Z-Wave network, the LED will either be on or off (depending on if the switch is on or off).\u00a0&lt;\/p&gt;","first_approval_time":"2018-03-21 20:58:27","frequently_listening":"0","inclusion":"&lt;ol&gt;&lt;li&gt;Plug the Smart Energy Switch into an outlet&lt;\/li&gt; &lt;li&gt;Put the controller in inclusion mode&lt;\/li&gt; &lt;li&gt;Press the button located between the LED&lt;\/li&gt; &lt;\/ol&gt;&lt;p&gt;If the Aeon Labs Smart Energy Switch was not successfully included into any Z-Wave network, the LED will be blinking. If the Aeon Labs Smart Energy Switch was successfully included to a Z-Wave network, the LED will either be on or off (depending on if the switch is on or off).\u00a0&lt;\/p&gt;","label":"DSC06","last_approval_time":"2018-10-17 07:28:24","listening":"1","overview":"&lt;p&gt;The Aeon Labs Smart Energy Switch is a Z-Wave appliance switch which can report wattage energy usage or kWh energy usage to a Z-Wave gateway. It can also be controlled by other Z-Wave devices to turn on\/off to save electricity when appropriate.&lt;\/p&gt;","protocol_version":"2.078","routing":"1","usage":"","uuid":"dsc06","version_max":"255.255","version_min":"0.000","wakeup":"","manufacturer":{"id":14,"label":"AEON Labs","reference":134,"uuid":"aeon","url":"http:\/\/aeotec.com\/"},"category":{"id":15,"label":"Power Outlet","category":"PowerOutlet","description":"Small devices to be plugged into a power socket in a wall which stick there"},"endpoints":[{"id":40,"number":0,"label":"Endpoint 0","basic_class":{"id":4,"name":"BASIC_TYPE_ROUTING_SLAVE"},"generic_class":{"id":16,"name":"GENERIC_TYPE_SWITCH_BINARY"},"specific_class":{"id":1,"name":"SPECIFIC_TYPE_POWER_SWITCH_BINARY"},"commandclass":[{"cmdclass_id":278,"commandclass_name":"COMMAND_CLASS_NO_OPERATION","basic":"0","version":1,"nif":"","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":277,"commandclass_name":"COMMAND_CLASS_BASIC","basic":"0","version":1,"nif":"","secure":"","nonsecure":"1","config":"","command_group":"APP","channels":[]},{"cmdclass_id":283,"commandclass_name":"COMMAND_CLASS_SWITCH_BINARY","basic":"1","version":1,"nif":"0","secure":"0","nonsecure":"1","config":"","command_group":"APP","channels":[{"name":"switch_binary","config":"","label":"Switch","overview":"","deprecated":"0000-00-00","id":88,"options":[]}]},{"cmdclass_id":285,"commandclass_name":"COMMAND_CLASS_SWITCH_ALL","basic":"0","version":1,"nif":"","secure":"","nonsecure":"1","config":"","command_group":"","channels":[]},{"cmdclass_id":282,"commandclass_name":"COMMAND_CLASS_SENSOR_MULTILEVEL","basic":"0","version":3,"nif":"","secure":"","nonsecure":"1","config":"","command_group":"APP","channels":[{"name":"sensor_power","config":"type=POWER","label":"Sensor (power)","overview":"","deprecated":"0000-00-00","id":87,"options":[]}]},{"cmdclass_id":281,"commandclass_name":"COMMAND_CLASS_METER","basic":"0","version":2,"nif":"0","secure":"0","nonsecure":"1","config":"NOGET","command_group":"APP","channels":[{"name":"meter_kwh","config":"type=E_KWh","label":"Electric meter (kWh)","overview":"","deprecated":"0000-00-00","id":85,"options":[]},{"name":"meter_watts","config":"type=E_W","label":"Electric meter (watts)","overview":"","deprecated":"0000-00-00","id":86,"options":[]}]},{"cmdclass_id":280,"commandclass_name":"COMMAND_CLASS_CONFIGURATION","basic":"0","version":1,"nif":"","secure":"","nonsecure":"1","config":"","command_group":"APP","channels":[]},{"cmdclass_id":284,"commandclass_name":"COMMAND_CLASS_MANUFACTURER_SPECIFIC","basic":"0","version":1,"nif":"","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":286,"commandclass_name":"COMMAND_CLASS_ASSOCIATION","basic":"0","version":1,"nif":"","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":279,"commandclass_name":"COMMAND_CLASS_VERSION","basic":"0","version":1,"nif":"","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]}]}],"parameters":[{"param_id":1,"label":"Multilevel Sensor Report Content","description":"","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":349,"options":[{"value":0,"label":"Power","id":390},{"value":1,"label":"Voltage","id":391}]},{"param_id":80,"label":"Automatic Notifications","description":"Enable or disable automatic notifications","units":"","overview":"&lt;p&gt;Enables automatic notifications to associated devices whenever there is a state change&lt;\/p&gt; (0=nothing, 1=hail CC, 2=basic CC report)","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":2,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":351,"options":[{"value":0,"label":"Nothing","id":392},{"value":1,"label":"Hail","id":393},{"value":2,"label":"Basic CC Report","id":394}]},{"param_id":90,"label":"Enable\/disable Parameter 91 and 92","description":"Enables\/disables parameter 91 and 92 below","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":352,"options":[{"value":0,"label":"Disable","id":396},{"value":1,"label":"Enable","id":395}]},{"param_id":91,"label":"Minimum change in wattage","description":"Minimum change in wattage to trigger event","units":"","overview":"&lt;p&gt;The value here represents minimum change in wattage (in terms of wattage) for a REPORT to be sent.&lt;\/p&gt;","size":2,"bitmask":0,"default":50,"minimum":0,"maximum":65535,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":353,"options":[]},{"param_id":92,"label":"Minimum change in wattage %","description":"Minimum change in wattage % to trigger event","units":"%","overview":"&lt;p&gt;The value here represents minimum change in wattage percent (in terms of percentage) for a REPORT to be sent.&lt;\/p&gt;","size":1,"bitmask":0,"default":10,"minimum":0,"maximum":100,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":354,"options":[]},{"param_id":100,"label":"Set 101 to 103 to default values","description":"","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"1","reinclude":0,"limit_options":"0","advanced":0,"confirmation":1,"id":355,"options":[{"value":0,"label":"No change","id":6236},{"value":1,"label":"Reset","id":397}]},{"param_id":101,"label":"Group 1 report","description":"","units":"","overview":"","size":4,"bitmask":0,"default":8,"minimum":0,"maximum":65535,"read_only":"","write_only":"","reinclude":0,"limit_options":"","advanced":0,"confirmation":0,"id":356,"options":[{"value":0,"label":"None","id":4687},{"value":2,"label":"Multisensor Report","id":398},{"value":4,"label":"Meter Report (Watts)","id":399},{"value":8,"label":"Meter Report (kWh)","id":400},{"value":12,"label":"Meter Report Watts and kWh","id":2809}]},{"param_id":102,"label":"Group 2 report","description":"","units":"","overview":"","size":4,"bitmask":0,"default":0,"minimum":0,"maximum":65535,"read_only":"","write_only":"","reinclude":0,"limit_options":"","advanced":0,"confirmation":0,"id":357,"options":[{"value":0,"label":"None","id":4688},{"value":2,"label":"Multisensor Report","id":401},{"value":4,"label":"Meter Report (Watts)","id":402},{"value":8,"label":"Meter Report (kWh)","id":403},{"value":12,"label":"Meter Report Watts and kWh","id":2810}]},{"param_id":103,"label":"Group 3 report","description":"","units":"","overview":"","size":4,"bitmask":0,"default":0,"minimum":0,"maximum":65535,"read_only":"","write_only":"","reinclude":0,"limit_options":"","advanced":0,"confirmation":0,"id":358,"options":[{"value":0,"label":"None","id":4689},{"value":2,"label":"Multisensor Report","id":404},{"value":4,"label":"Meter Report (Watts)","id":405},{"value":8,"label":"Meter Report (kWh)","id":406},{"value":12,"label":"Meter Report Watts and kWh","id":2811}]},{"param_id":110,"label":"Set 111 to 113 to default values","description":"","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"1","reinclude":0,"limit_options":"0","advanced":0,"confirmation":1,"id":359,"options":[{"value":0,"label":"No change","id":6237},{"value":1,"label":"Reset","id":407}]},{"param_id":111,"label":"Interval Group 1","description":"The time interval (in seconds) for sending report to Group 1","units":"","overview":"","size":4,"bitmask":0,"default":600,"minimum":1,"maximum":65535,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":360,"options":[]},{"param_id":112,"label":"Interval Group 2","description":"The time interval (in seconds) for sending report to Group 2","units":"","overview":"","size":4,"bitmask":0,"default":600,"minimum":1,"maximum":65535,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":361,"options":[]},{"param_id":113,"label":"Interval Group 3","description":"The time interval (in seconds) for sending report to Group 3","units":"","overview":"","size":4,"bitmask":0,"default":600,"minimum":1,"maximum":65535,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":362,"options":[]},{"param_id":254,"label":"Device Tag","description":"","units":"","overview":"","size":2,"bitmask":0,"default":0,"minimum":0,"maximum":65535,"read_only":"","write_only":"","reinclude":0,"limit_options":"","advanced":0,"confirmation":0,"id":363,"options":[]},{"param_id":255,"label":"Device Reset","description":"","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"1","reinclude":0,"limit_options":"0","advanced":0,"confirmation":1,"id":364,"options":[{"value":0,"label":"No change","id":6238},{"value":1,"label":"Reset","id":408}]}],"associations":[{"group_id":1,"label":"Status Reports","max_nodes":5,"controller":"1","description":"","overview":"","id":99}],"documents":[{"id":20,"file":"Engineering-Spec---Aeon-Labs-Smart-Energy-Switch-v1.pdf","label":"User Manual"},{"id":237,"file":"AEDSC06106ZWUS-Manual.pdf","label":"Manual"},{"id":768,"file":"dsc06.jpg","label":"Product Image"}]}</value>
+  </data>
+  <data name="AeonLabsOpenZWaveDBDeviceListJson" xml:space="preserve">
+    <value>{"search_filter":{"manufacturer":134,"filter":"0003:0006"},"total":1,"devices":[{"label":"DSC06","description":"Smart Energy Switch","manufacturer_name":"AEON Labs","id":75,"version_min":"0.000","version_max":"255.255","protocol_version":"2.078","manufacturer_ref":134,"uuid":"dsc06","category":"Battery"}]}</value>
+  </data>
+  <data name="BasicTopLevelOpenZwaveDBJson" xml:space="preserve">
+    <value>{
+  "approval_requested": 0,
+  "approved": 1,
+  "beaming": "1",
+  "database_id": 1113,
+  "db_version": 12,
+  "deleted": 0,
+  "description": "description",
+  "device_ref": "0002:0001",
+  "exclusion": "exclusion",
+  "first_approval_time": "0000-00-00 00:00:00",
+  "frequently_listening": "0",
+  "inclusion": "inclusion",
+  "label": "LZW30-SN",
+  "last_approval_time": "2021-09-23 23:44:54",
+  "listening": "1",
+  "overview": "overview",
+  "protocol_version": "6.004",
+  "routing": "1",
+  "usage": "",
+  "uuid": "lzw30sn",
+  "version_max": "255.255",
+  "version_min": "0.000",
+  "wakeup": "",
+  "manufacturer": {
+    "id": 696,
+    "label": "Inovelli",
+    "reference": 798,
+    "uuid": "inovelli",
+    "url": ""
+  }
+}</value>
+  </data>
+  <data name="HomeseerDimmerOpenZWaveDBDeviceListJson" xml:space="preserve">
+    <value>{"search_filter":{"manufacturer":12,"filter":"4447:3036"},"total":2,"devices":[{"label":"HS-WD200+","description":"Scene Capable Wall Dimmer Switch","manufacturer_name":"HomeSeer Technologies","id":806,"version_min":"0.000","version_max":"5.009","protocol_version":"4.061","manufacturer_ref":12,"uuid":"hswd200","category":"Battery"},{"label":"HS-WD200+","description":"Scene Capable Wall Dimmer Switch","manufacturer_name":"HomeSeer Technologies","id":1040,"version_min":"5.011","version_max":"255.255","protocol_version":"4.061","manufacturer_ref":12,"uuid":"hswd200511","category":"Battery"}]}</value>
+  </data>
+  <data name="HomeseerDimmerOpenZWaveDBFullJson" xml:space="preserve">
+    <value>{
+  "approval_requested": 0,
+  "approved": 1,
+  "beaming": "1",
+  "database_id": 1040,
+  "db_version": 8,
+  "deleted": 0,
+  "description": "Scene Capable Wall Dimmer Switch",
+  "device_ref": "4447:3036",
+  "exclusion": "&lt;p&gt;Put your Z-Wave controller into exclusion mode, tap the paddle of your new HomeSeer dimmer to begin the inclusion process. This will take a few moments to complete.&lt;/p&gt;",
+  "first_approval_time": "0000-00-00 00:00:00",
+  "frequently_listening": "0",
+  "inclusion": "&lt;p&gt;Put your Z-Wave controller into inclusion mode, tap the paddle of your new HomeSeer dimmer to begin the inclusion process. This will take a few moments to complete.&lt;/p&gt;",
+  "label": "HS-WD200+",
+  "last_approval_time": "2021-01-30 00:17:39",
+  "listening": "1",
+  "overview": "&lt;p&gt;HS-WD200+ is a Z-Wave wall dimmer that’s designed for wireless on-oﬀ-dim control of connected dimmable lighting loads.&lt;/p&gt;",
+  "protocol_version": "4.061",
+  "routing": "1",
+  "usage": "",
+  "uuid": "hswd200511",
+  "version_max": "255.255",
+  "version_min": "5.011",
+  "wakeup": "",
+  "manufacturer": {
+    "id": 69,
+    "label": "HomeSeer Technologies",
+    "reference": 12,
+    "uuid": "homeseer",
+    "url": "http://www.homeseer.com/"
+  },
+  "category": {
+    "id": 21,
+    "label": "Wall Switch",
+    "category": "WallSwitch",
+    "description": "Any device attached to the wall that controls a binary status of something, for ex. a light switch"
+  },
+  "endpoints": [
+    {
+      "id": 1607,
+      "number": 0,
+      "label": "Endpoint 0",
+      "basic_class": {
+        "id": 4,
+        "name": "BASIC_TYPE_ROUTING_SLAVE"
+      },
+      "generic_class": {
+        "id": 17,
+        "name": "GENERIC_TYPE_SWITCH_MULTILEVEL"
+      },
+      "specific_class": {
+        "id": 1,
+        "name": "SPECIFIC_TYPE_POWER_SWITCH_MULTILEVEL"
+      },
+      "commandclass": [
+        {
+          "cmdclass_id": 15253,
+          "commandclass_name": "COMMAND_CLASS_NO_OPERATION",
+          "basic": "0",
+          "version": 1,
+          "nif": "",
+          "secure": "",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "MGMT",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15248,
+          "commandclass_name": "COMMAND_CLASS_BASIC",
+          "basic": "0",
+          "version": 1,
+          "nif": "",
+          "secure": "",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "APP",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15250,
+          "commandclass_name": "COMMAND_CLASS_SWITCH_MULTILEVEL",
+          "basic": "1",
+          "version": 3,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "APP",
+          "channels": [
+            {
+              "name": "switch_dimmer",
+              "config": "",
+              "label": "Dimmer",
+              "overview": "",
+              "deprecated": "0000-00-00",
+              "id": 4320,
+              "options": []
+            }
+          ]
+        },
+        {
+          "cmdclass_id": 15245,
+          "commandclass_name": "COMMAND_CLASS_SWITCH_ALL",
+          "basic": "0",
+          "version": 1,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15247,
+          "commandclass_name": "COMMAND_CLASS_SCENE_ACTIVATION",
+          "basic": "0",
+          "version": 1,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "APP",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15257,
+          "commandclass_name": "COMMAND_CLASS_SCENE_ACTUATOR_CONF",
+          "basic": "0",
+          "version": 1,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "APP",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15246,
+          "commandclass_name": "COMMAND_CLASS_ASSOCIATION_GRP_INFO",
+          "basic": "0",
+          "version": 1,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "MGMT",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15258,
+          "commandclass_name": "COMMAND_CLASS_DEVICE_RESET_LOCALLY",
+          "basic": "0",
+          "version": 1,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "MGMT",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15249,
+          "commandclass_name": "COMMAND_CLASS_CENTRAL_SCENE",
+          "basic": "0",
+          "version": 3,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "APP",
+          "channels": [
+            {
+              "name": "scene_number",
+              "config": "",
+              "label": "Scene Number",
+              "overview": "",
+              "deprecated": "0000-00-00",
+              "id": 4319,
+              "options": []
+            }
+          ]
+        },
+        {
+          "cmdclass_id": 15244,
+          "commandclass_name": "COMMAND_CLASS_ZWAVEPLUS_INFO",
+          "basic": "0",
+          "version": 1,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "MGMT",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15252,
+          "commandclass_name": "COMMAND_CLASS_CONFIGURATION",
+          "basic": "0",
+          "version": 1,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "APP",
+          "channels": [
+            {
+              "name": "config_decimal",
+              "config": "parameter=13",
+              "label": "Sets switch mode of operation",
+              "overview": "&lt;p style=\"font-size: 12.16px;\"&gt;0=Normal mode (load status) 1=Status mode (custom status) &lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4590,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=14",
+              "label": "Normal mode LED colour",
+              "overview": "&lt;p style=\"font-size: 12.16px;\"&gt;Sets the Normal mode LED colour&lt;/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;Possible values: 0-6&lt;/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;0=White, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4591,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=21",
+              "label": "Status mode LED 1 Colour",
+              "overview": "&lt;p style=\"font-size: 12.16px;\"&gt;LED 1 is the Bottom LED&lt;/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;Possible values: 0-7&lt;/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4592,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=3",
+              "label": "Sets LED operation (in normal mode)",
+              "overview": "&lt;p&gt;0= LED ON if load is OFF&lt;/p&gt;\r\n&lt;p&gt;1= LED OFF if load is OFF&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4593,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=4",
+              "label": "Sets paddle’s load orientation ",
+              "overview": "&lt;p&gt;0 = Top of Paddle turns load ON&lt;/p&gt;\r\n&lt;p&gt;1 = Bottom of Paddle turns load ON &lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4594,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=22",
+              "label": "Status mode LED 2 Colour",
+              "overview": "&lt;p&gt;Possible values: 0-7&lt;/p&gt;\r\n&lt;p&gt; 0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4595,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=23",
+              "label": "Status mode LED 3 Colour",
+              "overview": "&lt;p&gt;Possible values: 0-7&lt;/p&gt;\r\n&lt;p&gt; 0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4596,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=24",
+              "label": "Status mode LED 4 Colour",
+              "overview": "&lt;p&gt;Possible values: 0-7&lt;/p&gt;\r\n&lt;p&gt; 0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4597,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=25",
+              "label": "Status mode LED 5 Colour",
+              "overview": "&lt;p&gt;Possible values: 0-7&lt;/p&gt;\r\n&lt;p&gt; 0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4598,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=26",
+              "label": "Status mode LED 6 Colour",
+              "overview": "&lt;p&gt;Possible values: 0-7&lt;/p&gt;\r\n&lt;p&gt; 0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4599,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=27",
+              "label": "Status mode LED 7 Colour",
+              "overview": "&lt;p&gt;LED 7 is the top LED&lt;/p&gt;\r\n&lt;p&gt; Possible values: 0-7&lt;/p&gt;\r\n&lt;p&gt; 0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4600,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=30",
+              "label": "Status mode LEDs Blink frequency",
+              "overview": "&lt;p&gt;Sets the dimmer Blink frequency for All LEDs in Status mode&amp;nbsp;&lt;/p&gt;\r\n&lt;p&gt;&amp;nbsp;Possible values: 0, 1-255&lt;/p&gt;\r\n&lt;p&gt;0=No blink, 1=100ms ON then 100ms OFF&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 4601,
+              "options": []
+            },
+            {
+              "name": "config_decimal",
+              "config": "parameter=31",
+              "label": "Status mode LEDs Blink status (Bitmask)",
+              "overview": "&lt;p &gt;Bitmask defines specific LEDs to enable for blinking:&lt;/p&gt;&lt;p &gt;Note: this decimal value is derived from a hex code calculation&lt;/p&gt;&lt;p &gt;based on the following:&lt;/p&gt;&lt;p &gt;Bit 0 = led 1, Bit 1 = led 2, Bit 2 = led 3, Bit 3 = led 4, Bit 4 = led 5,&amp;nbsp;&lt;span style=\"font-size: 1rem;\"&gt;Bit 5 = led 6, Bit 6 = led 7&lt;/span&gt;&lt;/p&gt;&lt;p &gt;IE: value of 1 = first LED, 64 = led 7&lt;/p&gt;",
+              "deprecated": "0000-00-00",
+              "id": 6022,
+              "options": []
+            }
+          ]
+        },
+        {
+          "cmdclass_id": 15255,
+          "commandclass_name": "COMMAND_CLASS_MANUFACTURER_SPECIFIC",
+          "basic": "0",
+          "version": 1,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "MGMT",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15254,
+          "commandclass_name": "COMMAND_CLASS_POWERLEVEL",
+          "basic": "0",
+          "version": 1,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "MGMT",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15256,
+          "commandclass_name": "COMMAND_CLASS_FIRMWARE_UPDATE_MD",
+          "basic": "0",
+          "version": 1,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "MGMT",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15243,
+          "commandclass_name": "COMMAND_CLASS_ASSOCIATION",
+          "basic": "0",
+          "version": 2,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "MGMT",
+          "channels": []
+        },
+        {
+          "cmdclass_id": 15251,
+          "commandclass_name": "COMMAND_CLASS_VERSION",
+          "basic": "0",
+          "version": 2,
+          "nif": "1",
+          "secure": "0",
+          "nonsecure": "1",
+          "config": "",
+          "command_group": "MGMT",
+          "channels": []
+        }
+      ]
+    }
+  ],
+  "parameters": [
+    {
+      "param_id": 3,
+      "label": "Bottom LED Operation",
+      "description": "Sets the operation of the bottom LED",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 1,
+      "minimum": 0,
+      "maximum": 1,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6225,
+      "options": [
+        {
+          "value": 0,
+          "label": "Bottom LED ON if load is OFF",
+          "id": 8668
+        },
+        {
+          "value": 1,
+          "label": "Bottom LED OFF if load is OFF",
+          "id": 8669
+        }
+      ]
+    },
+    {
+      "param_id": 4,
+      "label": "Orientation",
+      "description": "Set paddle load orientation",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6226,
+      "options": [
+        {
+          "value": 0,
+          "label": "Top of Paddle turns load ON",
+          "id": 8670
+        },
+        {
+          "value": 1,
+          "label": "Bottom of Paddle turns load ON",
+          "id": 8671
+        }
+      ]
+    },
+    {
+      "param_id": 11,
+      "label": "Remote Ramp Rate",
+      "description": "Set dimmer ramp rate for remote control",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 3,
+      "minimum": 0,
+      "maximum": 90,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6227,
+      "options": []
+    },
+    {
+      "param_id": 12,
+      "label": "Local Ramp Rate",
+      "description": "Set dimmer ramp rate for local control",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 3,
+      "minimum": 0,
+      "maximum": 90,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6228,
+      "options": []
+    },
+    {
+      "param_id": 13,
+      "label": "Status Mode",
+      "description": "Set dimmer display mode",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6229,
+      "options": [
+        {
+          "value": 0,
+          "label": "Load Status",
+          "id": 8672
+        },
+        {
+          "value": 1,
+          "label": "Custom Status",
+          "id": 8673
+        }
+      ]
+    },
+    {
+      "param_id": 14,
+      "label": "Load Status LED Color",
+      "description": "Set the LED color when displaying load status",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 6,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6230,
+      "options": [
+        {
+          "value": 0,
+          "label": "White",
+          "id": 8674
+        },
+        {
+          "value": 1,
+          "label": "Red",
+          "id": 8675
+        },
+        {
+          "value": 2,
+          "label": "Green",
+          "id": 8676
+        },
+        {
+          "value": 3,
+          "label": "Blue",
+          "id": 8677
+        },
+        {
+          "value": 4,
+          "label": "Magenta",
+          "id": 8678
+        },
+        {
+          "value": 5,
+          "label": "Yellow",
+          "id": 8679
+        },
+        {
+          "value": 6,
+          "label": "Cyan",
+          "id": 8680
+        }
+      ]
+    },
+    {
+      "param_id": 21,
+      "label": "Status LED 1 Color",
+      "description": "Status LED 1 Color (bottom)",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 7,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6231,
+      "options": [
+        {
+          "value": 0,
+          "label": "Off",
+          "id": 8681
+        },
+        {
+          "value": 1,
+          "label": "Red",
+          "id": 8682
+        },
+        {
+          "value": 2,
+          "label": "Green",
+          "id": 8683
+        },
+        {
+          "value": 3,
+          "label": "Blue",
+          "id": 8684
+        },
+        {
+          "value": 4,
+          "label": "Magenta",
+          "id": 8685
+        },
+        {
+          "value": 5,
+          "label": "Yellow",
+          "id": 8686
+        },
+        {
+          "value": 6,
+          "label": "Cyan",
+          "id": 8687
+        },
+        {
+          "value": 7,
+          "label": "White",
+          "id": 8688
+        }
+      ]
+    },
+    {
+      "param_id": 22,
+      "label": "Status LED 2 Color",
+      "description": "Status LED 2 Color",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 7,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6232,
+      "options": [
+        {
+          "value": 0,
+          "label": "Off",
+          "id": 8689
+        },
+        {
+          "value": 1,
+          "label": "Red",
+          "id": 8690
+        },
+        {
+          "value": 2,
+          "label": "Green",
+          "id": 8691
+        },
+        {
+          "value": 3,
+          "label": "Blue",
+          "id": 8692
+        },
+        {
+          "value": 4,
+          "label": "Magenta",
+          "id": 8693
+        },
+        {
+          "value": 5,
+          "label": "Yellow",
+          "id": 8694
+        },
+        {
+          "value": 6,
+          "label": "Cyan",
+          "id": 8695
+        },
+        {
+          "value": 7,
+          "label": "White",
+          "id": 8696
+        }
+      ]
+    },
+    {
+      "param_id": 23,
+      "label": "Status LED 3 Color",
+      "description": "Status LED 3 Color",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 7,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6233,
+      "options": [
+        {
+          "value": 0,
+          "label": "Off",
+          "id": 8697
+        },
+        {
+          "value": 1,
+          "label": "Red",
+          "id": 8698
+        },
+        {
+          "value": 2,
+          "label": "Green",
+          "id": 8699
+        },
+        {
+          "value": 3,
+          "label": "Blue",
+          "id": 8700
+        },
+        {
+          "value": 4,
+          "label": "Magenta",
+          "id": 8701
+        },
+        {
+          "value": 5,
+          "label": "Yellow",
+          "id": 8702
+        },
+        {
+          "value": 6,
+          "label": "Cyan",
+          "id": 8703
+        },
+        {
+          "value": 7,
+          "label": "White",
+          "id": 8704
+        }
+      ]
+    },
+    {
+      "param_id": 24,
+      "label": "Status LED 4 Color",
+      "description": "Status LED 4 Color",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 7,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6234,
+      "options": [
+        {
+          "value": 0,
+          "label": "Off",
+          "id": 8705
+        },
+        {
+          "value": 1,
+          "label": "Red",
+          "id": 8706
+        },
+        {
+          "value": 2,
+          "label": "Green",
+          "id": 8707
+        },
+        {
+          "value": 3,
+          "label": "Blue",
+          "id": 8708
+        },
+        {
+          "value": 4,
+          "label": "Magenta",
+          "id": 8709
+        },
+        {
+          "value": 5,
+          "label": "Yellow",
+          "id": 8710
+        },
+        {
+          "value": 6,
+          "label": "Cyan",
+          "id": 8711
+        },
+        {
+          "value": 7,
+          "label": "White",
+          "id": 8712
+        }
+      ]
+    },
+    {
+      "param_id": 25,
+      "label": "Status LED 5 Color",
+      "description": "Status LED 5 Color",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 7,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6235,
+      "options": [
+        {
+          "value": 0,
+          "label": "Off",
+          "id": 8713
+        },
+        {
+          "value": 1,
+          "label": "Red",
+          "id": 8714
+        },
+        {
+          "value": 2,
+          "label": "Green",
+          "id": 8715
+        },
+        {
+          "value": 3,
+          "label": "Blue",
+          "id": 8716
+        },
+        {
+          "value": 4,
+          "label": "Magenta",
+          "id": 8717
+        },
+        {
+          "value": 5,
+          "label": "Yellow",
+          "id": 8718
+        },
+        {
+          "value": 6,
+          "label": "Cyan",
+          "id": 8719
+        },
+        {
+          "value": 7,
+          "label": "White",
+          "id": 8720
+        }
+      ]
+    },
+    {
+      "param_id": 26,
+      "label": "Status LED 6 Color",
+      "description": "Status LED 6 Color",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 7,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6236,
+      "options": [
+        {
+          "value": 0,
+          "label": "Off",
+          "id": 8721
+        },
+        {
+          "value": 1,
+          "label": "Red",
+          "id": 8722
+        },
+        {
+          "value": 2,
+          "label": "Green",
+          "id": 8723
+        },
+        {
+          "value": 3,
+          "label": "Blue",
+          "id": 8724
+        },
+        {
+          "value": 4,
+          "label": "Magenta",
+          "id": 8725
+        },
+        {
+          "value": 5,
+          "label": "Yellow",
+          "id": 8726
+        },
+        {
+          "value": 6,
+          "label": "Cyan",
+          "id": 8727
+        },
+        {
+          "value": 7,
+          "label": "White",
+          "id": 8728
+        }
+      ]
+    },
+    {
+      "param_id": 27,
+      "label": "Status LED 7 Color",
+      "description": "Status LED 7 Color (top)",
+      "units": "",
+      "overview": "",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 7,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6237,
+      "options": [
+        {
+          "value": 0,
+          "label": "Off",
+          "id": 8729
+        },
+        {
+          "value": 1,
+          "label": "Red",
+          "id": 8730
+        },
+        {
+          "value": 2,
+          "label": "Green",
+          "id": 8731
+        },
+        {
+          "value": 3,
+          "label": "Blue",
+          "id": 8732
+        },
+        {
+          "value": 4,
+          "label": "Magenta",
+          "id": 8733
+        },
+        {
+          "value": 5,
+          "label": "Yellow",
+          "id": 8734
+        },
+        {
+          "value": 6,
+          "label": "Cyan",
+          "id": 8735
+        },
+        {
+          "value": 7,
+          "label": "White",
+          "id": 8736
+        }
+      ]
+    },
+    {
+      "param_id": 30,
+      "label": "Blink Frequency",
+      "description": "Set blink frequency when displaying custom status",
+      "units": "",
+      "overview": "&lt;p&gt;&lt;br&gt;&lt;/p&gt;",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 255,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6238,
+      "options": [
+        {
+          "value": 0,
+          "label": "No Blink",
+          "id": 8737
+        },
+        {
+          "value": 1,
+          "label": "Blink 100ms ON, 100ms OFF",
+          "id": 8738
+        },
+        {
+          "value": 2,
+          "label": "Blink 200ms ON, 200ms OFF",
+          "id": 8739
+        },
+        {
+          "value": 3,
+          "label": "Blink 300ms ON, 300ms OFF",
+          "id": 8740
+        },
+        {
+          "value": 4,
+          "label": "Blink 400ms ON, 400ms OFF",
+          "id": 8741
+        },
+        {
+          "value": 5,
+          "label": "Blink 500ms ON, 500ms OFF",
+          "id": 8742
+        }
+      ]
+    },
+    {
+      "param_id": 31,
+      "label": "LED 7 Blink Status",
+      "description": "LED 7 Blink Status (top)",
+      "units": "",
+      "overview": "&lt;p&gt;&lt;br&gt;&lt;/p&gt;",
+      "size": 1,
+      "bitmask": 63,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6245,
+      "options": [
+        {
+          "value": 0,
+          "label": "Solid",
+          "id": 8755
+        },
+        {
+          "value": 1,
+          "label": "Blink",
+          "id": 8756
+        }
+      ]
+    },
+    {
+      "param_id": 31,
+      "label": "LED 6 Blink Status",
+      "description": "LED 6 Blink Status",
+      "units": "",
+      "overview": "&lt;p&gt;&lt;br&gt;&lt;/p&gt;",
+      "size": 1,
+      "bitmask": 95,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6244,
+      "options": [
+        {
+          "value": 0,
+          "label": "Solid",
+          "id": 8753
+        },
+        {
+          "value": 1,
+          "label": "Blink",
+          "id": 8754
+        }
+      ]
+    },
+    {
+      "param_id": 31,
+      "label": "LED 5 Blink Status",
+      "description": "LED 5 Blink Status",
+      "units": "",
+      "overview": "&lt;p&gt;&lt;br&gt;&lt;/p&gt;",
+      "size": 1,
+      "bitmask": 111,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6243,
+      "options": [
+        {
+          "value": 0,
+          "label": "Solid",
+          "id": 8751
+        },
+        {
+          "value": 1,
+          "label": "Blink",
+          "id": 8752
+        }
+      ]
+    },
+    {
+      "param_id": 31,
+      "label": "LED 4 Blink Status",
+      "description": "LED 4 Blink Status",
+      "units": "",
+      "overview": "&lt;p&gt;&lt;br&gt;&lt;/p&gt;",
+      "size": 1,
+      "bitmask": 119,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6242,
+      "options": [
+        {
+          "value": 0,
+          "label": "Solid",
+          "id": 8749
+        },
+        {
+          "value": 1,
+          "label": "Blink",
+          "id": 8750
+        }
+      ]
+    },
+    {
+      "param_id": 31,
+      "label": "LED 3 Blink Status",
+      "description": "LED 3 Blink Status",
+      "units": "",
+      "overview": "&lt;p&gt;&lt;br&gt;&lt;/p&gt;",
+      "size": 1,
+      "bitmask": 123,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6241,
+      "options": [
+        {
+          "value": 0,
+          "label": "Solid",
+          "id": 8747
+        },
+        {
+          "value": 1,
+          "label": "Blink",
+          "id": 8748
+        }
+      ]
+    },
+    {
+      "param_id": 31,
+      "label": "LED 2 Blink Status",
+      "description": "LED 2 Blink Status",
+      "units": "",
+      "overview": "&lt;p&gt;&lt;br&gt;&lt;/p&gt;",
+      "size": 1,
+      "bitmask": 125,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6240,
+      "options": [
+        {
+          "value": 0,
+          "label": "Solid",
+          "id": 8745
+        },
+        {
+          "value": 1,
+          "label": "Blink",
+          "id": 8746
+        }
+      ]
+    },
+    {
+      "param_id": 31,
+      "label": "LED 1 Blink Status",
+      "description": "LED 1 Blink Status (bottom)",
+      "units": "",
+      "overview": "&lt;p&gt;&lt;br&gt;&lt;/p&gt;",
+      "size": 1,
+      "bitmask": 126,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 1,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 6239,
+      "options": [
+        {
+          "value": 0,
+          "label": "Solid",
+          "id": 8743
+        },
+        {
+          "value": 1,
+          "label": "Blink",
+          "id": 8744
+        }
+      ]
+    }
+  ],
+  "associations": [
+    {
+      "group_id": 1,
+      "label": "Lifeline",
+      "max_nodes": 5,
+      "controller": "1",
+      "description": "Lifeline association only supports the \"manual reset\" event.",
+      "overview": "",
+      "id": 2051
+    },
+    {
+      "group_id": 2,
+      "label": "Companion Sync",
+      "max_nodes": 5,
+      "controller": "0",
+      "description": "Any device added to group 2 will be controlled. This allows other WX200 devices to used as companion switches. LEDS will be kept in sync.",
+      "overview": "",
+      "id": 2052
+    }
+  ],
+  "documents": [
+    {
+      "id": 2089,
+      "file": "hs-wd200.png",
+      "label": "HS-WD200+ Product Image"
+    },
+    {
+      "id": 2090,
+      "file": "HS-WD200-Manual-5a.pdf",
+      "label": "HS-WD200+ Product Manual"
+    }
+  ]
+}</value>
+    <comment>HomeSeer Technologies Scene Capable Wall Dimmer Switch (HS-WD200+)</comment>
+  </data>
+  <data name="HomeseerDimmerOpenZWaveDBFullOlderJson" xml:space="preserve">
+    <value>{"approval_requested":0,"approved":1,"beaming":"1","database_id":806,"db_version":12,"deleted":0,"description":"Scene Capable Wall Dimmer Switch","device_ref":"4447:3036","exclusion":"&lt;p&gt;Put your Z-Wave controller into exclusion mode, tap the paddle of your new HomeSeer dimmer to begin the inclusion process. This will take a few moments to complete.&lt;\/p&gt;","first_approval_time":"2018-03-21 20:58:27","frequently_listening":"0","inclusion":"&lt;p&gt;Put your Z-Wave controller into inclusion mode, tap the paddle of your new HomeSeer dimmer to begin the inclusion process. This will take a few moments to complete.&lt;\/p&gt;","label":"HS-WD200+","last_approval_time":"2021-01-30 00:16:41","listening":"1","overview":"&lt;p&gt;HS-WD200+ is a Z-Wave wall dimmer that\u2019s designed for wireless on-o\ufb00-dim control of connected dimmable lighting loads.&lt;\/p&gt;","protocol_version":"4.061","routing":"1","usage":"","uuid":"hswd200","version_max":"5.009","version_min":"0.000","wakeup":"","manufacturer":{"id":69,"label":"HomeSeer Technologies","reference":12,"uuid":"homeseer","url":"http:\/\/www.homeseer.com\/"},"category":{"id":21,"label":"Wall Switch","category":"WallSwitch","description":"Any device attached to the wall that controls a binary status of something, for ex. a light switch"},"endpoints":[{"id":1141,"number":0,"label":"Endpoint 0","basic_class":{"id":4,"name":"BASIC_TYPE_ROUTING_SLAVE"},"generic_class":{"id":17,"name":"GENERIC_TYPE_SWITCH_MULTILEVEL"},"specific_class":{"id":1,"name":"SPECIFIC_TYPE_POWER_SWITCH_MULTILEVEL"},"commandclass":[{"cmdclass_id":10785,"commandclass_name":"COMMAND_CLASS_NO_OPERATION","basic":"0","version":1,"nif":"","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":10796,"commandclass_name":"COMMAND_CLASS_BASIC","basic":"0","version":1,"nif":"","secure":"","nonsecure":"1","config":"","command_group":"APP","channels":[]},{"cmdclass_id":10798,"commandclass_name":"COMMAND_CLASS_SWITCH_MULTILEVEL","basic":"1","version":3,"nif":"1","secure":"0","nonsecure":"1","config":"","command_group":"APP","channels":[{"name":"switch_dimmer","config":"","label":"Dimmer","overview":"","deprecated":"0000-00-00","id":3099,"options":[]}]},{"cmdclass_id":10789,"commandclass_name":"COMMAND_CLASS_SWITCH_ALL","basic":"0","version":1,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"","channels":[]},{"cmdclass_id":10797,"commandclass_name":"COMMAND_CLASS_SCENE_ACTIVATION","basic":"0","version":1,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"APP","channels":[]},{"cmdclass_id":10788,"commandclass_name":"COMMAND_CLASS_SCENE_ACTUATOR_CONF","basic":"0","version":1,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"APP","channels":[]},{"cmdclass_id":10801,"commandclass_name":"COMMAND_CLASS_TRANSPORT_SERVICE","basic":"","version":0,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"ENCAP","channels":[]},{"cmdclass_id":10800,"commandclass_name":"COMMAND_CLASS_ASSOCIATION_GRP_INFO","basic":"0","version":1,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":10794,"commandclass_name":"COMMAND_CLASS_DEVICE_RESET_LOCALLY","basic":"0","version":1,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":10786,"commandclass_name":"COMMAND_CLASS_CENTRAL_SCENE","basic":"0","version":3,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"APP","channels":[{"name":"scene_number","config":"","label":"Scene Number","overview":"","deprecated":"0000-00-00","id":3097,"options":[]}]},{"cmdclass_id":10790,"commandclass_name":"COMMAND_CLASS_ZWAVEPLUS_INFO","basic":"0","version":1,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":10803,"commandclass_name":"COMMAND_CLASS_SUPERVISION","basic":"","version":0,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"ENCAP","channels":[]},{"cmdclass_id":10792,"commandclass_name":"COMMAND_CLASS_CONFIGURATION","basic":"0","version":1,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"APP","channels":[{"name":"config_decimal","config":"parameter=13","label":"Mode of Operation","overview":"&lt;p&gt;Sets dimmer mode of operation.&lt;\/p&gt;\r\n&lt;p&gt;0=Normal mode (load status) 1=Status mode (custom status)\u00a0&lt;\/p&gt;","deprecated":"0000-00-00","id":3144,"options":[]},{"name":"config_decimal","config":"parameter=14","label":"Normal mode LED colour","overview":"&lt;p&gt;Sets the Normal mode LED colour&lt;\/p&gt;\r\n&lt;p&gt;Possible values: 0-6&lt;\/p&gt;\r\n&lt;p&gt;0=White, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan&lt;\/p&gt;","deprecated":"0000-00-00","id":3145,"options":[]},{"name":"config_decimal","config":"parameter=21","label":"Status mode LED 1 Colour","overview":"&lt;p&gt;LED 1 is the Bottom LED&lt;\/p&gt;\r\n&lt;p&gt;Possible values: 0-7&lt;\/p&gt;\r\n&lt;p&gt;0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;\/p&gt;","deprecated":"0000-00-00","id":3146,"options":[]},{"name":"config_decimal","config":"parameter=22","label":"Status mode LED 2 Colour","overview":"&lt;p style=\"font-size: 12.16px;\"&gt;Possible values: 0-7&lt;\/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;\/p&gt;","deprecated":"0000-00-00","id":3147,"options":[]},{"name":"config_decimal","config":"parameter=23","label":"Status mode LED 3 Colour","overview":"&lt;p style=\"font-size: 12.16px;\"&gt;Possible values: 0-7&lt;\/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;\/p&gt;","deprecated":"0000-00-00","id":3148,"options":[]},{"name":"config_decimal","config":"parameter=24","label":"Status mode LED 4 Colour","overview":"&lt;p style=\"font-size: 12.16px;\"&gt;Possible values: 0-7&lt;\/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;\/p&gt;","deprecated":"0000-00-00","id":3149,"options":[]},{"name":"config_decimal","config":"parameter=25","label":"Status mode LED 5 Colour","overview":"&lt;p style=\"font-size: 12.16px;\"&gt;Possible values: 0-7&lt;\/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;\/p&gt;","deprecated":"0000-00-00","id":3150,"options":[]},{"name":"config_decimal","config":"parameter=26","label":"Status mode LED 6 Colour","overview":"&lt;p style=\"font-size: 12.16px;\"&gt;Possible values: 0-7&lt;\/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;\/p&gt;","deprecated":"0000-00-00","id":3151,"options":[]},{"name":"config_decimal","config":"parameter=27","label":"Status mode LED 7 Colour","overview":"&lt;p style=\"font-size: 12.16px;\"&gt;LED 7 is the top LED&lt;\/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;Possible values: 0-7&lt;\/p&gt;\r\n&lt;p style=\"font-size: 12.16px;\"&gt;0=Off, 1=Red, 2=Green, 3=Blue, 4=Magenta, 5=Yellow, 6=Cyan, 7=White&lt;\/p&gt;","deprecated":"0000-00-00","id":3152,"options":[]},{"name":"config_decimal","config":"parameter=30","label":"Status mode LEDs Blink frequency","overview":"&lt;p&gt;Sets the dimmer Blink frequency for All LEDs in Status mode\u00a0&lt;\/p&gt;\r\n&lt;p&gt;Possible values: 0, 1-255&lt;\/p&gt;\r\n&lt;p&gt;0=No blink, 1=100ms ON then 100ms OFF&lt;\/p&gt;","deprecated":"0000-00-00","id":3153,"options":[]},{"name":"config_decimal","config":"parameter=31","label":"Status mode LEDs Blink status (Bitmask)","overview":"&lt;p&gt;Bitmask defines specific LEDs to enable for blinking:&lt;\/p&gt;&lt;p&gt;Note: this decimal value is derived from a hex code calculation&lt;\/p&gt;&lt;p&gt;based on the following:&lt;\/p&gt;&lt;p &gt;Bit 0 = led 1, Bit 1 = led 2, Bit 2 = led 3, Bit 3 = led 4, Bit 4 = led 5,&amp;nbsp;&lt;span style=\"font-size: 1rem;\"&gt;Bit 5 = led 6, Bit 6 = led 7&lt;\/span&gt;&lt;\/p&gt;&lt;p &gt;IE: value of 1 = first LED, 64 = led 7&lt;\/p&gt;","deprecated":"0000-00-00","id":3157,"options":[]}]},{"cmdclass_id":10787,"commandclass_name":"COMMAND_CLASS_MANUFACTURER_SPECIFIC","basic":"0","version":1,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":10791,"commandclass_name":"COMMAND_CLASS_POWERLEVEL","basic":"0","version":1,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":10793,"commandclass_name":"COMMAND_CLASS_FIRMWARE_UPDATE_MD","basic":"0","version":1,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":10795,"commandclass_name":"COMMAND_CLASS_ASSOCIATION","basic":"0","version":2,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":10799,"commandclass_name":"COMMAND_CLASS_VERSION","basic":"0","version":2,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"MGMT","channels":[]},{"cmdclass_id":10802,"commandclass_name":"COMMAND_CLASS_SECURITY_2","basic":"","version":0,"nif":"1","secure":"","nonsecure":"1","config":"","command_group":"ENCAP","channels":[]}]},{"id":1606,"number":0,"label":"Endpoint 0","basic_class":{"id":4,"name":"BASIC_TYPE_ROUTING_SLAVE"},"generic_class":{"id":17,"name":"GENERIC_TYPE_SWITCH_MULTILEVEL"},"specific_class":{"id":1,"name":"SPECIFIC_TYPE_POWER_SWITCH_MULTILEVEL"},"commandclass":[]}],"parameters":[{"param_id":3,"label":"Bottom LED Operation","description":"Sets the operation of the bottom LED","units":"","overview":"","size":1,"bitmask":0,"default":1,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4426,"options":[{"value":0,"label":"Bottom LED ON if load is OFF","id":6008},{"value":1,"label":"Bottom LED OFF if load is OFF","id":6009}]},{"param_id":4,"label":"Orientation","description":"Set paddle's load orientation","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4427,"options":[{"value":0,"label":"Top of Paddle turns load ON","id":6010},{"value":1,"label":"Bottom of Paddle turns load ON","id":6011}]},{"param_id":11,"label":"Remote Ramp Rate","description":"Set dimmer ramp rate for remote control","units":"","overview":"","size":1,"bitmask":0,"default":3,"minimum":0,"maximum":90,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4428,"options":[]},{"param_id":12,"label":"Local Ramp Rate","description":"Set dimmer ramp rate for local control","units":"","overview":"","size":1,"bitmask":0,"default":3,"minimum":0,"maximum":90,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4429,"options":[]},{"param_id":13,"label":"Status Mode","description":"Set dimmer display mode","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4430,"options":[{"value":0,"label":"Load Status","id":6012},{"value":1,"label":"Custom Status","id":6013}]},{"param_id":14,"label":"Load Status LED Color","description":"Set the LED color when displaying load status","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":6,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4431,"options":[{"value":0,"label":"White","id":6014},{"value":1,"label":"Red","id":6015},{"value":2,"label":"Green","id":6016},{"value":3,"label":"Blue","id":6017},{"value":4,"label":"Magenta","id":6018},{"value":5,"label":"Yellow","id":6019},{"value":6,"label":"Cyan","id":6020}]},{"param_id":21,"label":"Status LED 1 Color","description":"Status LED 1 Color (bottom)","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":7,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4432,"options":[{"value":0,"label":"Off","id":6021},{"value":1,"label":"Red","id":6022},{"value":2,"label":"Green","id":6023},{"value":3,"label":"Blue","id":6024},{"value":4,"label":"Magenta","id":6025},{"value":5,"label":"Yellow","id":6026},{"value":6,"label":"Cyan","id":6027},{"value":7,"label":"White","id":6028}]},{"param_id":22,"label":"Status LED 2 Color","description":"Status LED 2 Color","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":7,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4433,"options":[{"value":0,"label":"Off","id":6029},{"value":1,"label":"Red","id":6030},{"value":2,"label":"Green","id":6031},{"value":3,"label":"Blue","id":6032},{"value":4,"label":"Magenta","id":6033},{"value":5,"label":"Yellow","id":6034},{"value":6,"label":"Cyan","id":6035},{"value":7,"label":"White","id":6036}]},{"param_id":23,"label":"Status LED 3 Color","description":"Status LED 3 Color","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":7,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4434,"options":[{"value":0,"label":"Off","id":6037},{"value":1,"label":"Red","id":6042},{"value":2,"label":"Green","id":6044},{"value":3,"label":"Blue","id":6045},{"value":4,"label":"Magenta","id":6046},{"value":5,"label":"Yellow","id":6047},{"value":6,"label":"Cyan","id":6048},{"value":7,"label":"White","id":6049}]},{"param_id":24,"label":"Status LED 4 Color","description":"Status LED 4 Color","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":7,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4435,"options":[{"value":0,"label":"Off","id":6038},{"value":1,"label":"Red","id":6050},{"value":2,"label":"Green","id":6051},{"value":3,"label":"Blue","id":6052},{"value":4,"label":"Magenta","id":6053},{"value":5,"label":"Yellow","id":6054},{"value":6,"label":"Cyan","id":6055},{"value":7,"label":"White","id":6056}]},{"param_id":25,"label":"Status LED 5 Color","description":"Status LED 5 Color","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":7,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4436,"options":[{"value":0,"label":"Off","id":6039},{"value":1,"label":"Red","id":6057},{"value":2,"label":"Green","id":6058},{"value":3,"label":"Blue","id":6059},{"value":4,"label":"Magenta","id":6060},{"value":5,"label":"Yellow","id":6061},{"value":6,"label":"Cyan","id":6062},{"value":7,"label":"White","id":6063}]},{"param_id":26,"label":"Status LED 6 Color","description":"Status LED 6 Color","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":7,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4437,"options":[{"value":0,"label":"Off","id":6040},{"value":1,"label":"Red","id":6064},{"value":2,"label":"Green","id":6065},{"value":3,"label":"Blue","id":6066},{"value":4,"label":"Magenta","id":6067},{"value":5,"label":"Yellow","id":6068},{"value":6,"label":"Cyan","id":6069},{"value":7,"label":"White","id":6070}]},{"param_id":27,"label":"Status LED 7 Color","description":"Status LED 7 Color (top)","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":7,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4438,"options":[{"value":0,"label":"Off","id":6041},{"value":1,"label":"Red","id":6071},{"value":2,"label":"Green","id":6072},{"value":3,"label":"Blue","id":6073},{"value":4,"label":"Magenta","id":6074},{"value":5,"label":"Yellow","id":6075},{"value":6,"label":"Cyan","id":6076},{"value":7,"label":"White","id":6077}]},{"param_id":30,"label":"Blink Frequency","description":"Set blink frequency when displaying custom status","units":"","overview":"","size":1,"bitmask":0,"default":0,"minimum":0,"maximum":255,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"1","advanced":0,"confirmation":0,"id":4439,"options":[{"value":0,"label":"No Blink","id":6092},{"value":1,"label":"Blink 100ms ON, 100ms OFF","id":6196},{"value":2,"label":"Blink 200ms ON, 200ms OFF","id":6214},{"value":3,"label":"Blink 300ms ON, 300ms OFF","id":6215},{"value":4,"label":"Blink 400ms ON, 400ms OFF","id":6216},{"value":5,"label":"Blink 500ms ON, 500ms OFF","id":6217}]},{"param_id":31,"label":"LED 7 Blink Status","description":"LED 7 Blink Status (top)","units":"","overview":"&lt;p&gt;&lt;br&gt;&lt;\/p&gt;","size":1,"bitmask":63,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4446,"options":[{"value":0,"label":"Solid","id":6090},{"value":1,"label":"Blink","id":6091}]},{"param_id":31,"label":"LED 6 Blink Status","description":"LED 6 Blink Status","units":"","overview":"&lt;p&gt;&lt;br&gt;&lt;\/p&gt;","size":1,"bitmask":95,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4445,"options":[{"value":0,"label":"Solid","id":6088},{"value":1,"label":"Blink","id":6089}]},{"param_id":31,"label":"LED 5 Blink Status","description":"LED 5 Blink Status","units":"","overview":"&lt;p&gt;&lt;br&gt;&lt;\/p&gt;","size":1,"bitmask":111,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4444,"options":[{"value":0,"label":"Solid","id":6086},{"value":1,"label":"Blink","id":6087}]},{"param_id":31,"label":"LED 4 Blink Status","description":"LED 4 Blink Status","units":"","overview":"&lt;p&gt;&lt;br&gt;&lt;\/p&gt;","size":1,"bitmask":119,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4443,"options":[{"value":0,"label":"Solid","id":6084},{"value":1,"label":"Blink","id":6085}]},{"param_id":31,"label":"LED 3 Blink Status","description":"LED 3 Blink Status","units":"","overview":"&lt;p&gt;&lt;br&gt;&lt;\/p&gt;","size":1,"bitmask":123,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4442,"options":[{"value":0,"label":"Solid","id":6082},{"value":1,"label":"Blink","id":6083}]},{"param_id":31,"label":"LED 2 Blink Status","description":"LED 2 Blink Status","units":"","overview":"&lt;p&gt;&lt;br&gt;&lt;\/p&gt;","size":1,"bitmask":125,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4441,"options":[{"value":0,"label":"Solid","id":6080},{"value":1,"label":"Blink","id":6081}]},{"param_id":31,"label":"LED 1 Blink Status","description":"LED 1 Blink Status (bottom)","units":"","overview":"&lt;p&gt;&lt;br&gt;&lt;\/p&gt;","size":1,"bitmask":126,"default":0,"minimum":0,"maximum":1,"read_only":"0","write_only":"0","reinclude":0,"limit_options":"0","advanced":0,"confirmation":0,"id":4440,"options":[{"value":0,"label":"Solid","id":6078},{"value":1,"label":"Blink","id":6079}]}],"associations":[{"group_id":1,"label":"Lifeline","max_nodes":5,"controller":"1","description":"Lifeline association only supports the \"manual reset\" event.","overview":"","id":1413}],"documents":[{"id":1143,"file":"HS-WD200-Manual-4.pdf","label":"HS-WD200+ User Manual"},{"id":1144,"file":"hs-wd200.png","label":"Product Image"}]}</value>
+  </data>
+  <data name="ParameterReadOnlyOpenZWaveDBJson" xml:space="preserve">
+    <value>{
+ 
+  "database_id": 5623, 
+  "parameters": [
+        {
+      "param_id": 3,     
+      "size": 2,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 32767,
+      "read_only": "1",
+      "write_only": "0",
+      "limit_options": "1",
+      "id": 7247,
+      "options": []
+    }]
+}</value>
+  </data>
+  <data name="ParameterWithNoOptionOpenZWaveDBJson" xml:space="preserve">
+    <value>{
+ 
+  "database_id": 5623, 
+  "parameters": [
+        {
+      "param_id": 3,
+      "label": "Auto Off Timer",
+      "description": "Auto Off Timer",
+      "units": "seconds",
+      "overview": "&lt;p&gt;Automatically turns the switch off after x amount of seconds&lt;/p&gt; &lt;p&gt;0 = Disabled&lt;/p&gt; &lt;p&gt;1= 1 second&lt;/p&gt; &lt;p&gt;32767 = 32767 seconds&lt;/p&gt;",
+      "size": 2,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 32767,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "1",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 7247,
+      "options": []
+    }]
+}</value>
+  </data>
+  <data name="ParameterWithOptionOpenZWaveDBJson" xml:space="preserve">
+    <value>{
+ 
+  "database_id": 563, 
+  "parameters": [
+    {
+      "param_id": 1,
+      "label": "Power On State",
+      "description": "Power On State",
+      "units": "",
+      "overview": "&lt;p&gt;When power is restored, the switch reverts to either On, Off or last level&lt;/p&gt; &lt;p&gt;0 = Returns to State before Power Outage&lt;/p&gt; &lt;p&gt;1 = On&lt;/p&gt; &lt;p&gt;2 = Off&lt;/p&gt;",
+      "size": 1,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 2,
+      "read_only": "0",
+      "write_only": "0",
+      "reinclude": 0,
+      "limit_options": "0",
+      "advanced": 0,
+      "confirmation": 0,
+      "id": 7228,
+      "options": [
+        {
+          "value": 0,
+          "label": "Prior State",
+          "id": 9873
+        },
+        {
+          "value": 1,
+          "label": "On",
+          "id": 9874
+        },
+        {
+          "value": 2,
+          "label": "Off",
+          "id": 9875
+        }
+      ]
+    }]
+}</value>
+  </data>
+  <data name="ParameterWriteOnlyOpenZWaveDBJson" xml:space="preserve">
+    <value>{
+ 
+  "database_id": 5623, 
+  "parameters": [
+        {
+      "param_id": 3,     
+      "size": 2,
+      "bitmask": 0,
+      "default": 0,
+      "minimum": 0,
+      "maximum": 32767,
+      "read_only": "0",
+      "write_only": "1",
+      "limit_options": "1",
+      "id": 7247,
+      "options": []
+    }]
+}</value>
+  </data>
+</root>

@@ -1,0 +1,26 @@
+﻿<#@template hostspecific="true"#> 
+<#
+ string version = Host.ResolveParameterValue(null, null, "Version");
+#>
+{ 
+ "Version":"4.0.0.0",
+ "Packages":[
+  {
+    "PackageName": "ZWaveParameters",
+    "EXEFile": "HSPI_ZWaveParameters.exe",
+    "ID": "ZWaveParameters",
+    "Version": "<#=version#>",
+    "UC": 63,
+    "ZipFile": "HSPI_ZWaveParameters_<#=version#>.zip",
+    "Author": "dk307",
+    "Price": "Free",
+    "ReleaseNotesURL": "https://github.com/dk307/HSPI_ZWaveParameters",
+    "ShortDescription": "Show Z-wave parameters & update them",
+    "SupportURL": "https://github.com/dk307/HSPI_ZWaveParameters/issues",
+    "Tags": [
+      "Free",
+      "Beta"
+    ]
+  } 
+]
+}

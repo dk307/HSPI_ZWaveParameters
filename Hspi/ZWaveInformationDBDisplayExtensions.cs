@@ -66,14 +66,13 @@ namespace Hspi
                     list.Add(longerOne);
                 }
 
-                if (parameter.HasOptions)
-                {
-                }
-                else if (!parameter.HasSubParameters)
+                if (!parameter.HasOptions)          
                 {
                     list.Add(sizeString);
                     list.Add(Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}"));
                 }
+                
+                list.Add(Invariant($"Default: {parameter.DefaultValueDescription}"));
             }
 
             return list;

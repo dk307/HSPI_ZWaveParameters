@@ -34,9 +34,23 @@ namespace Hspi
             return Invariant($"<a href=\"{link}\" class=\"link-info\" target=\"_blank\">{data}</a>");
         }
 
-        public static string MakeMultipleRows(IEnumerable<string> values)
+        public static string MakeMultipleRows(IList<string> values)
         {
-            return string.Join("<BR>", values);
+            StringBuilder stb = new();
+            for (int i = 0; i < values.Count; i++)
+            {
+                var value2 = values[i].Trim();
+
+                stb.Append(value2);
+
+                if (!value2.EndsWith("</p>", StringComparison.OrdinalIgnoreCase) &&
+                    !value2.EndsWith("<BR>", StringComparison.OrdinalIgnoreCase) &&
+                    i != values.Count - 1)
+                {
+                    stb.Append("<BR>");
+                }
+            }
+            return stb.ToString();
         }
 
         private static readonly Dictionary<Style, string> styleClass = new()

@@ -140,6 +140,8 @@ namespace Hspi
                         throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"));
                 }
             }
+            catch (ZWaveSetConfigurationFailedException) { throw; }
+            catch (ZWavePluginNotRunningException) { throw; }
             catch (Exception ex)
             {
                 throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"), ex);

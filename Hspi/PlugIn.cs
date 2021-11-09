@@ -123,7 +123,7 @@ namespace Hspi
             {
                 logger.Error(Invariant($"Failed to process OnDeviceConfigChange for {devOrFeatRef} with error {ex.GetFullMessage()}"));
                 string errorMessage = ex.GetFullMessage();
-                throw new ShowErrorMessageException(errorMessage);
+                throw new ShowErrorMessageException(errorMessage, ex);
             }
         }
 

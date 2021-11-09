@@ -15,9 +15,9 @@ namespace HSPI_ZWaveParametersTest
     public class OpenZWaveDBInformationTest
     {
         [TestMethod]
-        public async Task ErrorThrowsException()
+        public async Task HttpErrorThrowsException()
         {
-            var handler = new Mock<HttpMessageHandler>();
+            var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpclient = handler.CreateClient();
 
             handler.SetupAnyRequest().ReturnsResponse(HttpStatusCode.NotFound);
@@ -29,7 +29,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public async Task DownloadForSingleDevice()
         {
-            var handler = new Mock<HttpMessageHandler>();
+            var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpclient = handler.CreateClient();
 
             handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006")
@@ -48,7 +48,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public async Task CorrectFirmwareIsSelected()
         {
-            var handler = new Mock<HttpMessageHandler>();
+            var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpclient = handler.CreateClient();
 
             handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036")
@@ -74,7 +74,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public async Task FirstDeviceIsSelectedIfNoMatchingFirmware()
         {
-            var handler = new Mock<HttpMessageHandler>();
+            var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpclient = handler.CreateClient();
 
             handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036")
@@ -93,7 +93,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public async Task NoDeviceThrowsException()
         {
-            var handler = new Mock<HttpMessageHandler>();
+            var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpclient = handler.CreateClient();
 
             handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x026E%204252:5A31")
@@ -120,7 +120,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public async Task ParameterWithSameIdAreGrouped()
         {
-            var handler = new Mock<HttpMessageHandler>();
+            var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpclient = handler.CreateClient();
 
             handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036")

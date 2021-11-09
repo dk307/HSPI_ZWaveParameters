@@ -98,7 +98,8 @@ namespace Hspi
                 }
                 else if (view is SelectListView selectListView)
                 {
-                    if (int.TryParse(selectListView.GetSelectedOption(), out var temp))
+                    string selection = selectListView.GetStringValue();
+                    if (int.TryParse(selection, out var temp))
                     {
                         value = parameterInfo?.Options?[temp].Value;
                     }
@@ -123,7 +124,7 @@ namespace Hspi
                 }
                 else
                 {
-                    throw new InvalidValueForTypeException("View not valid");
+                    throw new InvalidValueForTypeException("Selection/Input not valid");
                 }
             }
         }
@@ -146,7 +147,6 @@ namespace Hspi
                 var selectListView = new SelectListView(id,
                                                         label,
                                                         options,
-                                                        optionKeys,
                                                         ESelectListType.DropDown);
                 views.Add(selectListView);
 

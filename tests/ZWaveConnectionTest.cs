@@ -21,7 +21,7 @@ namespace HSPI_ZWaveParametersTest
             byte param = 45;
             int value = 42;
 
-            var mock = new Mock<IHsController>();
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param }))
                 .Returns(value);
 
@@ -39,7 +39,7 @@ namespace HSPI_ZWaveParametersTest
             byte nodeId = 234;
             byte param = 45;
 
-            var mock = new Mock<IHsController>();
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param }))
                 .Returns(34);
 
@@ -47,7 +47,15 @@ namespace HSPI_ZWaveParametersTest
                 .Returns(false);
 
             ZWaveConnection connection = new(mock.Object);
-            await Assert.ThrowsExceptionAsync<ZWaveGetConfigurationFailedException>(() => connection.GetConfiguration(homeId, nodeId, param));
+            try
+            {
+                await connection.GetConfiguration(homeId, nodeId, param);
+                Assert.Fail("No exception thrown");
+            }
+            catch (ZWaveGetConfigurationFailedException ex)
+            {
+                Assert.IsNull(ex.InnerException);
+            }
 
             mock.Verify();
         }
@@ -59,14 +67,22 @@ namespace HSPI_ZWaveParametersTest
             byte nodeId = 234;
             byte param = 45;
 
-            var mock = new Mock<IHsController>();
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param }))
                 .Throws(new TimeoutException());
 
-            mock.Setup(x => x.GetPluginVersionById(ZWaveInterface));
+            mock.Setup(x => x.GetPluginVersionById(ZWaveInterface)).Returns("3.7");
 
             ZWaveConnection connection = new(mock.Object);
-            await Assert.ThrowsExceptionAsync<ZWaveGetConfigurationFailedException>(() => connection.GetConfiguration(homeId, nodeId, param));
+            try
+            {
+                await connection.GetConfiguration(homeId, nodeId, param);
+                Assert.Fail("No exception thrown");
+            }
+            catch (ZWaveGetConfigurationFailedException ex)
+            {
+                Assert.IsInstanceOfType(ex.InnerException, typeof(TimeoutException));
+            }
 
             mock.Verify();
         }
@@ -78,7 +94,7 @@ namespace HSPI_ZWaveParametersTest
             byte nodeId = 234;
             byte param = 45;
 
-            var mock = new Mock<IHsController>();
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param }))
                 .Throws(new NullReferenceException());
 
@@ -94,6 +110,7 @@ namespace HSPI_ZWaveParametersTest
         {
             yield return new object[] { new ZWaveData(0x84, 74, 20, 234, "3425", new Version(5, 0), false),
                                                       0x84.ToString(), 74.ToString(), 20.ToString(), 234.ToString(), "3425", "5.0", "0", "0" };
+            // single digit firmware version
             yield return new object[] { new ZWaveData(0x84, 74, 23, 234, "345", new Version(5, 0), true),
                                                       0x84.ToString(), 74.ToString(), 23.ToString(), 234.ToString(), "345", "5", 0x80.ToString(), "0" };
             yield return new object[] { new ZWaveData(0x84, 74, 23, 234, "345", new Version(5, 0), true),
@@ -122,7 +139,7 @@ namespace HSPI_ZWaveParametersTest
         public void GetDeviceZWaveDataThrowsForInValidPlugInData()
         {
             int deviceRef = 9384;
-            var mock = new Mock<IHsController>();
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(ZWaveInterface);
 
             var plugInExtraData = new PlugExtraData();
@@ -136,7 +153,7 @@ namespace HSPI_ZWaveParametersTest
         public void GetDeviceZWaveDataThrowsForNonZWaveDevice()
         {
             int deviceRef = 9384;
-            var mock = new Mock<IHsController>();
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns("Something");
 
             ZWaveConnection connection = new(mock.Object);
@@ -147,7 +164,7 @@ namespace HSPI_ZWaveParametersTest
         public void GetDeviceZWaveDataThrowsForNoPlugInData()
         {
             int deviceRef = 9384;
-            var mock = new Mock<IHsController>();
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(ZWaveInterface);
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(null);
 
@@ -178,7 +195,7 @@ namespace HSPI_ZWaveParametersTest
                                                                      string capability,
                                                                      string security)
         {
-            var mock = new Mock<IHsController>();
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(ZWaveInterface);
 
             var plugInExtraData = new PlugExtraData();
@@ -196,12 +213,12 @@ namespace HSPI_ZWaveParametersTest
         }
 
         [DataTestMethod]
-        [DataRow("Success", false)]
-        [DataRow("Queued", false)]
-        [DataRow(null, true)]
-        [DataRow("Errored", true)]
-        [DataRow("Unknown", true)]
-        public void SetConfiguration(string result, bool isError)
+        [DataRow("Success", false, false)]
+        [DataRow("Queued", false, false)]
+        [DataRow(null, true, true)]
+        [DataRow("Errored", true, true)]
+        [DataRow("Unknown", true, true)]
+        public void SetConfiguration(string result, bool isError, bool expectCheckPlugInCall)
         {
             string homeId = "4567f";
             byte nodeId = 234;
@@ -209,7 +226,7 @@ namespace HSPI_ZWaveParametersTest
             int value = 42;
             byte size = 3;
 
-            var mock = new Mock<IHsController>();
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "SetDeviceParameterValue",
                                                    new object[5] { homeId, nodeId, param, size, value }))
                 .Returns(result);
@@ -221,9 +238,42 @@ namespace HSPI_ZWaveParametersTest
             }
             else
             {
-                Assert.ThrowsException<ZWaveSetConfigurationFailedException>(
-                    () => connection.SetConfiguration(homeId, nodeId, param, size, value));
+                try
+                {
+                    if (expectCheckPlugInCall)
+                    {
+                        mock.Setup(x => x.GetPluginVersionById(ZWaveInterface)).Returns("3.7");
+                    }
+
+                    connection.SetConfiguration(homeId, nodeId, param, size, value);
+                    Assert.Fail("No exception thrown");
+                }
+                catch (ZWaveSetConfigurationFailedException ex)
+                {
+                    Assert.IsNull(ex.InnerException);
+                }
             }
+        }
+
+        [TestMethod]
+        public void SetConfigurationWithZWavePlugInRunning()
+        {
+            string homeId = "4567f";
+            byte nodeId = 234;
+            byte param = 45;
+            int value = 42;
+            byte size = 3;
+
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
+            mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "SetDeviceParameterValue",
+                                                   new object[5] { homeId, nodeId, param, size, value }))
+                .Returns(null);
+
+            ZWaveConnection connection = new(mock.Object);
+
+            mock.Setup(x => x.GetPluginVersionById(ZWaveInterface)).Throws(new Exception());
+
+            Assert.ThrowsException<ZWavePluginNotRunningException>(() => connection.SetConfiguration(homeId, nodeId, param, size, value));
         }
 
         [TestMethod]
@@ -235,15 +285,22 @@ namespace HSPI_ZWaveParametersTest
             int value = 42;
             byte size = 3;
 
-            var mock = new Mock<IHsController>();
+            var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.LegacyPluginFunction(ZWaveInterface, string.Empty, "SetDeviceParameterValue",
                                                    new object[5] { homeId, nodeId, param, size, value }))
                 .Throws(new TimeoutException());
 
             ZWaveConnection connection = new(mock.Object);
 
-            Assert.ThrowsException<ZWaveSetConfigurationFailedException>(
-                () => connection.SetConfiguration(homeId, nodeId, param, size, value));
+            try
+            {
+                connection.SetConfiguration(homeId, nodeId, param, size, value);
+                Assert.Fail("No exception thrown");
+            }
+            catch (ZWaveSetConfigurationFailedException ex)
+            {
+                Assert.IsInstanceOfType(ex.InnerException, typeof(TimeoutException));
+            }
         }
 
         private const string ZWaveInterface = "Z-Wave";

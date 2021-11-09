@@ -3,6 +3,7 @@ using HomeSeer.Jui.Views;
 using Hspi.OpenZWaveDB;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -62,6 +63,17 @@ namespace Hspi
             SetPage(pageFactory.Page);
         }
 
+        private static T? TryGetFromString<T>(string value) where T : struct
+        {
+            var foo = TypeDescriptor.GetConverter(typeof(T));
+
+            if (foo.IsValid(value))
+            {
+                return (T)(foo.ConvertFromInvariantString(value));
+            }
+            return null;
+        }
+
         public Page? GetPage()
         {
             return page;
@@ -87,25 +99,29 @@ namespace Hspi
 
                 if (view is InputView inputView)
                 {
-                    if (int.TryParse(inputView.Value, out var temp))
+                    var temp = TryGetFromString<int>(view.GetStringValue());
+
+                    if (temp.HasValue)
                     {
                         value = temp;
                     }
                     else
                     {
-                        throw new InvalidValueForTypeException("Value not integer");
+                        throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));
                     }
                 }
                 else if (view is SelectListView selectListView)
                 {
                     string selection = selectListView.GetStringValue();
-                    if (int.TryParse(selection, out var temp))
+                    if (int.TryParse(selection, NumberStyles.AllowTrailingWhite |
+                                                NumberStyles.AllowTrailingWhite,
+                                     CultureInfo.InvariantCulture, out var temp))
                     {
                         value = parameterInfo?.Options?[temp].Value;
                     }
                     else
                     {
-                        throw new InvalidValueForTypeException("Value not integer");
+                        throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));
                     }
                 }
 
@@ -169,7 +185,7 @@ namespace Hspi
                     stb2.Append(')');
                 }
 
-                var inputView = new InputView(id, stb2.ToString(), EInputType.Number);
+                var inputView = new InputView(id, stb2.ToString(), EInputType.Text);
                 views.Add(inputView);
 
                 if (parameter.ReadOnly)
@@ -245,7 +261,7 @@ namespace Hspi
         {
             if (Data == null)
             {
-                throw new Exception("Existing ZWave data is null");
+                throw new InvalidOperationException("Existing ZWave data is null");
             }
         }
 
@@ -331,7 +347,7 @@ namespace Hspi
 
         private const string NewLine = "<BR>";
         private const string ZWaveParameterPrefix = "zw_parameter_";
-        private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int deviceOrFeatureRef;
         private readonly HttpClient? httpClient;
         private readonly IZWaveConnection zwaveConnection;

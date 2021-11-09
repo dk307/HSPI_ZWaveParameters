@@ -115,15 +115,12 @@ namespace Hspi
 
                 return true;
             }
-            catch (ShowErrorMessageException)
-            {
-                throw;
-            }
             catch (Exception ex)
             {
+                // This needs to Exception class to show error message
                 logger.Error(Invariant($"Failed to process OnDeviceConfigChange for {devOrFeatRef} with error {ex.GetFullMessage()}"));
                 string errorMessage = ex.GetFullMessage();
-                throw new ShowErrorMessageException(errorMessage, ex);
+                throw new Exception(errorMessage);
             }
         }
 

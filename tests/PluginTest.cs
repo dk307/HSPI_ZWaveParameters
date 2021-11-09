@@ -92,9 +92,10 @@ namespace HSPI_ZWaveParametersTest
             {
                 pluginMock.Object.SaveJuiDeviceConfigPage(page.Page.ToJsonString(), 10);
             }
-            catch (ShowErrorMessageException ex)
+            catch (Exception ex)
             {
                 Assert.IsNull(ex.InnerException);
+                Assert.IsTrue(ex.Message.Contains("Plugin was restarted"));
             }
         }
 
@@ -117,16 +118,17 @@ namespace HSPI_ZWaveParametersTest
 
             page.Page.Views[0].UpdateValue("34");
 
+            string message = "sdksdkhskioweoir";
             deviceConfigPageMock.Setup(x => x.OnDeviceConfigChange(It.IsAny<Page>()))
-                                .Throws(new ZWaveSetConfigurationFailedException());
+                                .Throws(new ZWaveSetConfigurationFailedException(message));
 
             try
             {
                 plugIn.SaveJuiDeviceConfigPage(page.Page.ToJsonString(), devOrFeatRef);
             }
-            catch (ShowErrorMessageException ex)
+            catch (Exception ex)
             {
-                Assert.IsInstanceOfType(ex.InnerException, typeof(ZWaveSetConfigurationFailedException));
+                Assert.IsTrue(ex.Message.Contains(message));
             }
 
             deviceConfigPageMock.Verify();

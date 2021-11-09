@@ -3,7 +3,8 @@ using System.Runtime.Serialization;
 
 namespace Hspi.Exceptions
 {
-    internal class NotAZWaveDeviceException : Exception
+    [Serializable]
+    public class NotAZWaveDeviceException : Exception
     {
         public NotAZWaveDeviceException()
         {

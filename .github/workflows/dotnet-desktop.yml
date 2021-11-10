@@ -34,5 +34,5 @@ jobs:
           
       - name: Unit Tests
         run: |
-          mtests.exe tests\bin\Release\HSPI_ZWaveParametersTest.dll /resultsfile:TestResults.trx
+          mstests.exe tests\bin\Release\HSPI_ZWaveParametersTest.dll /resultsfile:TestResults.trx
 

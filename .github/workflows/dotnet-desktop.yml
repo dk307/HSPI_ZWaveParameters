@@ -12,6 +12,7 @@ jobs:
     
     steps:      
       - uses: actions/checkout@v2
+        submodules: true
       
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1

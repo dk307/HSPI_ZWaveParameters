@@ -11,7 +11,8 @@ jobs:
     runs-on: windows-latest
     
     steps:      
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           submodules: true
       
@@ -30,3 +31,8 @@ jobs:
       - name: Build Solution
         run: |
           msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Release"
+          
+      - name: Unit Tests
+        run: |
+          mtests.exe tests\bin\Release\HSPI_ZWaveParametersTest.dll /resultsfile:TestResults.trx
+

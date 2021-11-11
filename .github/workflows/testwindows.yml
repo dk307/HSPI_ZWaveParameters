@@ -34,7 +34,7 @@ jobs:
       - name: Unit tests
         uses: zyborg/dotnet-tests-report@v1
         with:
-          project_path: \tests\HSPI_ZWaveParametersTest.csproj
+          project_path: tests\HSPI_ZWaveParametersTest.csproj
           report_name: windows_unit_tests
           report_title: Windows Unit Tests
           github_token: ${{ secrets.GITHUB_TOKEN }}

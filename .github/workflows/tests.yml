@@ -36,12 +36,11 @@ jobs:
         run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Debug"
 
       - name: Cache unit tests binaries
-        env:
-         cache-name: unit-test-binaries
+        id: unit-test-binaries
         uses: actions/cache@v2
         with:
          path: .\tests\bin\Debug\*
-         key: abc
+         key: ${{ github.sha }}
              
       - name: Run Unit Tests
         run: vstest.console.exe .\tests\bin\Debug\HSPI_ZWaveParametersTest.dll /logger:trx
@@ -60,12 +59,14 @@ jobs:
     needs: [build-cache-test-win]    
 
     steps:
+      - name: Check Cache Exists
+        if: steps.unit-test-binaries.outputs.cache-hit != 'true'
+        run:  echo "No cache found"
+
       - name: Use cache unit tests binaries
-        env:
-         cache-name: unit-test-binaries
         uses: actions/cache@v2
         with:
           path: ./*
-          key: abc
+          key: ${{ github.sha }}
       - run: ls -l
       

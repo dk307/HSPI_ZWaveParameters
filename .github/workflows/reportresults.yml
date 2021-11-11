@@ -1,0 +1,15 @@
+name: 'Test Report'
+on:
+  workflow_run:
+    workflows: ['Build and Test']                     # runs after CI workflow
+    types:
+      - completed
+jobs:
+  report:
+    runs-on: windows-latest
+    steps:
+    - uses: dorny/test-reporter@v1
+      with:
+        artifact: test-results            # artifact name
+        name: Unit Tests                  # Name of the check run which will be created
+        reporter: dotnet-trx              # Format of test results

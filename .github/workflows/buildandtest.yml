@@ -33,7 +33,7 @@ jobs:
           
       - name: Unit Tests
         shell: powershell
-        run: "vstest.console.exe .\tests\bin\Release\HSPI_ZWaveParametersTest.dll /logger:trx;LogFileName=testresults.trx"
+        run: 'vstest.console.exe .\tests\bin\Release\HSPI_ZWaveParametersTest.dll /logger:trx;LogFileName=testresults.trx'
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v2  # upload test results

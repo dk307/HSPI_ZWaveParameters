@@ -1,4 +1,4 @@
-name: 'Test Report'
+name: 'Unit Test Report'
 on:
   workflow_run:
     workflows: ['Build and Test']                     # runs after CI workflow
@@ -12,4 +12,5 @@ jobs:
       with:
         artifact: test-results            # artifact name
         name: Unit Tests                  # Name of the check run which will be created
+        path: '*.trx'
         reporter: dotnet-trx              # Format of test results

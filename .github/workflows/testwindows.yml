@@ -35,7 +35,7 @@ jobs:
         run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Debug"
           
       - name: Unit Tests
-        run: vstest.console.exe .\tests\bin\Release\HSPI_ZWaveParametersTest.dll /logger:trx
+        run: vstest.console.exe .\tests\bin\Debug\HSPI_ZWaveParametersTest.dll /logger:trx
 
         # Using the trx-parser action
       - name: Parse Trx files

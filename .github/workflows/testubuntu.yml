@@ -1,4 +1,4 @@
-name: 'Unit Tests On Windows'
+name: 'Unit Tests On Ubuntu'
 
 on:  
   push:
@@ -26,10 +26,10 @@ jobs:
         run: nuget restore HSPI_ZWaveParameters.sln
 
       - name: Build Solution
-        run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Debug"
+        run: msbuild HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Debug"
           
       - name: Unit Tests
-        run: vstest.console.exe .\tests\bin\Debug\HSPI_ZWaveParametersTest.dll /logger:trx
+        run: vstest.console .\tests\bin\Debug\HSPI_ZWaveParametersTest.dll /logger:trx
 
         # Using the trx-parser action
       - name: Parse Trx files

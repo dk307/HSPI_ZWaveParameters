@@ -34,5 +34,11 @@ jobs:
           
       - name: Unit Tests
         run: |
-          mstest.exe tests\bin\Release\HSPI_ZWaveParametersTest.dll /resultsfile:TestResults.trx
+          mstest.exe /testcontainer:tests\bin\Release\HSPI_ZWaveParametersTest.dll /resultsfile:testresults.trx
 
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v2  # upload test results
+        if: success() || failure()        # run this step even if previous step failed
+        with:
+          name: test-results
+          path: testresults.trx

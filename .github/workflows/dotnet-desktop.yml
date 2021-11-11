@@ -32,6 +32,7 @@ jobs:
         run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Release"
           
       - name: Unit Tests
+        shell: powershell
         run: vstest.console.exe .\tests\bin\Release\HSPI_ZWaveParametersTest.dll /logger:trx;LogFileName=testresults.trx
 
       - name: Upload Test Results

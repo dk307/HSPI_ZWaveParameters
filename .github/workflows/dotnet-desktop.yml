@@ -29,16 +29,14 @@ jobs:
         run: nuget restore HSPI_ZWaveParameters.sln
 
       - name: Build Solution
-        run: |
-          msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Release"
+        run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Release"
           
       - name: Unit Tests
-        run: |
-          vstest.console.exe .\tests\bin\Release\HSPI_ZWaveParametersTest.dll /logger:trx;LogFileName=testresults.trx
+        run: vstest.console.exe .\tests\bin\Release\HSPI_ZWaveParametersTest.dll /logger:trx;LogFileName=testresults.trx
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v2  # upload test results
         if: success() || failure()        # run this step even if previous step failed
         with:
           name: test-results
-          path: testresults.trx
+          path: .\TestResults\testresults.trx

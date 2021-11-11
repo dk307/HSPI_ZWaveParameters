@@ -1,4 +1,4 @@
-name: 'Unit Tests On Windows'
+name: 'Unit Tests'
 
 on:  
   push:
@@ -7,7 +7,8 @@ on:
     branches: [ main ]
 
 jobs:  
-  build:    
+  build-cache-test-win:   
+    name: Build, cache and test on Windows
     runs-on: windows-latest
     
     steps:      
@@ -33,7 +34,14 @@ jobs:
 
       - name: Build Solution
         run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Debug"
-          
+
+      - name: Cache unit tests binaries
+        id: restore-build
+        uses: actions/cache@v2
+        with:
+         path: .\tests\bin\Debug
+         key: ${{ github.sha }}
+             
       - name: Unit Tests
         run: vstest.console.exe .\tests\bin\Debug\HSPI_ZWaveParametersTest.dll /logger:trx
 
@@ -45,4 +53,15 @@ jobs:
           TRX_PATH: ${{ github.workspace }}/TestResults #This should be the path to your TRX files
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
 
-    
+  cache-use-build:
+    name: Test on Ubuntu
+    runs-on: ubuntu-latest
+    needs: [build-cache-test-win]    
+
+    steps:
+      - uses: actions/cache@v2
+        id: restore-build
+        with:
+          path: ./*
+          key: ${{ github.sha }}
+      

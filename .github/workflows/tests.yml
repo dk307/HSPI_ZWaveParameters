@@ -42,6 +42,7 @@ jobs:
         with:
          path: .\tests\bin\Debug\*
          key: ${{ github.sha }}
+         restore-keys: ${{ github.sha }}
              
       - name: Run Unit Tests
         run: vstest.console.exe .\tests\bin\Debug\HSPI_ZWaveParametersTest.dll /logger:trx
@@ -67,5 +68,6 @@ jobs:
         with:
           path: ./*
           key: ${{ github.sha }}
+          restore-keys: ${{ github.sha }}
       - run: ls -l
       

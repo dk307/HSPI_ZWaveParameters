@@ -29,19 +29,21 @@ jobs:
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE
 
-      - name: Restore Packages
+      - name: Restore Nuget Packages
         run: nuget restore HSPI_ZWaveParameters.sln
 
       - name: Build Solution
         run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Debug"
 
       - name: Cache unit tests binaries
+        env:
+         cache-name: unit-test-binaries
         uses: actions/cache@v2
         with:
          path: .\tests\bin\Debug\*
          key: ${{ github.sha }}
              
-      - name: Unit Tests
+      - name: Run Unit Tests
         run: vstest.console.exe .\tests\bin\Debug\HSPI_ZWaveParametersTest.dll /logger:trx
 
         # Using the trx-parser action
@@ -59,6 +61,8 @@ jobs:
 
     steps:
       - name: Use cache unit tests binaries
+        env:
+         cache-name: unit-test-binaries
         uses: actions/cache@v2
         with:
           path: ./*

@@ -39,7 +39,7 @@ jobs:
         id: unit-test-binaries
         uses: actions/cache@v2
         with:
-         path: .\tests\bin\Debug\*
+         path: ./tests/bin/Debug/*
          key: ${{ github.sha }}
              
       - name: Run Unit Tests

@@ -32,7 +32,12 @@ jobs:
         run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Debug"
           
       - name: Unit Tests
-        run: vstest.console.exe .\tests\bin\Release\HSPI_ZWaveParametersTest.dll /logger:trx;LogFileName=testresults.trx
+        run: vstest.console.exe .\tests\bin\Release\HSPI_ZWaveParametersTest.dll /logger:trx
         shell: cmd
 
-    
+      - name: Parse Trx files
+        uses: NasAmin/trx-parser@v0.1
+        id: trx-parser
+        with:
+          TRX_PATH: ${{ github.workspace }}/TestResults #This should be the path to your TRX files
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}   

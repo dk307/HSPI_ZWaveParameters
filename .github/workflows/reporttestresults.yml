@@ -7,10 +7,14 @@ on:
       - completed
 
 jobs:
-  report:
-    runs-on: windows-latest
+  unit-test-results:
+    name: Unit Test Results
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion != 'skipped'
+
     steps:
-    - uses: dorny/test-reporter@v1
+    - name: Publish results
+      uses: dorny/test-reporter@v1
       with:
         artifact: test-results            # artifact name
         name: Unit Tests                  # Name of the check run which will be created

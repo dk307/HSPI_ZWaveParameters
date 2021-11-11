@@ -6,6 +6,7 @@ using Moq;
 using Moq.Contrib.HttpClient;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -24,23 +25,38 @@ namespace HSPI_ZWaveParametersTest
         {
             yield return new object[] { AeonLabsZWaveData, CreateAeonLabsSwitchHttpHandler() };
             yield return new object[] { AeonLabsZWaveData with { Listening = false }, CreateAeonLabsSwitchHttpHandler() };
-            yield return new object[] { HomeseerDimmerZWaveData, CreateHomeseerDimmerHttpHandler()};
+            yield return new object[] { HomeseerDimmerZWaveData, CreateHomeseerDimmerHttpHandler() };
+        }
+
+        [TestMethod]
+        public void OnDeviceConfigChangeWithoutBuildingPage()
+        {
+            int deviceRef = 3746;
+            var zwaveData = HomeseerDimmerZWaveData;
+            var httpHandler = CreateHomeseerDimmerHttpHandler();
+
+            var mock = SetupZWaveConnection(deviceRef, zwaveData);
+            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpHandler.CreateClient());
+
+            var changes = PageFactory.CreateGenericPage("id", "name");
+
+            Assert.ThrowsException<InvalidOperationException>(() => deviceConfigPage.OnDeviceConfigChange(changes.Page));
         }
 
         [TestMethod]
         public async Task OnDeviceConfigChangeWithNoChange()
         {
-            await OnDeviceConfigChange((view, parameter) => (false, null, null));
+            await TestOnDeviceConfigChange((view, parameter) => (false, null, null));
         }
 
         [TestMethod]
         public async Task OnDeviceConfigChangeWithSetForBitmask()
         {
-            await OnDeviceConfigChange((view, parameter) =>
+            await TestOnDeviceConfigChange((view, parameter) =>
             {
                 if (parameter.Bitmask != 0)
                 {
-                    return (true, int.MaxValue, parameter.Bitmask);
+                    return (true, int.MaxValue.ToString(CultureInfo.InvariantCulture), parameter.Bitmask);
                 }
                 return (false, null, null);
             });
@@ -49,9 +65,22 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public async Task OnDeviceConfigChangeWithSetToDefault()
         {
-            await OnDeviceConfigChange((view, parameter) =>
+            await TestOnDeviceConfigChange((view, parameter) =>
             {
-                return (true, parameter.Default, parameter.Default);
+                return (true, parameter.Default.ToString(CultureInfo.InvariantCulture), parameter.Default);
+            });
+        }
+
+        [TestMethod]
+        public async Task OnDeviceConfigChangeWithInputAsHex()
+        {
+            await TestOnDeviceConfigChange((view, parameter) =>
+            {
+                if (view is InputView inputView)
+                {
+                    return (true, Invariant($"0x{parameter.Default:x}"), parameter.Default);
+                }
+                return (false, null, null);
             });
         }
 
@@ -152,6 +181,7 @@ namespace HSPI_ZWaveParametersTest
                                          "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040",
                                          Resource.HomeseerDimmerOpenZWaveDBFullJson);
         }
+
         private static Mock<HttpMessageHandler> CreateMockHttpHandler(string deviceListUrl, string deviceListJson, string deviceUrl, string deviceJson)
         {
             var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
@@ -231,7 +261,7 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0);
         }
 
-        private async Task OnDeviceConfigChange(Func<AbstractView, ZWaveDeviceParameter, (bool, int?, int?)> changedData)
+        private async Task TestOnDeviceConfigChange(Func<AbstractView, ZWaveDeviceParameter, (bool, string, int?)> changedData)
         {
             var (zwaveMock, deviceConfigPage) = await CreateHomeseerDimmerDeviceConfigPage();
 
@@ -255,12 +285,13 @@ namespace HSPI_ZWaveParametersTest
                 {
                     if (view is SelectListView selectionView)
                     {
-                        int selection = parameter.Options.TakeWhile(x => x.Value != newValue.Value).Count();
+                        int newValueInt = int.Parse(newValue, NumberStyles.Any, CultureInfo.InvariantCulture);
+                        int selection = parameter.Options.TakeWhile(x => x.Value != newValueInt).Count();
                         selectionView.Selection = selection;
                     }
                     else
                     {
-                        view.UpdateValue(newValue.Value.ToString());
+                        view.UpdateValue(newValue);
                     }
 
                     changes = changes.WithView(view);

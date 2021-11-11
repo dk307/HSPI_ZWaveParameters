@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ZWave device information Plugin for Homeseer 4")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("ZWave Device Parameters Plugin for Homeseer 4")]
+[assembly: AssemblyDescription("ZWave Device Parameters Plugin for Homeseer 4")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyCopyright("Copyright ©  2021")]

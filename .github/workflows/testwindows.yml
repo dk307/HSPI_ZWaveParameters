@@ -31,13 +31,13 @@ jobs:
       - name: Build Solution
         run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Debug"
           
-      - name: Unit Tests
-        run: vstest.console.exe .\tests\bin\Release\HSPI_ZWaveParametersTest.dll /logger:trx
-        shell: cmd
-
-      - name: Parse Trx files
-        uses: NasAmin/trx-parser@v0.1
-        id: trx-parser
+      - name: Unit tests
+        uses: zyborg/dotnet-tests-report@v1
         with:
-          TRX_PATH: ${{ github.workspace }}/TestResults #This should be the path to your TRX files
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
+          project_path: \tests\HSPI_ZWaveParametersTest.csproj
+          report_name: windows_unit_tests
+          report_title: Windows Unit Tests
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gist_name: window_unit_tests.md
+          gist_badge_label: 'Windows Unit Tests: %Counters_passed%/%Counters_total%'
+          gist_token: ${{ secrets.GIST_TOKEN }}  

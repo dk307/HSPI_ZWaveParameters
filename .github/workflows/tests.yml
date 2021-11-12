@@ -72,9 +72,9 @@ jobs:
         run: echo "No cache found"
 
       - name: Download unit tests binaries
-        uses: actions/download-artifactv@2
+        uses: actions/download-artifact@v2
         with:
           path: ./tests/bin/Debug
           name: ${{ github.sha }}
-      - run: ls -l
+      - run: ls -l ./tests/bin/Debug
       

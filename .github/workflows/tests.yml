@@ -22,7 +22,14 @@ jobs:
 
       - name: Setup VSTest Path
         uses: darenm/Setup-VSTest@v1
-   
+
+      - uses: actions/cache@v2
+        with:
+         path: ~/.nuget/packages
+         key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+         restore-keys: |
+              ${{ runner.os }}-nuget-
+ 
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.5
 
@@ -39,7 +46,7 @@ jobs:
         id: unit-test-binaries
         uses: actions/cache@v2
         with:
-         path: ./tests/bin/Debug/*
+         path: .\tests\bin\Debug\*
          key: ${{ github.sha }}
              
       - name: Run Unit Tests
@@ -61,7 +68,7 @@ jobs:
     steps:
       - name: Check Cache Exists
         if: steps.unit-test-binaries.outputs.cache-hit != 'true'
-        run:  echo "No cache found"
+        run: echo "No cache found"
 
       - name: Use cache unit tests binaries
         uses: actions/cache@v2

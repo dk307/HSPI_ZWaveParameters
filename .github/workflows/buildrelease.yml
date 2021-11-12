@@ -18,9 +18,17 @@ jobs:
       
       - name: Setup VS Dev Environment
         uses: seanmiddleditch/gha-setup-vsdevenv@v4
-   
+    
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.5
+   
+      - name: Cache Nuget Packages
+        uses: actions/cache@v2
+        with:
+         path: ~/.nuget/packages
+         key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+         restore-keys: |
+              ${{ runner.os }}-nuget-
 
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE

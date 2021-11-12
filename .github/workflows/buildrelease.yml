@@ -1,4 +1,4 @@
-name: 'Build and Test'
+name: 'Build Release'
 
 on:  
   push:
@@ -18,9 +18,17 @@ jobs:
       
       - name: Setup VS Dev Environment
         uses: seanmiddleditch/gha-setup-vsdevenv@v4
-   
+    
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.5
+   
+      - name: Cache Nuget Packages
+        uses: actions/cache@v2
+        with:
+         path: ~/.nuget/packages
+         key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+         restore-keys: |
+              ${{ runner.os }}-nuget-
 
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE
@@ -30,14 +38,3 @@ jobs:
 
       - name: Build Solution
         run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Release"
-          
-      - name: Unit Tests
-        run: vstest.console.exe .\tests\bin\Release\HSPI_ZWaveParametersTest.dll /logger:trx;LogFileName=testresults.trx
-        shell: cmd
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v2  # upload test results
-        if: success() || failure()        # run this step even if previous step failed
-        with:
-          name: test-results
-          path: .\TestResults\testresults.trx

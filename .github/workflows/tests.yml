@@ -67,6 +67,8 @@ jobs:
     needs: [build-cache-test-win]    
 
     steps:
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
       - name: Download unit tests binaries
         uses: actions/download-artifact@v2
         with:
@@ -74,4 +76,4 @@ jobs:
           name: ${{ github.sha }}
       - run: ls -l ./tests/bin/Debug
       - name: Run Unit Tests
-        run: mono vstest.console ./tests/bin/Debug/HSPI_ZWaveParametersTest.dll
+        run: dotnet test ./tests/bin/Debug/HSPI_ZWaveParametersTest.dll

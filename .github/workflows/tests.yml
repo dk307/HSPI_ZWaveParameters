@@ -76,7 +76,7 @@ jobs:
           name: ${{ github.sha }}
       - run: ls -l ./tests/bin/Debug
       - name: Run Unit Tests
-        run: dotnet vstest --logger:trx ./tests/bin/Debug/HSPI_ZWaveParametersTest.dll -l prx
+        run: dotnet vstest --logger:trx ./tests/bin/Debug/HSPI_ZWaveParametersTest.dll
 
         # Using the trx-parser action
       - name: Parse Trx files

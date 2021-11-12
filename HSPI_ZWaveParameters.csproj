@@ -92,6 +92,7 @@
     <Compile Include="Hspi\Exceptions\ZWaveGetConfigurationFailedException.cs" />
     <Compile Include="Hspi\Exceptions\ZWavePlugInDataInvalidException.cs" />
     <Compile Include="Hspi\Exceptions\ZWavePluginNotRunningException.cs" />
+    <Compile Include="Hspi\Exceptions\ZWavePlugIsControllerException.cs" />
     <Compile Include="Hspi\Exceptions\ZWaveSetConfigurationFailedException.cs" />
     <Compile Include="Hspi\HSPI.cs" />
     <Compile Include="Hspi\IDeviceConfigPage.cs" />

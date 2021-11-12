@@ -75,6 +75,21 @@ namespace Hspi
                 throw new ZWavePlugInDataInvalidException("Device Plugin extra data is not valid");
             }
 
+            const int BasicTypeController = 1;
+            const int BasicTypeStaticController = 2;
+            const int GenericTypeGenericController = 1;
+            const int GenericTypeStaticController = 2;
+
+            var basicType = GetValueFromExtraDataWithTrim<Int32>(plugInData, "basictype");
+            var genericType = GetValueFromExtraDataWithTrim<Int32>(plugInData, "generictype");
+
+            if
+                ((basicType.HasValue && (BasicTypeController == basicType || BasicTypeStaticController == basicType)) ||
+                 (genericType.HasValue && (GenericTypeGenericController == genericType || GenericTypeStaticController == genericType)))
+            {
+                throw new ZWavePlugIsControllerException("Device is controller");
+            }
+
             var manufacturerId = GetValueFromExtraDataWithTrim<Int32>(plugInData, "manufacturer_id");
             var productId = GetValueFromExtraDataWithTrim<UInt16>(plugInData, "manufacturer_prod_id");
             var productType = GetValueFromExtraDataWithTrim<UInt16>(plugInData, "manufacturer_prod_type");
@@ -176,7 +191,7 @@ namespace Hspi
         }
 
         private const string ZWaveInterface = "Z-Wave";
-        private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly AsyncLock getConfiguationLock = new();
         private readonly IHsController HomeSeerSystem;
     }

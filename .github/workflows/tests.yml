@@ -74,4 +74,4 @@ jobs:
           name: ${{ github.sha }}
       - run: ls -l ./tests/bin/Debug
       - name: Run Unit Tests
-        run: mono vstest.console.exe ./tests/bin/Debug/HSPI_ZWaveParametersTest.dll
+        run: mono vstest.console ./tests/bin/Debug/HSPI_ZWaveParametersTest.dll

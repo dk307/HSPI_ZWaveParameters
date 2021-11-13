@@ -93,15 +93,18 @@ namespace HSPI_ZWaveParametersTest
         [TestInitialize]
         public void SetExecutingAssembly()
         {
-            Assembly assembly = Assembly.GetCallingAssembly();
+            if (Type.GetType("Mono.Runtime") == null)
+            {
+                Assembly assembly = Assembly.GetCallingAssembly();
 
-            AppDomainManager manager = new();
-            FieldInfo entryAssemblyfield = manager.GetType().GetField("m_entryAssembly", BindingFlags.Instance | BindingFlags.NonPublic);
-            entryAssemblyfield.SetValue(manager, assembly);
+                AppDomainManager manager = new();
+                FieldInfo entryAssemblyfield = manager.GetType().GetField("m_entryAssembly", BindingFlags.Instance | BindingFlags.NonPublic);
+                entryAssemblyfield.SetValue(manager, assembly);
 
-            AppDomain domain = AppDomain.CurrentDomain;
-            FieldInfo domainManagerField = domain.GetType().GetField("_domainManager", BindingFlags.Instance | BindingFlags.NonPublic);
-            domainManagerField.SetValue(domain, manager);
+                AppDomain domain = AppDomain.CurrentDomain;
+                FieldInfo domainManagerField = domain.GetType().GetField("_domainManager", BindingFlags.Instance | BindingFlags.NonPublic);
+                domainManagerField.SetValue(domain, manager);
+            }
         }
 
         private static void CreateMockForHsController(Mock<IHsController> mock, int deviceRef, ZWaveData zwaveData)

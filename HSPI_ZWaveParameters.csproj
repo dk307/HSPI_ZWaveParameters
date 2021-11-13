@@ -198,7 +198,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Hspi\html\empty.txt" />
     <Content Include="install.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -218,10 +217,7 @@
     <ArtifactsDirectory>$(OutputPath)\Artifacts</ArtifactsDirectory>
     <_TransformExe>$(DevEnvDir)\TextTransform.exe</_TransformExe>
   </PropertyGroup>
-  <Target Name="ZipHtmlFiles" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
-    <ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)\Hspi\html" DestinationFile="$(OutputPath)\html.zip" Overwrite="true" />
-  </Target>
-  <Target Name="ZipFinalFiles" DependsOnTargets="Build;ZipHtmlFiles" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="ZipFinalFiles" DependsOnTargets="Build;" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
     <RemoveDir Directories="$(ArtifactsDirectory)" />
     <MakeDir Directories="$(ArtifactsDirectory)" />
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)\HSPI_ZWaveParameters.exe">
@@ -246,7 +242,6 @@
       <ReleaseFiles Include="$(OutputPath)\System.Memory.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Numerics.Vectors.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Runtime.CompilerServices.Unsafe.dll" />
-      <ReleaseFiles Include="$(OutputPath)\html.zip" />
       <ReleaseFiles Include="$(OutputPath)\install.txt" />
     </ItemGroup>
     <Copy SourceFiles="@(ReleaseFiles)" DestinationFolder="$(ArtifactsDirectory)" />

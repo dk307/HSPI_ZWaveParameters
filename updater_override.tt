@@ -6,7 +6,7 @@
  "Version":"4.0.0.0",
  "Packages":[
   {
-    "PackageName": "ZWaveParameters",
+    "PackageName": "Z-Wave Parameters",
     "EXEFile": "HSPI_ZWaveParameters.exe",
     "ID": "ZWaveParameters",
     "Version": "<#=version#>",

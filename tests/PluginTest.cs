@@ -243,13 +243,6 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(plugin.Name, PlugInData.PlugInName);
         }
 
-        [TestMethod]
-        public void SupportsSettings()
-        {
-            var plugin = new PlugIn();
-            Assert.AreEqual(plugin.HasSettings, true);
-        }
-
         private static (Mock<PlugIn>, Mock<IDeviceConfigPage>) CreatePlugInAndDeviceConfig(int devOrFeatRef)
         {
             var pluginMock = CreatePlugInMock();

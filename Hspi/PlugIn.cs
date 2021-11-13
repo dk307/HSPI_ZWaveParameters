@@ -21,7 +21,6 @@ namespace Hspi
         {
         }
 
-        public override bool HasSettings => true;
         public override bool SupportsConfigDeviceAll => true;
 
         public override string GetJuiDeviceConfigPage(int deviceOrFeatureRef)
@@ -130,6 +129,7 @@ namespace Hspi
 
         protected override bool OnSettingChange(string pageId, AbstractView currentView, AbstractView changedView)
         {
+            logger.Debug(Invariant($"{pageId} has change  value of {changedView.Id} to {changedView.GetStringValue()}"));
             if (settingsPages != null && settingsPages.OnSettingChange(changedView))
             {
                 UpdateDebugLevel();

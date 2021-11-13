@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +17,16 @@ namespace Hspi.OpenZWaveDB
 {
     internal class OpenZWaveDBInformation
     {
+        static OpenZWaveDBInformation()
+        {
+            var handler = new HttpClientHandler()
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            };
+
+            httpClientGlobal = new HttpClient(handler, true);
+        }
+
         public OpenZWaveDBInformation(int manufactureId, int productType, int productId, Version firmware,
                                       HttpClient? httpClient)
         {
@@ -29,7 +39,19 @@ namespace Hspi.OpenZWaveDB
 
         public ZWaveInformation? Data => data;
 
- 
+        public static ZWaveInformation ParseJson(string deviceJson)
+        {
+            var serializer = new JsonSerializer();
+            using var stringReader = new StringReader(deviceJson);
+            using var reader = new JsonTextReader(stringReader);
+            var obj = serializer.Deserialize<ZWaveInformation>(reader);
+            if ((obj == null) || string.IsNullOrWhiteSpace(obj.Id))
+            {
+                throw new ShowErrorMessageException("Json invalid from database");
+            }
+            return obj;
+        }
+
         public async Task Update(CancellationToken cancellationToken)
         {
             try
@@ -72,20 +94,6 @@ namespace Hspi.OpenZWaveDB
                 throw new Exception("Failed to get Data from Open Z-Wave DB", ex);
             }
         }
-
-        public static ZWaveInformation ParseJson(string deviceJson)
-        {
-            var serializer = new JsonSerializer();
-            using var stringReader = new StringReader(deviceJson);
-            using var reader = new JsonTextReader(stringReader);
-            var obj = serializer.Deserialize<ZWaveInformation>(reader);
-            if ((obj == null) || string.IsNullOrWhiteSpace(obj.Id))
-            {
-                throw new ShowErrorMessageException("Json invalid from database");
-            }
-            return obj;
-        }
-
         private async Task<string> GetCall(string deviceUrl, CancellationToken cancellationToken)
         {
             logger.Info("Getting data from " + deviceUrl);
@@ -136,10 +144,10 @@ namespace Hspi.OpenZWaveDB
 
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
-        private static readonly HttpClient httpClientGlobal = new();
-        private readonly HttpClient httpClient;
-        private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly HttpClient httpClientGlobal;
+        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly Version firmware;
+        private readonly HttpClient httpClient;
         private readonly int manufactureId;
         private readonly int productId;
         private readonly int productType;

@@ -28,7 +28,6 @@ namespace Hspi
         }
 
         public ZWaveInformation? Data { get; private set; }
-
         public virtual async Task BuildConfigPage(CancellationToken cancellationToken)
         {
             var pageFactory = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
@@ -61,17 +60,6 @@ namespace Hspi
                 pageFactory = pageFactory.WithLabel(NewId(), string.Empty, string.Join(Environment.NewLine, scripts));
             }
             SetPage(pageFactory.Page);
-        }
-
-        private static T? TryGetFromString<T>(string value) where T : struct
-        {
-            var foo = TypeDescriptor.GetConverter(typeof(T));
-
-            if (foo.IsValid(value))
-            {
-                return (T)(foo.ConvertFromInvariantString(value));
-            }
-            return null;
         }
 
         public Page? GetPage()
@@ -200,6 +188,17 @@ namespace Hspi
         private static string CreateZWaveParameterId(int parameter)
         {
             return Invariant($"{ZWaveParameterPrefix}{parameter}");
+        }
+
+        private static T? TryGetFromString<T>(string value) where T : struct
+        {
+            var foo = TypeDescriptor.GetConverter(typeof(T));
+
+            if (foo.IsValid(value))
+            {
+                return (T)(foo.ConvertFromInvariantString(value));
+            }
+            return null;
         }
 
         private static int ZWaveParameterFromId(string idParameter)

@@ -21,6 +21,7 @@ namespace Hspi
         {
         }
 
+        public override bool HasSettings => true;
         public override bool SupportsConfigDeviceAll => true;
 
         public override string GetJuiDeviceConfigPage(int deviceOrFeatureRef)
@@ -85,7 +86,10 @@ namespace Hspi
         {
             try
             {
-                pluginConfig = new PluginConfig(HomeSeerSystem);
+                logger.Info("Plugin Starting");
+                Settings.Add(SettingsPages.CreateDefault());
+                LoadSettingsFromIni();
+                settingsPages = new SettingsPages(Settings);
                 UpdateDebugLevel();
 
                 logger.Info("Plugin Started");
@@ -124,13 +128,24 @@ namespace Hspi
             }
         }
 
+        protected override bool OnSettingChange(string pageId, AbstractView currentView, AbstractView changedView)
+        {
+            if (settingsPages != null && settingsPages.OnSettingChange(changedView))
+            {
+                UpdateDebugLevel();
+                return true;
+            }
+
+            return base.OnSettingChange(pageId, currentView, changedView);
+        }
+
         private string HandleDeviceConfigPostBackProc(string data)
         {
             try
             {
                 var input = JObject.Parse(data);
 
-                if (input["operation"]?.ToString() == "GET")
+                if (input["operation"]?.ToString() == DeviceConfigPageOperation)
                 {
                     var homeId = input["homeId"]?.ToString();
                     var nodeId = (byte?)input["nodeId"];
@@ -163,8 +178,11 @@ namespace Hspi
 
         private void UpdateDebugLevel()
         {
-            this.LogDebug = pluginConfig!.DebugLogging;
-            Logger.ConfigureLogging(LogDebug, pluginConfig.LogToFile, HomeSeerSystem);
+            if (settingsPages != null)
+            {
+                this.LogDebug = settingsPages.DebugLoggingEnabled;
+                Logger.ConfigureLogging(LogDebug, settingsPages.LogtoFileEnabled, HomeSeerSystem);
+            }
         }
 
         internal struct ZWaveParameterGetResult
@@ -173,9 +191,10 @@ namespace Hspi
             public int? Value { get; init; }
         }
 
+        private SettingsPages? settingsPages;
+        private const string DeviceConfigPageOperation = "GET";
         private const string HTMLEndline = "<BR>";
-        private readonly static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IDictionary<int, IDeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, IDeviceConfigPage>();
-        private PluginConfig? pluginConfig;
     }
 }

@@ -50,18 +50,6 @@ namespace Hspi
             }
         }
 
-        private void CheckZWavePlugInRunning()
-        {
-            try
-            {
-                HomeSeerSystem.GetPluginVersionById(ZWaveInterface);
-            }
-            catch (Exception ex)
-            {
-                throw new ZWavePluginNotRunningException("ZWave plugin not found", ex);
-            }
-        }
-
         public ZWaveData GetDeviceZWaveData(int deviceOrFeatureRef)
         {
             if (!IsZwaveDevice(deviceOrFeatureRef))
@@ -83,8 +71,7 @@ namespace Hspi
             var basicType = GetValueFromExtraDataWithTrim<Int32>(plugInData, "basictype");
             var genericType = GetValueFromExtraDataWithTrim<Int32>(plugInData, "generictype");
 
-            if
-                ((basicType.HasValue && (BasicTypeController == basicType || BasicTypeStaticController == basicType)) ||
+            if ((basicType.HasValue && (BasicTypeController == basicType || BasicTypeStaticController == basicType)) ||
                  (genericType.HasValue && (GenericTypeGenericController == genericType || GenericTypeStaticController == genericType)))
             {
                 throw new ZWavePlugIsControllerException("Device is controller");
@@ -190,6 +177,17 @@ namespace Hspi
             }
         }
 
+        private void CheckZWavePlugInRunning()
+        {
+            try
+            {
+                HomeSeerSystem.GetPluginVersionById(ZWaveInterface);
+            }
+            catch (Exception ex)
+            {
+                throw new ZWavePluginNotRunningException("ZWave plugin not found", ex);
+            }
+        }
         private const string ZWaveInterface = "Z-Wave";
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly AsyncLock getConfiguationLock = new();

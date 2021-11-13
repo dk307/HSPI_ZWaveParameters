@@ -107,9 +107,9 @@
     <Compile Include="Hspi\OpenZWaveDB\ZWaveEndPoints.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveInformation.cs" />
     <Compile Include="Hspi\PlugIn.cs" />
-    <Compile Include="Hspi\PluginConfig.cs" />
     <Compile Include="Hspi\PlugInData.cs" />
     <Compile Include="Hspi\Program.cs" />
+    <Compile Include="Hspi\SettingsPages.cs" />
     <Compile Include="Hspi\ZWaveConnection.cs" />
     <Compile Include="Hspi\ZWaveInformationDBDisplayExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -121,7 +121,6 @@
     <Compile Include="Shared\Hspi\CompilerHelper.cs" />
     <Compile Include="Shared\Hspi\HSPIBase.cs" />
     <Compile Include="Shared\Hspi\Logger.cs" />
-    <Compile Include="Shared\Hspi\PluginConfigBase.cs" />
     <Compile Include="Shared\Hspi\Utils\ExceptionHelper.cs" />
     <Compile Include="Shared\Hspi\Utils\TaskHelper.cs" />
   </ItemGroup>

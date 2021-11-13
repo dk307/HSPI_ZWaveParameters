@@ -271,7 +271,7 @@ namespace HSPI_ZWaveParametersTest
             var changes = PageFactory.CreateGenericPage(page.Id, page.Name);
             foreach (var view in viewGroup.Views)
             {
-                if (!(view is InputView) && !(view is SelectListView))
+                if (view is not InputView && view is not SelectListView)
                 {
                     continue;
                 }

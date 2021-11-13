@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompilerHelper.cs" />
+    <Compile Include="SettingPagesTest.cs" />
     <Compile Include="DeviceConfigPageTest.cs" />
     <Compile Include="ZWaveConnectionTest.cs" />
     <Compile Include="PluginTest.cs" />

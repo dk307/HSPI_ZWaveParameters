@@ -43,6 +43,8 @@ jobs:
         run: nuget restore HSPI_ZWaveParameters.sln
 
       - name: Determine Version
+        with:
+          updateAssemblyInfo: true
         id:   gitversion
         uses: gittools/actions/gitversion/execute@v0.9.7
 

@@ -84,6 +84,9 @@
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\logo.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Hspi\Bootstrap.cs" />
     <Compile Include="Hspi\DeviceConfigPage.cs" />
@@ -92,7 +95,6 @@
     <Compile Include="Hspi\Exceptions\ZWaveGetConfigurationFailedException.cs" />
     <Compile Include="Hspi\Exceptions\ZWavePlugInDataInvalidException.cs" />
     <Compile Include="Hspi\Exceptions\ZWavePluginNotRunningException.cs" />
-    <Compile Include="Hspi\Exceptions\ZWavePlugIsControllerException.cs" />
     <Compile Include="Hspi\Exceptions\ZWaveSetConfigurationFailedException.cs" />
     <Compile Include="Hspi\HSPI.cs" />
     <Compile Include="Hspi\IDeviceConfigPage.cs" />
@@ -110,6 +112,7 @@
     <Compile Include="Hspi\PlugInData.cs" />
     <Compile Include="Hspi\Program.cs" />
     <Compile Include="Hspi\SettingsPages.cs" />
+    <Compile Include="Hspi\Utils\StringConverter.cs" />
     <Compile Include="Hspi\ZWaveConnection.cs" />
     <Compile Include="Hspi\ZWaveInformationDBDisplayExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -201,6 +204,7 @@
     <Content Include="install.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\logo.ico" />
     <Content Include="updater_override.tt" />
   </ItemGroup>
   <ItemGroup>
@@ -210,7 +214,11 @@
     <EmbeddedResource Include="HtmlSnippets.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>HtmlSnippets.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

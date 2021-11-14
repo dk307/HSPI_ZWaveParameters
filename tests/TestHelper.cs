@@ -50,9 +50,7 @@ namespace HSPI_ZWaveParametersTest
                                                             string homeId,
                                                             string firmware,
                                                             string capability,
-                                                            string security,
-                                                            string basicType,
-                                                            string genericType)
+                                                            string security)
         {
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(ZWaveInterface);
 
@@ -65,8 +63,6 @@ namespace HSPI_ZWaveParametersTest
             AddIfNotNull("node_version_app", firmware);
             AddIfNotNull("capability", capability);
             AddIfNotNull("security", security);
-            AddIfNotNull("basictype", basicType);
-            AddIfNotNull("generictype", genericType);
 
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(plugInExtraData);
 

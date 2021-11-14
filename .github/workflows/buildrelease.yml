@@ -47,7 +47,7 @@ jobs:
           updateAssemblyInfo: true
           updateAssemblyInfoFilename: ./Properties/AssemblyInfo.cs
           useConfigFile: true
-          configFilePath: ./github/gitversion.yml
+          configFilePath: ./.github/gitversion.yml
         id:   gitversion
         uses: gittools/actions/gitversion/execute@v0.9.7
    

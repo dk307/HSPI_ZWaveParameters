@@ -95,7 +95,6 @@
     <Compile Include="Hspi\Exceptions\ZWaveGetConfigurationFailedException.cs" />
     <Compile Include="Hspi\Exceptions\ZWavePlugInDataInvalidException.cs" />
     <Compile Include="Hspi\Exceptions\ZWavePluginNotRunningException.cs" />
-    <Compile Include="Hspi\Exceptions\ZWavePlugIsControllerException.cs" />
     <Compile Include="Hspi\Exceptions\ZWaveSetConfigurationFailedException.cs" />
     <Compile Include="Hspi\HSPI.cs" />
     <Compile Include="Hspi\IDeviceConfigPage.cs" />
@@ -113,6 +112,7 @@
     <Compile Include="Hspi\PlugInData.cs" />
     <Compile Include="Hspi\Program.cs" />
     <Compile Include="Hspi\SettingsPages.cs" />
+    <Compile Include="Hspi\Utils\StringConverter.cs" />
     <Compile Include="Hspi\ZWaveConnection.cs" />
     <Compile Include="Hspi\ZWaveInformationDBDisplayExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -214,6 +214,7 @@
     <EmbeddedResource Include="HtmlSnippets.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>HtmlSnippets.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

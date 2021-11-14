@@ -16,16 +16,16 @@ namespace HSPI_ZWaveParametersTest
         public static IEnumerable<object[]> GetDeviceZWaveDataData()
         {
             yield return new object[] { new ZWaveData(0x84, 74, 20, 234, "3425", new Version(5, 0), false),
-                                                      0x84.ToString(), 74.ToString(), 20.ToString(), 234.ToString(), "3425", "5.0", "0", "0" ,"3", "5"};
+                                                      0x84.ToString(), 74.ToString(), 20.ToString(), 234.ToString(), "3425", "5.0", "0", "0" };
             // single digit firmware version
             yield return new object[] { new ZWaveData(0x84, 74, 23, 234, "345", new Version(5, 0), true),
-                                                      0x84.ToString(), 74.ToString(), 23.ToString(), 234.ToString(), "345", "5", 0x80.ToString(), "0","3", "5" };
+                                                      0x84.ToString(), 74.ToString(), 23.ToString(), 234.ToString(), "345", "5", 0x80.ToString(), "0" };
             yield return new object[] { new ZWaveData(0x84, 74, 23, 234, "345", new Version(5, 0), true),
-                                                      0x84.ToString(), 74.ToString(), 23.ToString(), 234.ToString(), "345", "5.0", 0x80.ToString(), "0" ,"3", "5"};
+                                                      0x84.ToString(), 74.ToString(), 23.ToString(), 234.ToString(), "345", "5.0", 0x80.ToString(), "0"};
             yield return new object[] { new ZWaveData(0x84, 70, 23, 234, "345", new Version(5, 0), true),
-                                                      0x84.ToString(), 70.ToString(), 23.ToString(), 234.ToString(), "345", "5.0", "0", 0x20.ToString() ,"3", "5"};
+                                                      0x84.ToString(), 70.ToString(), 23.ToString(), 234.ToString(), "345", "5.0", "0", 0x20.ToString()};
             yield return new object[] { new ZWaveData(0x80, 74, 23, 234, "345", new Version(5, 0), true),
-                                                      0x80.ToString(), 74.ToString(), 23.ToString(), 234.ToString(), "345", "5.0", "0", 0x40.ToString() ,"3", "5"};
+                                                      0x80.ToString(), 74.ToString(), 23.ToString(), 234.ToString(), "345", "5.0", "0", 0x40.ToString() };
         }
 
         [TestMethod]
@@ -120,41 +120,31 @@ namespace HSPI_ZWaveParametersTest
         [DataTestMethod]
         [DynamicData(nameof(GetDeviceZWaveDataData), DynamicDataSourceType.Method)]
         public void GetDeviceZWaveData(ZWaveData zwaveData, string manufactureId, string productId, string productType,
-                                       string nodeId, string homeId, string firmware, string capability, string security,
-                                       string basicType, string genericType)
+                                       string nodeId, string homeId, string firmware, string capability, string security)
         {
             int deviceRef = 9384;
             var mock = CreateMockForHsController(deviceRef, manufactureId, productId, productType, nodeId, homeId,
-                                                 firmware, capability, security, basicType, genericType);
+                                                 firmware, capability, security);
 
             ZWaveConnection connection = new(mock.Object);
             Assert.AreEqual(connection.GetDeviceZWaveData(deviceRef), zwaveData);
         }
 
         [DataTestMethod]
-        [DataRow("1", null)]
-        [DataRow("2", null)]
-        [DataRow(null, "1")]
-        [DataRow(null, "2")]
-        [DataRow("1", "2")]
-        public void GetDeviceZWaveDataThrowsForController(string basictype, string genericType)
-        {
-            int deviceRef = 9384;
-            var mock = CreateMockForHsController(deviceRef, basicType: basictype, genericType: genericType);
-
-            ZWaveConnection connection = new(mock.Object);
-            Assert.ThrowsException<ZWavePlugIsControllerException>(() => connection.GetDeviceZWaveData(deviceRef));
-        }
-
-        [TestMethod]
-        public void GetDeviceZWaveDataThrowsForInValidPlugInData()
+        [DataRow(null, null, null, null, null, null)]
+        [DataRow("45", "2", "4", "4", "4", null)]
+        [DataRow("", "2", "4", "4", "4", "0")]
+        [DataRow("", "2", "4", "4", "4", "0")]
+        [DataRow("0", "0", "23", "FG0", "0", "0")]
+        public void GetDeviceZWaveDataThrowsForInValidPlugInData(string manufactureId, string productId, string productType,
+                                                                 string nodeId, string homeId, string firmware)
         {
             int deviceRef = 9384;
             var mock = new Mock<IHsController>(MockBehavior.Strict);
             mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.Interface)).Returns(TestHelper.ZWaveInterface);
 
-            var plugInExtraData = new PlugExtraData();
-            mock.Setup(x => x.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)).Returns(plugInExtraData);
+            TestHelper.SetupZWaveDataInHsControllerMock(mock, deviceRef, manufactureId, productId, productType,
+                                                        nodeId, homeId, firmware, null, null);
 
             ZWaveConnection connection = new(mock.Object);
             Assert.ThrowsException<ZWavePlugInDataInvalidException>(() => connection.GetDeviceZWaveData(deviceRef));
@@ -274,7 +264,6 @@ namespace HSPI_ZWaveParametersTest
             Assert.ThrowsException<ZWavePluginNotRunningException>(() => connection.SetConfiguration(homeId, nodeId, param, size, value));
         }
 
-
         private static Mock<IHsController> CreateMockForHsController(int deviceRef,
                                                                      string manufactureId = null,
                                                                      string productId = null,
@@ -283,14 +272,11 @@ namespace HSPI_ZWaveParametersTest
                                                                      string homeId = null,
                                                                      string firmware = null,
                                                                      string capability = null,
-                                                                     string security = null,
-                                                                     string basicType = null,
-                                                                     string genericType = null)
+                                                                     string security = null)
         {
             var mock = new Mock<IHsController>(MockBehavior.Strict);
             TestHelper.SetupZWaveDataInHsControllerMock(mock, deviceRef, manufactureId, productId, productType,
-                                                        nodeId, homeId, firmware, capability, security, basicType,
-                                                        genericType);
+                                                        nodeId, homeId, firmware, capability, security);
             return mock;
         }
     }

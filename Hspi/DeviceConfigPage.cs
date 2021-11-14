@@ -3,7 +3,6 @@ using HomeSeer.Jui.Views;
 using Hspi.OpenZWaveDB;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -28,6 +27,7 @@ namespace Hspi
         }
 
         public ZWaveInformation? Data { get; private set; }
+
         public virtual async Task BuildConfigPage(CancellationToken cancellationToken)
         {
             var pageFactory = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
@@ -87,7 +87,7 @@ namespace Hspi
 
                 if (view is InputView inputView)
                 {
-                    var temp = TryGetFromString<int>(view.GetStringValue());
+                    var temp = Hspi.Utils.StringConverter.TryGetFromString<int>(view.GetStringValue());
 
                     if (temp.HasValue)
                     {
@@ -188,17 +188,6 @@ namespace Hspi
         private static string CreateZWaveParameterId(int parameter)
         {
             return Invariant($"{ZWaveParameterPrefix}{parameter}");
-        }
-
-        private static T? TryGetFromString<T>(string value) where T : struct
-        {
-            var foo = TypeDescriptor.GetConverter(typeof(T));
-
-            if (foo.IsValid(value))
-            {
-                return (T)(foo.ConvertFromInvariantString(value));
-            }
-            return null;
         }
 
         private static int ZWaveParameterFromId(string idParameter)

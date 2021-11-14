@@ -1,5 +1,5 @@
-# ZWave Parameters Plugin
-HS4 Plugin to show & update Z-Wave device parameters. The parameter information is fetched from open z-wave database.
+# Z-Wave Parameters Plugin
+HS4 Plugin to view & update Z-Wave device parameters. The parameter information is fetched from open z-wave database.
 
 
 Build State

@@ -101,9 +101,7 @@ namespace HSPI_ZWaveParametersTest
                                                          zwaveData.NodeId.ToString(),
                                                          zwaveData.Firmware.ToString(),
                                                          zwaveData.Listening ? 0x80.ToString() : "0",
-                                                         "0",
-                                                         "3",
-                                                         "34");
+                                                         "0");
         }
 
         private static (Mock<PlugIn> mockPlugin, Mock<IHsController> mockHsController)

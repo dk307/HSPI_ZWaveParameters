@@ -63,20 +63,6 @@ namespace Hspi
                 throw new ZWavePlugInDataInvalidException("Device Plugin extra data is not valid");
             }
 
-            const int BasicTypeController = 1;
-            const int BasicTypeStaticController = 2;
-            const int GenericTypeGenericController = 1;
-            const int GenericTypeStaticController = 2;
-
-            var basicType = GetValueFromExtraDataWithTrim<Int32>(plugInData, "basictype");
-            var genericType = GetValueFromExtraDataWithTrim<Int32>(plugInData, "generictype");
-
-            if ((basicType.HasValue && (BasicTypeController == basicType || BasicTypeStaticController == basicType)) ||
-                 (genericType.HasValue && (GenericTypeGenericController == genericType || GenericTypeStaticController == genericType)))
-            {
-                throw new ZWavePlugIsControllerException("Device is controller");
-            }
-
             var manufacturerId = GetValueFromExtraDataWithTrim<Int32>(plugInData, "manufacturer_id");
             var productId = GetValueFromExtraDataWithTrim<UInt16>(plugInData, "manufacturer_prod_id");
             var productType = GetValueFromExtraDataWithTrim<UInt16>(plugInData, "manufacturer_prod_type");
@@ -85,12 +71,19 @@ namespace Hspi
             var homeId = GetValueFromExtraData(plugInData, "homeid");
             var firmware = GetValueFromExtraData(plugInData, "node_version_app");
 
+            logger.Debug(Invariant($"PED Data for {deviceOrFeatureRef} is manufacturerId:{manufacturerId} productId:{productId} productType:{productType} firmware:{firmware}"));
+
             if (!manufacturerId.HasValue
                 || !productType.HasValue
                 || !productId.HasValue
                 || !nodeId.HasValue
                 || homeId == null
                 || string.IsNullOrWhiteSpace(firmware))
+            {
+                throw new ZWavePlugInDataInvalidException("Device Z-Wave plugin data is not valid");
+            }
+
+            if (manufacturerId == 0 && productId == 0 && productType == 0 && firmware == "0")
             {
                 throw new ZWavePlugInDataInvalidException("Device Z-Wave plugin data is not valid");
             }
@@ -169,7 +162,8 @@ namespace Hspi
         {
             if (plugInData.ContainsNamed(name))
             {
-                return (T)Convert.ChangeType(plugInData[name].Trim('"', '\\'), typeof(T));
+                string stringValue = plugInData[name].Trim('"', '\\');
+                return Hspi.Utils.StringConverter.TryGetFromString<T>(stringValue);
             }
             else
             {
@@ -188,6 +182,7 @@ namespace Hspi
                 throw new ZWavePluginNotRunningException("ZWave plugin not found", ex);
             }
         }
+
         private const string ZWaveInterface = "Z-Wave";
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly AsyncLock getConfiguationLock = new();

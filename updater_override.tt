@@ -15,7 +15,7 @@
     "Author": "dk307",
     "Price": "Free",
     "ReleaseNotesURL": "https://github.com/dk307/HSPI_ZWaveParameters",
-    "ShortDescription": "Show Z-wave parameters & update them",
+    "ShortDescription": "View & update Z-wave device parameters",
     "SupportURL": "https://github.com/dk307/HSPI_ZWaveParameters/issues",
     "Tags": [
       "Free",

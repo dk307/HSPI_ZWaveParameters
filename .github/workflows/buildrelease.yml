@@ -68,7 +68,7 @@ jobs:
           
       - name: Release development build
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: "marvinpinto/action-automatic-releases@1.2.1"
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "${{ steps.gitversion.outputs.majorMinorPatch }}"
@@ -80,7 +80,7 @@ jobs:
 
       - name: Release development build
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.ref, 'refs/tags/')
-        uses: "marvinpinto/action-automatic-releases@1.2.1"
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false

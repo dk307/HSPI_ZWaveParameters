@@ -1,10 +1,13 @@
 name: 'Unit Tests'
 
-on:  
+on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
+    types:
+      - "opened"
+      - "closed"
+      - "reopened"
+      - "synchronize"
 
 jobs:  
   build-cache-test-win:   

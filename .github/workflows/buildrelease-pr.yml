@@ -1,7 +1,7 @@
-name: 'Build Release on Main'
+name: 'Check Release in PR'
 
 on:  
-  push:
+  pull_request:
     branches: [ main ]
 
 jobs:  

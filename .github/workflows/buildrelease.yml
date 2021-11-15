@@ -67,10 +67,10 @@ jobs:
             .\bin\Release\updater_override.json
 
       - name: Release development build
-        # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: "softprops/action-gh-release@v1"
         with:
-          tag_name: "${{ steps.gitversion.outputs.majorMinorPatch }}"
+          tag_name: "v${{ steps.gitversion.outputs.majorMinorPatch }}"
           prerelease: true
           name: "Development Build"
           fail_on_unmatched_files: true

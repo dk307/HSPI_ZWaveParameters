@@ -71,21 +71,9 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "${{ steps.gitversion.outputs.majorMinorPatch }}"
+          automatic_release_tag: latest
           prerelease: true
           title: "Development Build"
-          files: |
-           .\bin\Release\HSPI_ZWaveParameters_*.zip
-           .\bin\Release\updater_override.json
-
-      - name: Release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.ref, 'refs/tags/')
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          draft: true
-          title: "Release Build"
           files: |
            .\bin\Release\HSPI_ZWaveParameters_*.zip
            .\bin\Release\updater_override.json

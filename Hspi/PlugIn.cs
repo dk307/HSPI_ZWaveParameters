@@ -1,6 +1,7 @@
 ﻿using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
 using Hspi.Exceptions;
+using Hspi.OpenZWaveDB;
 using Hspi.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -65,7 +66,7 @@ namespace Hspi
 
         protected virtual IDeviceConfigPage CreateDeviceConfigPage(int deviceOrFeatureRef)
         {
-            return new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef);
+            return new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef, new FileCachingHttpQuery());
         }
 
         protected virtual IZWaveConnection CreateZWaveConnection()

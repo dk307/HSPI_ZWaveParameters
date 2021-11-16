@@ -5,7 +5,6 @@ using HomeSeer.PluginSdk.Logging;
 using Hspi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Moq.Contrib.HttpClient;
 using Moq.Protected;
 using System;
 using System.Collections.Generic;
@@ -42,7 +41,7 @@ namespace HSPI_ZWaveParametersTest
 
             var deviceConfigPage = new DeviceConfigPage(new ZWaveConnection(hsControllerMock.Object),
                                                                             deviceRef,
-                                                                            TestHelper.CreateAeonLabsSwitchHttpHandler().CreateClient());
+                                                                            TestHelper.CreateAeonLabsSwitchHttpHandler().Object);
 
             plugInMock.Protected()
                 .Setup<IDeviceConfigPage>("CreateDeviceConfigPage", deviceRef)

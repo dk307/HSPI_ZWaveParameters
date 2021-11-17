@@ -2,6 +2,7 @@
 using HomeSeer.PluginSdk.Devices;
 using Hspi.Exceptions;
 using Nito.AsyncEx;
+using Serilog;
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace Hspi
             {
                 // we use lock because we read status later from another variable
                 using var readLock = await getConfiguationLock.LockAsync().ConfigureAwait(false);
-                logger.Debug(Invariant($"Getting HomeId:{homeId} NodeId:{nodeId} Parameter:{param}"));
+                Log.Debug("Getting homeId:{homeId} nodeId:{nodeId} parameter:{parameter}", homeId, nodeId, param);
                 var value = (int)HomeSeerSystem.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
 
                 bool wasSuccessful = (bool)HomeSeerSystem.LegacyPluginPropertyGet(ZWaveInterface, string.Empty, "Configuration_Get_Result");
@@ -36,7 +37,7 @@ namespace Hspi
                     throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for node {nodeId} "));
                 }
 
-                logger.Debug(Invariant($"For HomeId:{homeId} NodeId:{nodeId} Parameter:{param} got {value}"));
+                Log.Debug("For homeId:{homeId} nodeId:{nodeId} parameter:{parameter} got {value}", homeId, nodeId, param, value);
                 return value;
             }
             catch (ZWaveGetConfigurationFailedException)
@@ -50,14 +51,14 @@ namespace Hspi
             }
         }
 
-        public ZWaveData GetDeviceZWaveData(int deviceOrFeatureRef)
+        public ZWaveData GetDeviceZWaveData(int deviceRef)
         {
-            if (!IsZwaveDevice(deviceOrFeatureRef))
+            if (!IsZwaveDevice(deviceRef))
             {
                 throw new NotAZWaveDeviceException("Device is not a Z-Wave device");
             }
 
-            var plugInData = (PlugExtraData)HomeSeerSystem.GetPropertyByRef(deviceOrFeatureRef, EProperty.PlugExtraData);
+            var plugInData = (PlugExtraData)HomeSeerSystem.GetPropertyByRef(deviceRef, EProperty.PlugExtraData);
             if (plugInData == null)
             {
                 throw new ZWavePlugInDataInvalidException("Device Plugin extra data is not valid");
@@ -71,7 +72,8 @@ namespace Hspi
             var homeId = GetValueFromExtraData(plugInData, "homeid");
             var firmware = GetValueFromExtraData(plugInData, "node_version_app");
 
-            logger.Debug(Invariant($"PED Data for {deviceOrFeatureRef} is manufacturerId:{manufacturerId} productId:{productId} productType:{productType} firmware:{firmware}"));
+            Log.Debug("PED Data for deviceRef:{deviceRef} is manufacturerId:{manufacturerId} productId:{productId} productType:{productType} firmware:{firmware}",
+                       deviceRef, manufacturerId, productId, productType, firmware);
 
             if (!manufacturerId.HasValue
                 || !productType.HasValue
@@ -103,6 +105,9 @@ namespace Hspi
 
             var zwaveData = new ZWaveData(manufacturerId.Value, productId.Value,
                                           productType.Value, nodeId.Value, homeId, firmwareVersion, listening);
+
+            Log.Debug("ZwaveData for deviceRef:{deviceRef} is {@data}", deviceRef, zwaveData);
+
             return zwaveData;
         }
 
@@ -115,14 +120,17 @@ namespace Hspi
         {
             try
             {
-                logger.Info(Invariant($"Updating HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value}"));
+                Log.Information("Updating homeId:{homeId} nodeId:{nodeId} param:{param} size:{size} bytes value:{value}",
+                                homeId, nodeId, param, size, value);
+
                 var result = HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "SetDeviceParameterValue", new object[5] { homeId, nodeId, param, size, value }) as string;
 
                 switch (result)
                 {
                     case "Queued":
                     case "Success":
-                        logger.Info(Invariant($"Updated HomeId:{homeId} NodeId:{nodeId} Parameter:{param} Size:{size} bytes  Value:{value} with result:{result}"));
+                        Log.Information("Updated homeId:{homeId} nodeId:{nodeId} param:{param} size:{size} bytes value:{value} with {result}",
+                                         homeId, nodeId, param, size, value, result);
                         break;
 
                     case "Unknown":
@@ -184,7 +192,6 @@ namespace Hspi
         }
 
         private const string ZWaveInterface = "Z-Wave";
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly AsyncLock getConfiguationLock = new();
         private readonly IHsController HomeSeerSystem;
     }

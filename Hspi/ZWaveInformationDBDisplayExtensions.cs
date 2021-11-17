@@ -1,7 +1,6 @@
 ﻿using Hspi.OpenZWaveDB;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using static System.FormattableString;
 
 #nullable enable
@@ -59,19 +58,20 @@ namespace Hspi
             }
             else
             {
-                var descList = new[] { parameter.Description, parameter.Overview};
+                var descList = new[] { parameter.Description, parameter.Overview };
                 string? longerOne = descList.OrderByDescending(x => x?.Length ?? 0).FirstOrDefault();
 
-                if (!string.IsNullOrWhiteSpace(longerOne) && longerOne != parameter.Label) {
+                if (!string.IsNullOrWhiteSpace(longerOne) && longerOne != parameter.Label)
+                {
                     list.Add(longerOne!);
                 }
 
-                if (!parameter.HasOptions)          
+                if (!parameter.HasOptions)
                 {
                     list.Add(sizeString);
                     list.Add(Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units}"));
                 }
-                
+
                 list.Add(Invariant($"Default: {parameter.DefaultValueDescription}"));
             }
 

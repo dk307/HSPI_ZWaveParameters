@@ -1,6 +1,7 @@
 ﻿using HomeSeer.Jui.Types;
 using HomeSeer.Jui.Views;
 using Hspi.OpenZWaveDB;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -20,7 +21,7 @@ namespace Hspi
     {
         public DeviceConfigPage(IZWaveConnection zwaveConnection, int deviceOrFeatureRef, IHttpQueryMaker httpQueryMaker)
         {
-            logger.Debug(Invariant($"Creating Page for {deviceOrFeatureRef}"));
+            Log.Debug("Creating Page for deviceRef:{deviceRef}", deviceOrFeatureRef);
             this.zwaveConnection = zwaveConnection;
             this.deviceOrFeatureRef = deviceOrFeatureRef;
             this.httpQueryMaker = httpQueryMaker;
@@ -337,7 +338,6 @@ namespace Hspi
 
         private const string NewLine = "<BR>";
         private const string ZWaveParameterPrefix = "zw_parameter_";
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int deviceOrFeatureRef;
         private readonly IHttpQueryMaker httpQueryMaker;
         private readonly IZWaveConnection zwaveConnection;

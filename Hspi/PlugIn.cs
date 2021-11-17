@@ -5,11 +5,12 @@ using Hspi.OpenZWaveDB;
 using Hspi.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using static System.FormattableString;
+using System.Threading.Tasks;
 
 #nullable enable
 
@@ -29,7 +30,7 @@ namespace Hspi
             try
             {
                 var page = CreateDeviceConfigPage(deviceOrFeatureRef);
-                page.BuildConfigPage(CancellationToken.None).ResultForSync();
+                Task.Run(() => page.BuildConfigPage(CancellationToken.None)).Wait();
                 cacheForUpdate[deviceOrFeatureRef] = page;
                 return page?.GetPage()?.ToJsonString() ?? throw new Exception("Page is unexpectely null");
             }
@@ -74,39 +75,36 @@ namespace Hspi
             return new ZWaveConnection(HomeSeerSystem);
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-            }
-            base.Dispose(disposing);
-        }
-
         protected override void Initialize()
         {
             try
             {
-                logger.Info("Plugin Starting");
+                Log.Information("Plugin Starting");
                 Settings.Add(SettingsPages.CreateDefault());
                 LoadSettingsFromIni();
                 settingsPages = new SettingsPages(Settings);
                 UpdateDebugLevel();
 
-                logger.Info("Plugin Started");
+                Log.Information("Plugin Started");
             }
             catch (Exception ex)
             {
-                string result = Invariant($"Failed to initialize PlugIn with {ex.GetFullMessage()}");
-                logger.Error(result);
+                Log.Error("Failed to initialize PlugIn with {error}", ex.GetFullMessage());
                 throw;
             }
+        }
+
+        protected override void OnShutdown()
+        {
+            Log.Information("Shutting down");
+            base.OnShutdown();
         }
 
         protected override bool OnDeviceConfigChange(Page deviceConfigPage, int devOrFeatRef)
         {
             try
             {
-                logger.Debug(Invariant($"OnDeviceConfigChange for {devOrFeatRef}"));
+                Log.Debug("OnDeviceConfigChange for devOrFeatRef:{devOrFeatRef}", devOrFeatRef);
 
                 if (cacheForUpdate.TryGetValue(devOrFeatRef, out var page))
                 {
@@ -122,15 +120,15 @@ namespace Hspi
             catch (Exception ex)
             {
                 // This needs to Exception class to show error message
-                logger.Error(Invariant($"Failed to process OnDeviceConfigChange for {devOrFeatRef} with error {ex.GetFullMessage()}"));
                 string errorMessage = ex.GetFullMessage();
+                Log.Error("Failed to process OnDeviceConfigChange for devOrFeatRef:{devOrFeatRef} with error {error}", devOrFeatRef, errorMessage);
                 throw new Exception(errorMessage);
             }
         }
 
         protected override bool OnSettingChange(string pageId, AbstractView currentView, AbstractView changedView)
         {
-            logger.Debug(Invariant($"{pageId} has change  value of {changedView.Id} to {changedView.GetStringValue()}"));
+            Log.Information("Page:{pageId} has changed value of id:{id} to {value}", pageId, changedView.Id, changedView.GetStringValue());
             if (settingsPages != null && settingsPages.OnSettingChange(changedView))
             {
                 UpdateDebugLevel();
@@ -158,7 +156,7 @@ namespace Hspi
                     }
 
                     var connection = CreateZWaveConnection();
-                    int value = connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value).ResultForSync();
+                    int value = Task.Run(() => connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value)).Result;
 
                     return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
                     {
@@ -169,7 +167,7 @@ namespace Hspi
             }
             catch (Exception ex)
             {
-                logger.Error(Invariant($"Failed to process PostBackProc for Update with {data} with error {ex.GetFullMessage()}"));
+                Log.Error("Failed to process PostBackProc for Update with {data} with {error}", data, ex.GetFullMessage());
                 return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
                 {
                     ErrorMessage = ex.GetFullMessage(HTMLEndline)
@@ -195,7 +193,6 @@ namespace Hspi
         private SettingsPages? settingsPages;
         private const string DeviceConfigPageOperation = "GET";
         private const string HTMLEndline = "<BR>";
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IDictionary<int, IDeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, IDeviceConfigPage>();
     }
 }

@@ -3,13 +3,15 @@ using Hspi.OpenZWaveDB;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace Hspi
 {
     internal interface IDeviceConfigPage
     {
-        ZWaveInformation Data { get; }
+        ZWaveInformation? Data { get; }
 
-        Page GetPage();
+        Page? GetPage();
 
         Task BuildConfigPage(CancellationToken cancellationToken);
 

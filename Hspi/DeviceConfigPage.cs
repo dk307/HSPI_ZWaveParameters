@@ -271,6 +271,8 @@ namespace Hspi
 
         private LabelView? CreateDescriptionViewForParameter(int parameterId)
         {
+            CheckInitialized();
+
             var list = Data.DescriptionForParameter(parameterId);
             if (list.Count > 0)
             {

@@ -43,6 +43,13 @@ namespace HSPI_ZWaveParametersTest
                 .Returns(true);
         }
 
+        public static void SetupRequest(Mock<IHttpQueryMaker> mock,
+                                        string deviceListUrl, string deviceListJson)
+        {
+            mock.Setup(x => x.GetResponseAsString(deviceListUrl, It.IsAny<CancellationToken>()))
+                               .Returns(Task.FromResult(deviceListJson));
+        }
+
         public static void SetupZWaveDataInHsControllerMock(Mock<IHsController> mock,
                                                             int deviceRef,
                                                             string manufactureId,
@@ -93,14 +100,6 @@ namespace HSPI_ZWaveParametersTest
 
             return mock;
         }
-
-        public static void SetupRequest(Mock<IHttpQueryMaker> mock, 
-                                        string deviceListUrl, string deviceListJson)
-        {
-            mock.Setup(x => x.GetResponseAsString(deviceListUrl, It.IsAny<CancellationToken>()))
-                               .Returns(Task.FromResult(deviceListJson));
-        }
-
         public const string ZWaveInterface = "Z-Wave";
     }
 }

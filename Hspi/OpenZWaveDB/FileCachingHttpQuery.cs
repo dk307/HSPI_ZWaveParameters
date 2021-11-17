@@ -1,4 +1,5 @@
-﻿using MonkeyCache;
+﻿using Hspi.Utils;
+using MonkeyCache;
 using System;
 using System.IO;
 using System.Net;
@@ -22,14 +23,9 @@ namespace Hspi.OpenZWaveDB
             httpClientGlobal = new HttpClient(handler, true);
         }
 
-        public FileCachingHttpQuery(HttpClient? httpClient = null)
+        public FileCachingHttpQuery(HttpClient? httpClient = null, string? cachePath = null)
         {
-            using var process = System.Diagnostics.Process.GetCurrentProcess();
-
-            string mainExeFile = process.MainModule.FileName;
-            string hsDir = Path.GetDirectoryName(mainExeFile);
-            string cachePath = Path.Combine(hsDir, "data", PlugInData.PlugInId, "cache");
-
+            cachePath ??= GetCachePath();
             barrel = MonkeyCache.FileStore.Barrel.Create(cachePath);
             this.httpClient = httpClient ?? httpClientGlobal;
         }
@@ -37,16 +33,8 @@ namespace Hspi.OpenZWaveDB
         public async Task<string> GetResponseAsString(string url, CancellationToken cancellationToken)
         {
             logger.Info("Getting data from " + url);
-            if (barrel.Exists(url))
-            {
-                _ = Task.Run(async () => await UpdateCache(url, cancellationToken), cancellationToken);
-                return barrel.Get<string>(url);
-            }
 
-            string json = await GetResponseString(url, cancellationToken).ConfigureAwait(false);
-            return json;
-
-            async Task<string> GetResponseString(string url, CancellationToken cancellationToken)
+            try
             {
                 var result = await httpClient.GetAsync(new Uri(url, UriKind.Absolute), cancellationToken).ConfigureAwait(false);
                 result.EnsureSuccessStatusCode();
@@ -54,21 +42,28 @@ namespace Hspi.OpenZWaveDB
                 barrel.Add(url, json, TimeSpan.MaxValue);
                 return json;
             }
-
-            async Task UpdateCache(string url, CancellationToken cancellationToken)
+            catch (Exception ex)
             {
-                var result = await httpClient.GetAsync(new Uri(url, UriKind.Absolute), cancellationToken).ConfigureAwait(false);
-                if (result.IsSuccessStatusCode)
+                if (barrel.Exists(url))
                 {
-                    var json = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    barrel.Add(url, json, TimeSpan.MaxValue);
+                    logger.Info($"Failed to get from {url} with {ex.GetFullMessage()}. Using cached values.");
+                    return barrel.Get<string>(url);
                 }
+                throw;
             }
         }
 
+        private static string GetCachePath()
+        {
+            using var process = System.Diagnostics.Process.GetCurrentProcess();
+            string mainExeFile = process.MainModule.FileName;
+            string hsDir = Path.GetDirectoryName(mainExeFile);
+            return Path.Combine(hsDir, "data", PlugInData.PlugInId, "cache");
+        }
+
+        private static readonly HttpClient httpClientGlobal;
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IBarrel barrel;
         private readonly HttpClient httpClient;
-        private static readonly HttpClient httpClientGlobal;
     }
 }

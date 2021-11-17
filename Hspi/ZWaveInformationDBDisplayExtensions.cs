@@ -63,7 +63,7 @@ namespace Hspi
                 string? longerOne = descList.OrderByDescending(x => x?.Length ?? 0).FirstOrDefault();
 
                 if (!string.IsNullOrWhiteSpace(longerOne) && longerOne != parameter.Label) {
-                    list.Add(longerOne);
+                    list.Add(longerOne!);
                 }
 
                 if (!parameter.HasOptions)          

@@ -31,7 +31,7 @@ namespace Hspi
                 var page = CreateDeviceConfigPage(deviceOrFeatureRef);
                 page.BuildConfigPage(CancellationToken.None).ResultForSync();
                 cacheForUpdate[deviceOrFeatureRef] = page;
-                return page?.GetPage()?.ToJsonString() ?? throw new Exception("Page is unexpectely null")
+                return page?.GetPage()?.ToJsonString() ?? throw new Exception("Page is unexpectely null");
             }
             catch (Exception ex)
             {

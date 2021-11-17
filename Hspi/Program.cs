@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿
+using Serilog;
+#nullable enable
 
 namespace Hspi
 {
@@ -11,7 +13,6 @@ namespace Hspi
         {
             Logger.ConfigureLogging(false, false);
             Log.Information("Starting");
-
             try
             {
                 using var plugin = new HSPI_ZWaveParameters.HSPI();

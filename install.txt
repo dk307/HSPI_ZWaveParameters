@@ -8,6 +8,7 @@ Nito.Disposables.dll,.\bin\ZWaveParameters,0
 Serilog.dll,.\bin\ZWaveParameters,0
 Serilog.Sinks.Console.dll,.\bin\ZWaveParameters,0
 Serilog.Sinks.File.dll,.\bin\ZWaveParameters,0
+Destructurama.Attributed.dll,.\bin\ZWaveParameters,0
 System.Buffers.dll,.\bin\ZWaveParameters,0
 System.Collections.Immutable.dll,.\bin\ZWaveParameters,0
 System.Memory.dll,.\bin\ZWaveParameters,0

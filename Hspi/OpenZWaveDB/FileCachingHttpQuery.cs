@@ -40,7 +40,7 @@ namespace Hspi.OpenZWaveDB
                 var result = await httpClient.GetAsync(new Uri(url, UriKind.Absolute), cancellationToken).ConfigureAwait(false);
                 result.EnsureSuccessStatusCode();
                 var json = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
-                barrel.Add(url, json, TimeSpan.MaxValue);
+                barrel.Add(url, json, TimeSpan.FromDays(365 * 2));
                 return json;
             }
             catch (Exception ex)

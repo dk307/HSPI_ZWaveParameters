@@ -1,5 +1,7 @@
 ﻿using HomeSeer.Jui.Views;
 
+#nullable enable
+
 namespace Hspi
 {
     internal class SettingsPages

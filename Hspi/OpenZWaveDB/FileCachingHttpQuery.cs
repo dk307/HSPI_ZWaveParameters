@@ -1,5 +1,6 @@
 ﻿using Hspi.Utils;
 using MonkeyCache;
+using Serilog;
 using System;
 using System.IO;
 using System.Net;
@@ -32,7 +33,7 @@ namespace Hspi.OpenZWaveDB
 
         public async Task<string> GetResponseAsString(string url, CancellationToken cancellationToken)
         {
-            logger.Info("Getting data from " + url);
+            Log.Information("Getting data from {url}", url);
 
             try
             {
@@ -46,7 +47,7 @@ namespace Hspi.OpenZWaveDB
             {
                 if (barrel.Exists(url))
                 {
-                    logger.Info($"Failed to get from {url} with {ex.GetFullMessage()}. Using cached values.");
+                    Log.Information("Failed to get from {url} with {error}. Using cached values.", url, ex.GetFullMessage());
                     return barrel.Get<string>(url);
                 }
                 throw;
@@ -62,7 +63,6 @@ namespace Hspi.OpenZWaveDB
         }
 
         private static readonly HttpClient httpClientGlobal;
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IBarrel barrel;
         private readonly HttpClient httpClient;
     }

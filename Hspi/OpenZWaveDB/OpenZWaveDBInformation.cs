@@ -1,14 +1,13 @@
 ﻿using Hspi.Exceptions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.FormattableString;
 
 #nullable enable
 
@@ -97,7 +96,8 @@ namespace Hspi.OpenZWaveDB
                 throw new ShowErrorMessageException("Device not found in z-wave database");
             }
 
-            logger.Debug(Invariant($"Found {devices.Length} devices for manufactureId:{manufactureId} productType:{productType} productId:{productId}"));
+            Log.Debug("Found {count} devices for manufactureId:{manufactureId} productType:{productType} productId:{productId}",
+                            devices.Length, manufactureId, productType, productId);
 
             int? id = null;
             foreach (var device in devices)
@@ -106,7 +106,8 @@ namespace Hspi.OpenZWaveDB
                 {
                     if ((firmware >= device.VersionMin) && (firmware <= device.VersionMax))
                     {
-                        logger.Debug(Invariant($"Found Specific device {device.Id} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}"));
+                        Log.Debug("Found Specific {@device} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}",
+                                     device, manufactureId, productType, productId, firmware);
                         id = device.Id;
                         break;
                     }
@@ -115,7 +116,8 @@ namespace Hspi.OpenZWaveDB
 
             if (id == null)
             {
-                logger.Warn(Invariant($"No matching firmware found for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}. Picking first in list"));
+                Log.Warning("No matching firmware found for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}. Picking first in list",
+                            manufactureId, productType, productId, firmware);
                 id = devices.First().Id;
             }
 
@@ -124,7 +126,6 @@ namespace Hspi.OpenZWaveDB
 
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly IHttpQueryMaker fileCachingHttpQuery;
         private readonly Version firmware;
         private readonly int manufactureId;

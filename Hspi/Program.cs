@@ -1,4 +1,6 @@
-﻿namespace Hspi
+﻿using Serilog;
+
+namespace Hspi
 {
     /// <summary>
     /// Class for the main program.
@@ -8,7 +10,7 @@
         private static void Main(string[] args)
         {
             Logger.ConfigureLogging(false, false);
-            logger.Info("Starting...");
+            Log.Information("Starting");
 
             try
             {
@@ -17,10 +19,9 @@
             }
             finally
             {
-                logger.Info("Bye!!!");
+                Log.Information("Exiting");
+                Log.CloseAndFlush();
             }
         }
-
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
     }
 }

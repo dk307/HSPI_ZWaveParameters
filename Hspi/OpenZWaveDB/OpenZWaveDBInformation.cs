@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,24 +16,14 @@ namespace Hspi.OpenZWaveDB
 {
     internal class OpenZWaveDBInformation
     {
-        static OpenZWaveDBInformation()
-        {
-            var handler = new HttpClientHandler()
-            {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            };
-
-            httpClientGlobal = new HttpClient(handler, true);
-        }
-
         public OpenZWaveDBInformation(int manufactureId, int productType, int productId, Version firmware,
-                                      HttpClient? httpClient)
+                                      IHttpQueryMaker fileCachingHttpQuery)
         {
             this.manufactureId = manufactureId;
             this.productType = productType;
             this.productId = productId;
             this.firmware = firmware;
-            this.httpClient = httpClient ?? httpClientGlobal;
+            this.fileCachingHttpQuery = fileCachingHttpQuery;
         }
 
         public ZWaveInformation? Data => data;
@@ -47,7 +36,7 @@ namespace Hspi.OpenZWaveDB
             var obj = serializer.Deserialize<ZWaveInformation>(reader);
             if ((obj == null) || string.IsNullOrWhiteSpace(obj.Id))
             {
-                throw new ShowErrorMessageException("Json invalid from database");
+                throw new ShowErrorMessageException("Invalid Json from database");
             }
             return obj;
         }
@@ -59,7 +48,7 @@ namespace Hspi.OpenZWaveDB
                 var id = await GetDeviceId(cancellationToken).ConfigureAwait(false);
 
                 string deviceUrl = string.Format(deviceUrlFormat, id);
-                var deviceJson = await GetCall(deviceUrl, cancellationToken).ConfigureAwait(false);
+                var deviceJson = await fileCachingHttpQuery.GetResponseAsString(deviceUrl, cancellationToken).ConfigureAwait(false);
 
                 var obj = ParseJson(deviceJson);
 
@@ -94,20 +83,11 @@ namespace Hspi.OpenZWaveDB
                 throw new Exception("Failed to get Data from Open Z-Wave DB", ex);
             }
         }
-        private async Task<string> GetCall(string deviceUrl, CancellationToken cancellationToken)
-        {
-            logger.Info("Getting data from " + deviceUrl);
-            var result = await httpClient.GetAsync(new Uri(deviceUrl, UriKind.Absolute), cancellationToken).ConfigureAwait(false);
-            result.EnsureSuccessStatusCode();
-
-            var json = await result.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return json;
-        }
 
         private async Task<int> GetDeviceId(CancellationToken cancellationToken)
         {
             string listUrl = string.Format(listUrlFormat, manufactureId, productType, productId);
-            var listJson = await GetCall(listUrl, cancellationToken).ConfigureAwait(false);
+            var listJson = await fileCachingHttpQuery.GetResponseAsString(listUrl, cancellationToken).ConfigureAwait(false);
 
             var jobject = JObject.Parse(listJson);
             var devices = jobject?["devices"]?.ToObject<ZWaveDevice[]>();
@@ -144,10 +124,9 @@ namespace Hspi.OpenZWaveDB
 
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
-        private static readonly HttpClient httpClientGlobal;
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private readonly IHttpQueryMaker fileCachingHttpQuery;
         private readonly Version firmware;
-        private readonly HttpClient httpClient;
         private readonly int manufactureId;
         private readonly int productId;
         private readonly int productType;

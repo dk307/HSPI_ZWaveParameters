@@ -1,12 +1,14 @@
 ﻿using HomeSeer.PluginSdk;
 using HomeSeer.PluginSdk.Devices;
 using Hspi;
+using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Moq.Contrib.HttpClient;
 using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HSPI_ZWaveParametersTest
 {
@@ -16,7 +18,7 @@ namespace HSPI_ZWaveParametersTest
 
         public static ZWaveData HomeseerDimmerZWaveData => new(0x000C, 0x3036, 0x4447, 23, "56", new Version(5, 15), true);
 
-        public static Mock<HttpMessageHandler> CreateAeonLabsSwitchHttpHandler()
+        public static Mock<IHttpQueryMaker> CreateAeonLabsSwitchHttpHandler()
         {
             return CreateMockHttpHandler("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006",
                                                                 Resource.AeonLabsOpenZWaveDBDeviceListJson,
@@ -24,7 +26,7 @@ namespace HSPI_ZWaveParametersTest
                                                                 Resource.AeonLabsOpenZWaveDBDeviceJson);
         }
 
-        public static Mock<HttpMessageHandler> CreateHomeseerDimmerHttpHandler()
+        public static Mock<IHttpQueryMaker> CreateHomeseerDimmerHttpHandler()
         {
             return CreateMockHttpHandler("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
                                          Resource.HomeseerDimmerOpenZWaveDBDeviceListJson,
@@ -39,6 +41,13 @@ namespace HSPI_ZWaveParametersTest
 
             mock.Setup(x => x.LegacyPluginPropertyGet(ZWaveInterface, string.Empty, "Configuration_Get_Result"))
                 .Returns(true);
+        }
+
+        public static void SetupRequest(Mock<IHttpQueryMaker> mock,
+                                        string deviceListUrl, string deviceListJson)
+        {
+            mock.Setup(x => x.GetResponseAsString(deviceListUrl, It.IsAny<CancellationToken>()))
+                               .Returns(Task.FromResult(deviceListJson));
         }
 
         public static void SetupZWaveDataInHsControllerMock(Mock<IHsController> mock,
@@ -81,18 +90,16 @@ namespace HSPI_ZWaveParametersTest
             htmlDocument.LoadHtml(html);
             Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0);
         }
-        private static Mock<HttpMessageHandler> CreateMockHttpHandler(string deviceListUrl, string deviceListJson, string deviceUrl, string deviceJson)
+
+        private static Mock<IHttpQueryMaker> CreateMockHttpHandler(string deviceListUrl, string deviceListJson, string deviceUrl, string deviceJson)
         {
-            var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            var mock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
 
-            handler.SetupRequest(HttpMethod.Get, deviceListUrl)
-                               .ReturnsResponse(deviceListJson, "application/json");
+            SetupRequest(mock, deviceListUrl, deviceListJson);
+            SetupRequest(mock, deviceUrl, deviceJson);
 
-            handler.SetupRequest(HttpMethod.Get, deviceUrl)
-                               .ReturnsResponse(deviceJson, "application/json");
-            return handler;
+            return mock;
         }
-
         public const string ZWaveInterface = "Z-Wave";
     }
 }

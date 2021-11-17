@@ -18,12 +18,12 @@ namespace Hspi
 {
     internal class DeviceConfigPage : IDeviceConfigPage
     {
-        public DeviceConfigPage(IZWaveConnection zwaveConnection, int deviceOrFeatureRef, HttpClient? httpClient = null)
+        public DeviceConfigPage(IZWaveConnection zwaveConnection, int deviceOrFeatureRef, IHttpQueryMaker httpQueryMaker)
         {
             logger.Debug(Invariant($"Creating Page for {deviceOrFeatureRef}"));
             this.zwaveConnection = zwaveConnection;
             this.deviceOrFeatureRef = deviceOrFeatureRef;
-            this.httpClient = httpClient;
+            this.httpQueryMaker = httpQueryMaker;
         }
 
         public ZWaveInformation? Data { get; private set; }
@@ -34,7 +34,7 @@ namespace Hspi
             var zwaveData = zwaveConnection.GetDeviceZWaveData(this.deviceOrFeatureRef);
 
             var openZWaveData = new OpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType,
-                                                           zwaveData.ProductId, zwaveData.Firmware, httpClient);
+                                                           zwaveData.ProductId, zwaveData.Firmware, httpQueryMaker);
 
             await openZWaveData.Update(cancellationToken).ConfigureAwait(false);
 
@@ -271,6 +271,8 @@ namespace Hspi
 
         private LabelView? CreateDescriptionViewForParameter(int parameterId)
         {
+            CheckInitialized();
+
             var list = Data.DescriptionForParameter(parameterId);
             if (list.Count > 0)
             {
@@ -337,7 +339,7 @@ namespace Hspi
         private const string ZWaveParameterPrefix = "zw_parameter_";
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
         private readonly int deviceOrFeatureRef;
-        private readonly HttpClient? httpClient;
+        private readonly IHttpQueryMaker httpQueryMaker;
         private readonly IZWaveConnection zwaveConnection;
         private int id = 0;
         private Page? page;

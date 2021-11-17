@@ -3,7 +3,6 @@ using Hspi;
 using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Moq.Contrib.HttpClient;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -30,10 +29,10 @@ namespace HSPI_ZWaveParametersTest
         {
             int deviceRef = 3746;
             var zwaveData = TestHelper.HomeseerDimmerZWaveData;
-            var httpHandler = TestHelper.CreateHomeseerDimmerHttpHandler();
+            var httpQueryMock = TestHelper.CreateHomeseerDimmerHttpHandler();
 
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
-            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpHandler.CreateClient());
+            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpQueryMock.Object);
 
             var changes = PageFactory.CreateGenericPage("id", "name");
 
@@ -83,12 +82,12 @@ namespace HSPI_ZWaveParametersTest
 
         [DataTestMethod]
         [DynamicData(nameof(GetSupportsDeviceConfigPageData), DynamicDataSourceType.Method)]
-        public async Task SupportsDeviceConfigPage(ZWaveData zwaveData, Mock<HttpMessageHandler> httpHandler)
+        public async Task SupportsDeviceConfigPage(ZWaveData zwaveData, Mock<IHttpQueryMaker> httpQueryMock)
         {
             int deviceRef = 34;
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
 
-            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpHandler.CreateClient());
+            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpQueryMock.Object);
             await deviceConfigPage.BuildConfigPage(CancellationToken.None);
             var page = deviceConfigPage.GetPage();
 
@@ -108,7 +107,7 @@ namespace HSPI_ZWaveParametersTest
             // verify script
             VerifyScript((LabelView)page.Views[3], zwaveData.Listening);
 
-            Mock.VerifyAll(mock, httpHandler);
+            Mock.VerifyAll(mock, httpQueryMock);
         }
 
         [TestMethod]
@@ -116,18 +115,18 @@ namespace HSPI_ZWaveParametersTest
         {
             int deviceRef = 334;
             var handler = new Mock<HttpMessageHandler>();
-            var httpclient = handler.CreateClient();
+            var httpQueryMock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
 
-            handler.SetupRequest(HttpMethod.Get, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006")
-                               .ReturnsResponse(Resource.AeonLabsOpenZWaveDBDeviceListJson, "application/json");
+            TestHelper.SetupRequest(httpQueryMock, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006",
+                                    Resource.AeonLabsOpenZWaveDBDeviceListJson);
 
-            handler.SetupRequest(HttpMethod.Get, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75")
-                               .ReturnsResponse("{ database_id:1034}", "application/json");
+            TestHelper.SetupRequest(httpQueryMock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75",
+                                    "{ database_id:1034}");
 
             var zwaveData = TestHelper.AeonLabsZWaveData;
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
 
-            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpclient);
+            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpQueryMock.Object);
             await deviceConfigPage.BuildConfigPage(CancellationToken.None);
             var page = deviceConfigPage.GetPage();
 
@@ -143,10 +142,10 @@ namespace HSPI_ZWaveParametersTest
         {
             int deviceRef = 3746;
             ZWaveData zwaveData = TestHelper.AeonLabsZWaveData;
-            var httpHandler = TestHelper.CreateAeonLabsSwitchHttpHandler();
+            var httpQueryMock = TestHelper.CreateAeonLabsSwitchHttpHandler();
 
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
-            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpHandler.CreateClient());
+            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpQueryMock.Object);
             await deviceConfigPage.BuildConfigPage(CancellationToken.None);
             return (mock, deviceConfigPage);
         }
@@ -155,10 +154,10 @@ namespace HSPI_ZWaveParametersTest
         {
             int deviceRef = 3746;
             var zwaveData = TestHelper.HomeseerDimmerZWaveData;
-            var httpHandler = TestHelper.CreateHomeseerDimmerHttpHandler();
+            var httpQueryMock = TestHelper.CreateHomeseerDimmerHttpHandler();
 
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
-            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpHandler.CreateClient());
+            var deviceConfigPage = new DeviceConfigPage(mock.Object, deviceRef, httpQueryMock.Object);
             await deviceConfigPage.BuildConfigPage(CancellationToken.None);
             return (mock, deviceConfigPage);
         }

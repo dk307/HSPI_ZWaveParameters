@@ -1,6 +1,7 @@
 ﻿using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
 using Hspi.Exceptions;
+using Hspi.OpenZWaveDB;
 using Hspi.Utils;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -30,7 +31,7 @@ namespace Hspi
                 var page = CreateDeviceConfigPage(deviceOrFeatureRef);
                 page.BuildConfigPage(CancellationToken.None).ResultForSync();
                 cacheForUpdate[deviceOrFeatureRef] = page;
-                return page.GetPage().ToJsonString();
+                return page?.GetPage()?.ToJsonString() ?? throw new Exception("Page is unexpectely null");
             }
             catch (Exception ex)
             {
@@ -65,7 +66,7 @@ namespace Hspi
 
         protected virtual IDeviceConfigPage CreateDeviceConfigPage(int deviceOrFeatureRef)
         {
-            return new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef);
+            return new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef, new FileCachingHttpQuery());
         }
 
         protected virtual IZWaveConnection CreateZWaveConnection()
@@ -157,7 +158,7 @@ namespace Hspi
                     }
 
                     var connection = CreateZWaveConnection();
-                    int value = connection.GetConfiguration(homeId, nodeId.Value, parameter.Value).ResultForSync();
+                    int value = connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value).ResultForSync();
 
                     return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
                     {

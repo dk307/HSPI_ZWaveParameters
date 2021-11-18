@@ -48,7 +48,7 @@ jobs:
       - name: Determine and update version
         with:
           updateAssemblyInfo: true
-          updateAssemblyInfoFilename: ./Properties/AssemblyInfo.cs
+          updateAssemblyInfoFilename: ./plugin/Properties/AssemblyInfo.cs
           useConfigFile: true
           configFilePath: ./.github/gitversion.yml
         id:   gitversion

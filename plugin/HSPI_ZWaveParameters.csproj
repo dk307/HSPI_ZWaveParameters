@@ -117,12 +117,12 @@
     <Compile Include="Hspi\Utils\StringConverter.cs" />
     <Compile Include="Hspi\ZWaveConnection.cs" />
     <Compile Include="Hspi\ZWaveInformationDBDisplayExtensions.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HtmlSnippets.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>HtmlSnippets.resx</DependentUpon>
     </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\Hspi\CompilerHelper.cs" />
     <Compile Include="Shared\Hspi\HSPIBase.cs" />
     <Compile Include="Shared\Hspi\Logger2.cs" />
@@ -133,7 +133,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\app.manifest" />
-    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -232,8 +231,8 @@
   <ItemGroup>
     <EmbeddedResource Include="HtmlSnippets.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>HtmlSnippets.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>HtmlSnippets.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

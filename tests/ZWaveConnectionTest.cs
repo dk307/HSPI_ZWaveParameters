@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HSPI_ZWaveParametersTest
@@ -40,7 +41,7 @@ namespace HSPI_ZWaveParametersTest
             TestHelper.SetupGetConfigurationInHsController(homeId, nodeId, param, value, mock);
 
             ZWaveConnection connection = new(mock.Object);
-            Assert.AreEqual(await connection.GetConfiguration(homeId, nodeId, param), value);
+            Assert.AreEqual(await connection.GetConfiguration(homeId, nodeId, param, CancellationToken.None), value);
         }
 
         [TestMethod]
@@ -60,7 +61,7 @@ namespace HSPI_ZWaveParametersTest
             ZWaveConnection connection = new(mock.Object);
             try
             {
-                await connection.GetConfiguration(homeId, nodeId, param);
+                await connection.GetConfiguration(homeId, nodeId, param, CancellationToken.None);
                 Assert.Fail("No exception thrown");
             }
             catch (ZWaveGetConfigurationFailedException ex)
@@ -87,7 +88,7 @@ namespace HSPI_ZWaveParametersTest
             ZWaveConnection connection = new(mock.Object);
             try
             {
-                await connection.GetConfiguration(homeId, nodeId, param);
+                await connection.GetConfiguration(homeId, nodeId, param, CancellationToken.None);
                 Assert.Fail("No exception thrown");
             }
             catch (ZWaveGetConfigurationFailedException ex)
@@ -112,7 +113,8 @@ namespace HSPI_ZWaveParametersTest
             mock.Setup(x => x.GetPluginVersionById(TestHelper.ZWaveInterface)).Throws(new KeyNotFoundException());
 
             ZWaveConnection connection = new(mock.Object);
-            await Assert.ThrowsExceptionAsync<ZWavePluginNotRunningException>(() => connection.GetConfiguration(homeId, nodeId, param));
+            await Assert.ThrowsExceptionAsync<ZWavePluginNotRunningException>(
+                () => connection.GetConfiguration(homeId, nodeId, param, CancellationToken.None));
 
             mock.Verify();
         }

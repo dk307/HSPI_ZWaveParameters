@@ -5,6 +5,7 @@ using Nito.AsyncEx;
 using Serilog;
 using System;
 using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 using static System.FormattableString;
 
@@ -19,12 +20,12 @@ namespace Hspi
             this.HomeSeerSystem = hsController;
         }
 
-        public async Task<int> GetConfiguration(string homeId, byte nodeId, byte param)
+        public async Task<int> GetConfiguration(string homeId, byte nodeId, byte param, CancellationToken cancellationtoken)
         {
             try
             {
                 // we use lock because we read status later from another variable
-                using var readLock = await getConfiguationLock.LockAsync().ConfigureAwait(false);
+                using var readLock = await getConfiguationLock.LockAsync(cancellationtoken).ConfigureAwait(false);
                 Log.Debug("Getting homeId:{homeId} nodeId:{nodeId} parameter:{parameter}", homeId, nodeId, param);
                 var value = (int)HomeSeerSystem.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
 

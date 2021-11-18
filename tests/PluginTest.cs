@@ -178,7 +178,7 @@ namespace HSPI_ZWaveParametersTest
                 parameter = (byte)23
             };
             zwaveConnectionMock
-                 .Setup(x => x.GetConfiguration(input.homeId, input.nodeId, input.parameter))
+                 .Setup(x => x.GetConfiguration(input.homeId, input.nodeId, input.parameter, It.IsAny<CancellationToken>()))
                  .Returns(Task.FromResult(parameterValue));
 
             var value = pluginMock.Object.PostBackProc("Update", JsonConvert.SerializeObject(input), "user", 0);
@@ -224,7 +224,7 @@ namespace HSPI_ZWaveParametersTest
                 parameter = (byte)23
             };
             zwaveConnectionMock
-                 .Setup(x => x.GetConfiguration(input.homeId, input.nodeId, input.parameter))
+                 .Setup(x => x.GetConfiguration(input.homeId, input.nodeId, input.parameter, It.IsAny<CancellationToken>()))
                  .ThrowsAsync(new ZWaveGetConfigurationFailedException());
 
             var value = pluginMock.Object.PostBackProc("Update", JsonConvert.SerializeObject(input), "user", 0);

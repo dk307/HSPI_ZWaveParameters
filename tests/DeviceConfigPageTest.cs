@@ -93,19 +93,25 @@ namespace HSPI_ZWaveParametersTest
 
             Assert.IsNotNull(page);
 
-            Assert.AreEqual(page.Views.Count, 4);
+            Assert.AreEqual(page.Views.Count, !zwaveData.Listening ? 5 : 4);
 
             // verify header link
             VerifyHeader(deviceConfigPage, page.Views[0]);
 
+            if (!zwaveData.Listening)
+            {
+                // verify valid non-listening message
+                TestHelper.VeryHtmlValid(page.Views[1].ToHtml());
+            }
+
             // verify refresh button
-            TestHelper.VeryHtmlValid(page.Views[1].ToHtml());
+            TestHelper.VeryHtmlValid(page.Views[!zwaveData.Listening ? 2 : 1].ToHtml());
 
             // verify parameters
-            VerifyParametersView(deviceConfigPage, (ViewGroup)page.Views[2]);
+            VerifyParametersView(deviceConfigPage, (ViewGroup)page.Views[!zwaveData.Listening ? 3 : 2]);
 
             // verify script
-            VerifyScript((LabelView)page.Views[3], zwaveData.Listening);
+            VerifyScript((LabelView)page.Views[!zwaveData.Listening ? 4 : 3], zwaveData.Listening);
 
             Mock.VerifyAll(mock, httpQueryMock);
         }

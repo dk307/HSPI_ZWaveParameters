@@ -30,7 +30,7 @@ namespace Hspi
             try
             {
                 var page = CreateDeviceConfigPage(deviceOrFeatureRef);
-                Task.Run(() => page.BuildConfigPage(CancellationToken.None)).Wait();
+                Task.Run(() => page.BuildConfigPage(ShutdownCancellationToken)).Wait();
                 cacheForUpdate[deviceOrFeatureRef] = page;
                 return page?.GetPage()?.ToJsonString() ?? throw new Exception("Page is unexpectely null");
             }
@@ -156,7 +156,7 @@ namespace Hspi
                     }
 
                     var connection = CreateZWaveConnection();
-                    int value = Task.Run(() => connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value)).Result;
+                    int value = Task.Run(() => connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
 
                     return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
                     {

@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -211,6 +210,11 @@ namespace Hspi
                 var parametersView = new ViewGroup(NewId(), string.Empty);
                 page = CreateAllParameterRefreshButton(page, scripts, parametersView.Id, out var allButtonId);
 
+                if (!listening)
+                {
+                    page = page.WithLabel(NewId(), "Device is non-listening one. Please wake the device and refresh the parameters.");
+                }
+
                 foreach (var parameter in Data.Parameters)
                 {
                     string parameterLabel = Invariant($"{Bootstrap.ApplyStyle(Data.LabelForParameter(parameter.ParameterId), Bootstrap.Style.TextBold)}(#{parameter.ParameterId})");
@@ -256,7 +260,8 @@ namespace Hspi
 
         private PageFactory CreateAllParameterRefreshButton(PageFactory page,
                                                             List<string> scripts,
-                                                            string containerToClickButtonId, out string allButtonId)
+                                                            string containerToClickButtonId, 
+                                                            out string allButtonId)
         {
             scripts.Add(HtmlSnippets.PostForRefreshScript);
 

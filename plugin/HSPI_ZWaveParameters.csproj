@@ -277,6 +277,7 @@
       <ReleaseFiles Include="$(OutputPath)\HtmlSanitizer.dll" />
       <ReleaseFiles Include="$(OutputPath)\AngleSharp.dll" />
       <ReleaseFiles Include="$(OutputPath)\AngleSharp.Css.dll" />
+      <ReleaseFiles Include="$(OutputPath)\System.Text.Encoding.CodePages.dll" />
       <ReleaseFiles Include="$(OutputPath)\install.txt" />
     </ItemGroup>
     <Copy SourceFiles="@(ReleaseFiles)" DestinationFolder="$(ArtifactsDirectory)" />

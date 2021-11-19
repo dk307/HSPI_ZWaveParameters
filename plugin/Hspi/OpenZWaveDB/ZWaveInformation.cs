@@ -16,6 +16,9 @@ namespace Hspi.OpenZWaveDB
         public string? Label { get; init; }
         public ZWaveDeviceManufacturer? Manufacturer { get; init; }
 
+        public byte Approved { get; init; }
+        public byte Deleted { get; init; }
+
         [JsonProperty("parameters")]
         public IReadOnlyList<ZWaveDeviceParameter>? Parameters { get; init; }
 

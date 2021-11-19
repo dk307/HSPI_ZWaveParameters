@@ -143,7 +143,7 @@ namespace Hspi
 
             if (parameter.HasOptions && !parameter.HasSubParameters)
             {
-                var options = parameter.Options.Select(x => x.Description).ToList();
+                var options = parameter.Options.Select(x => x.Description.StripHtml()).ToList();
                 var optionKeys = parameter.Options.Select(x => x.Value.ToString(CultureInfo.InvariantCulture)).ToList();
 
                 scripts.Add(Invariant($"<script> const {id}_optionkeys = [{string.Join(",", optionKeys)}];</script>"));
@@ -168,7 +168,7 @@ namespace Hspi
 
                     if (!string.IsNullOrWhiteSpace(parameter.Units))
                     {
-                        stb2.Append(parameter.Units);
+                        stb2.Append(parameter.Units!.StripHtml());
                     }
                     stb2.Append(')');
                 }
@@ -260,7 +260,7 @@ namespace Hspi
 
         private PageFactory CreateAllParameterRefreshButton(PageFactory page,
                                                             List<string> scripts,
-                                                            string containerToClickButtonId, 
+                                                            string containerToClickButtonId,
                                                             out string allButtonId)
         {
             scripts.Add(HtmlSnippets.PostForRefreshScript);
@@ -323,7 +323,7 @@ namespace Hspi
                 scripts.Add(Invariant($"<script>$('#{currentWrapperControlValueId}').hide()</script>"));
                 string refreshButton =
                         string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave waves-effect waves-light\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\">Refresh</button>",
-                                        homeId, nodeId, parameter.ParameterId, currentMessageValueId, currentWrapperControlValueId, elementId);
+                                      homeId, nodeId, parameter.ParameterId, currentMessageValueId, currentWrapperControlValueId, elementId);
 
                 views.Add(AddRawHtml(refreshButton, false));
             }

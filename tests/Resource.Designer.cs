@@ -19,7 +19,7 @@ namespace HSPI_ZWaveParametersTest {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resource {
@@ -66,6 +66,24 @@ namespace HSPI_ZWaveParametersTest {
         internal static string AeonLabsOpenZWaveDBDeviceJson {
             get {
                 return ResourceManager.GetString("AeonLabsOpenZWaveDBDeviceJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///	&quot;approval_requested&quot;: 0,
+        ///	&quot;approved&quot;: 1,
+        ///	&quot;beaming&quot;: &quot;1&quot;,
+        ///	&quot;database_id&quot;: 75,
+        ///	&quot;db_version&quot;: 6,
+        ///	&quot;deleted&quot;: 0,
+        ///	&quot;description&quot;: &quot;Smart Energy Switch&quot;,
+        ///	&quot;device_ref&quot;: &quot;0003:0006&quot;,
+        ///	&quot;exclusion&quot;: &quot;&lt;ol&gt;&lt;li&gt;Put the controller in exclusion mode&lt;\/li&gt; &lt;li&gt;Press the button located between the LED&lt;\/li&gt; &lt;\/ol&gt;&lt;p&gt;If the Aeon Labs Smart Energy Switch was removed from the Z-Wave network, the LED will be blinking. If the Aeon Labs Smart Energy Switch was not successfully removed from the Z-Wave network, the L [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AeonLabsOpenZWaveDBDeviceJsonWithInvalidHtml {
+            get {
+                return ResourceManager.GetString("AeonLabsOpenZWaveDBDeviceJsonWithInvalidHtml", resourceCulture);
             }
         }
         
@@ -149,6 +167,8 @@ namespace HSPI_ZWaveParametersTest {
         ///   Looks up a localized string similar to {
         /// 
         ///  &quot;database_id&quot;: 5623, 
+        ///  &quot;approved&quot;:1, 
+        ///  &quot;deleted&quot;:0,
         ///  &quot;parameters&quot;: [
         ///        {
         ///      &quot;param_id&quot;: 3,     
@@ -175,6 +195,8 @@ namespace HSPI_ZWaveParametersTest {
         ///   Looks up a localized string similar to {
         /// 
         ///  &quot;database_id&quot;: 5623, 
+        ///  &quot;approved&quot;:1, 
+        ///  &quot;deleted&quot;:0,
         ///  &quot;parameters&quot;: [
         ///        {
         ///      &quot;param_id&quot;: 3,
@@ -188,8 +210,7 @@ namespace HSPI_ZWaveParametersTest {
         ///      &quot;minimum&quot;: 0,
         ///      &quot;maximum&quot;: 32767,
         ///      &quot;read_only&quot;: &quot;0&quot;,
-        ///      &quot;write_only&quot;: &quot;0&quot;,
-        ///      &quot;reincl [rest of string was truncated]&quot;;.
+        ///      [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ParameterWithNoOptionOpenZWaveDBJson {
             get {
@@ -201,6 +222,8 @@ namespace HSPI_ZWaveParametersTest {
         ///   Looks up a localized string similar to {
         /// 
         ///  &quot;database_id&quot;: 563, 
+        ///  &quot;approved&quot;:1,
+        ///  &quot;deleted&quot;:0,
         ///  &quot;parameters&quot;: [
         ///    {
         ///      &quot;param_id&quot;: 1,
@@ -213,9 +236,7 @@ namespace HSPI_ZWaveParametersTest {
         ///      &quot;default&quot;: 0,
         ///      &quot;minimum&quot;: 0,
         ///      &quot;maximum&quot;: 2,
-        ///      &quot;read_only&quot;: &quot;0&quot;,
-        ///      &quot;write_only&quot;: &quot;0&quot;,
-        ///       [rest of string was truncated]&quot;;.
+        ///      &quot;read_only&quot;: &quot;0&quot;,        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string ParameterWithOptionOpenZWaveDBJson {
             get {
@@ -227,6 +248,8 @@ namespace HSPI_ZWaveParametersTest {
         ///   Looks up a localized string similar to {
         /// 
         ///  &quot;database_id&quot;: 5623, 
+        ///  &quot;approved&quot;:1, 
+        ///  &quot;deleted&quot;:0,
         ///  &quot;parameters&quot;: [
         ///        {
         ///      &quot;param_id&quot;: 3,     

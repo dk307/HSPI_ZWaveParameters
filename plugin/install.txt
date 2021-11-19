@@ -16,3 +16,7 @@ System.Numerics.Vectors.dll,.\bin\ZWaveParameters,0
 System.Runtime.CompilerServices.Unsafe.dll,.\bin\ZWaveParameters,0
 MonkeyCache.dll,.\bin\ZWaveParameters,0
 MonkeyCache.FileStore.dll,.\bin\ZWaveParameters,0 
+AngleSharp.dll,.\bin\ZWaveParameters,0 
+AngleSharp.Css.dll,.\bin\ZWaveParameters,0 
+HtmlSanitizer.dll,.\bin\ZWaveParameters,0 
+System.Text.Encoding.CodePages.dll,.\bin\ZWaveParameters,0 

@@ -101,6 +101,7 @@
     <Compile Include="Hspi\IZWaveConnection.cs" />
     <Compile Include="Hspi\OpenZWaveDB\FileCachingHttpQuery.cs" />
     <Compile Include="Hspi\OpenZWaveDB\IHttpQueryMaker.cs" />
+    <Compile Include="Hspi\OpenZWaveDB\SanitizeHtml.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveCommandClass.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveCommandClassChannel.cs" />
     <Compile Include="Hspi\OpenZWaveDB\ZWaveDevice.cs" />
@@ -152,6 +153,9 @@
     </PackageReference>
     <PackageReference Include="HomeSeer-PluginSDK">
       <Version>1.3.1</Version>
+    </PackageReference>
+    <PackageReference Include="HtmlSanitizer">
+      <Version>6.0.453</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
       <Version>6.0.0</Version>
@@ -270,6 +274,10 @@
       <ReleaseFiles Include="$(OutputPath)\System.Runtime.CompilerServices.Unsafe.dll" />
       <ReleaseFiles Include="$(OutputPath)\MonkeyCache.dll" />
       <ReleaseFiles Include="$(OutputPath)\MonkeyCache.FileStore.dll" />
+      <ReleaseFiles Include="$(OutputPath)\HtmlSanitizer.dll" />
+      <ReleaseFiles Include="$(OutputPath)\AngleSharp.dll" />
+      <ReleaseFiles Include="$(OutputPath)\AngleSharp.Css.dll" />
+      <ReleaseFiles Include="$(OutputPath)\System.Text.Encoding.CodePages.dll" />
       <ReleaseFiles Include="$(OutputPath)\install.txt" />
     </ItemGroup>
     <Copy SourceFiles="@(ReleaseFiles)" DestinationFolder="$(ArtifactsDirectory)" />

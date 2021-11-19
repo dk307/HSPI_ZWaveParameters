@@ -1,5 +1,5 @@
-﻿
-using Serilog;
+﻿using Serilog;
+
 #nullable enable
 
 namespace Hspi

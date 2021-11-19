@@ -10,10 +10,13 @@ namespace Hspi
 
     internal interface IZWaveConnection
     {
-        Task<int> GetConfiguration(string homeId, byte nodeId, byte param, 
+        Task<int> GetConfiguration(string homeId, byte nodeId, byte param,
                                    CancellationToken cancellationtoken);
+
         ZWaveData GetDeviceZWaveData(int deviceOrFeatureRef);
+
         bool IsZwaveDevice(int devOrFeatRef);
+
         void SetConfiguration(string homeId, byte nodeId, byte param, byte size, int value);
     }
 }

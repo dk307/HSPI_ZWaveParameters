@@ -87,6 +87,37 @@ namespace HSPI_ZWaveParametersTest
             mock.Verify();
         }
 
+        [DataTestMethod]
+        [DataRow("{\"database_id\" : 7756, \"approved\": 0, \"deleted\": 0, \"label\": \"HS-WD200+\"}", DisplayName = "Non Approved")]
+        [DataRow("{\"database_id\" : 7756, \"approved\": 1, \"deleted\": 1, \"label\": \"HS-WD200+\"}", DisplayName = "Deleted")] // Deleted
+        public async Task VariousErrorInJsonThrowsException(string json)
+        {
+            var httpQueryMock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
+
+            TestHelper.SetupRequest(httpQueryMock, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
+                                    Resource.HomeseerDimmerOpenZWaveDBDeviceListJson);
+
+            TestHelper.SetupRequest(httpQueryMock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=806", json);
+
+            var obj1 = new OpenZWaveDBInformation(12, 17479, 12342, new Version(5, 10, 0), httpQueryMock.Object);
+
+            bool thrown = false;
+            try
+            {
+                await obj1.Update(CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                thrown = true;
+                Assert.IsInstanceOfType(ex.InnerException, typeof(ShowErrorMessageException));
+                Assert.IsTrue(ex.InnerException.Message.Contains("Non-Approved Or Deleted Device"));
+            }
+
+            Assert.IsTrue(thrown);
+
+            httpQueryMock.Verify();
+        }
+
         [TestMethod]
         public async Task NoDeviceThrowsException()
         {
@@ -106,6 +137,7 @@ namespace HSPI_ZWaveParametersTest
             {
                 thrown = true;
                 Assert.IsInstanceOfType(ex.InnerException, typeof(ShowErrorMessageException));
+                Assert.IsTrue(ex.InnerException.Message.Contains("Device not found"));
             }
 
             Assert.IsTrue(thrown);

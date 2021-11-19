@@ -37,6 +37,12 @@ namespace Hspi.OpenZWaveDB
             {
                 throw new ShowErrorMessageException("Invalid Json from database");
             }
+
+            if (obj.Deleted != 0 || obj.Approved == 0)
+            {
+                throw new ShowErrorMessageException("Non-Approved Or Deleted Device from database");
+            }
+
             return obj;
         }
 
@@ -79,7 +85,7 @@ namespace Hspi.OpenZWaveDB
             }
             catch (Exception ex)
             {
-                throw new Exception("Failed to get Data from Open Z-Wave DB", ex);
+                throw new Exception("Failed to get data from Open Z-Wave Database", ex);
             }
         }
 
@@ -97,7 +103,7 @@ namespace Hspi.OpenZWaveDB
             }
 
             Log.Debug("Found {count} devices for manufactureId:{manufactureId} productType:{productType} productId:{productId}",
-                            devices.Length, manufactureId, productType, productId);
+                      devices.Length, manufactureId, productType, productId);
 
             int? id = null;
             foreach (var device in devices)

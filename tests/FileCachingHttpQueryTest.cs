@@ -33,7 +33,7 @@ namespace HSPI_ZWaveParametersTest
             handler.SetupRequest(HttpMethod.Get, url)
                                 .ReturnsResponse(data, "application/json");
 
-            var obj = new FileCachingHttpQuery(httpClient, 
+            var obj = new FileCachingHttpQuery(httpClient,
                                                Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
 
             Assert.AreEqual(await obj.GetResponseAsString(url, CancellationToken.None), data);
@@ -60,7 +60,7 @@ namespace HSPI_ZWaveParametersTest
             handler.SetupRequest(HttpMethod.Get, url)
                                 .ReturnsResponse(HttpStatusCode.Forbidden);
 
-            var obj = new FileCachingHttpQuery(httpClient, 
+            var obj = new FileCachingHttpQuery(httpClient,
                                                Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
 
             await Assert.ThrowsExceptionAsync<HttpRequestException>(() => obj.GetResponseAsString(url, CancellationToken.None));

@@ -22,6 +22,10 @@ namespace HSPI_ZWaveParametersTest
             yield return new object[] { TestHelper.AeonLabsZWaveData, TestHelper.CreateAeonLabsSwitchHttpHandler() };
             yield return new object[] { TestHelper.AeonLabsZWaveData with { Listening = false }, TestHelper.CreateAeonLabsSwitchHttpHandler() };
             yield return new object[] { TestHelper.HomeseerDimmerZWaveData, TestHelper.CreateHomeseerDimmerHttpHandler() };
+            yield return new object[] { TestHelper.AeonLabsZWaveData, TestHelper.CreateMockHttpHandler("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x0086%200003:0006",
+                                                                                                             Resource.AeonLabsOpenZWaveDBDeviceListJson,
+                                                                                                             "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75",
+                                                                                                             Resource.AeonLabsOpenZWaveDBDeviceJsonWithInvalidHtml) };
         }
 
         [TestMethod]
@@ -127,7 +131,7 @@ namespace HSPI_ZWaveParametersTest
                                     Resource.AeonLabsOpenZWaveDBDeviceListJson);
 
             TestHelper.SetupRequest(httpQueryMock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75",
-                                    "{ database_id:1034}");
+                                    "{ database_id:1034, approved:1, deleted:0}");
 
             var zwaveData = TestHelper.AeonLabsZWaveData;
             var mock = SetupZWaveConnection(deviceRef, zwaveData);

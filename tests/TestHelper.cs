@@ -6,7 +6,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,6 +31,16 @@ namespace HSPI_ZWaveParametersTest
                                          Resource.HomeseerDimmerOpenZWaveDBDeviceListJson,
                                          "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040",
                                          Resource.HomeseerDimmerOpenZWaveDBFullJson);
+        }
+
+        public static Mock<IHttpQueryMaker> CreateMockHttpHandler(string deviceListUrl, string deviceListJson, string deviceUrl, string deviceJson)
+        {
+            var mock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
+
+            SetupRequest(mock, deviceListUrl, deviceListJson);
+            SetupRequest(mock, deviceUrl, deviceJson);
+
+            return mock;
         }
 
         public static void SetupGetConfigurationInHsController(string homeId, byte nodeId, byte param, int value, Mock<IHsController> mock)
@@ -89,16 +98,6 @@ namespace HSPI_ZWaveParametersTest
             HtmlAgilityPack.HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(html);
             Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0);
-        }
-
-        private static Mock<IHttpQueryMaker> CreateMockHttpHandler(string deviceListUrl, string deviceListJson, string deviceUrl, string deviceJson)
-        {
-            var mock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
-
-            SetupRequest(mock, deviceListUrl, deviceListJson);
-            SetupRequest(mock, deviceUrl, deviceJson);
-
-            return mock;
         }
         public const string ZWaveInterface = "Z-Wave";
     }

@@ -1,7 +1,6 @@
 ﻿using Hspi.Exceptions;
 using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace HSPI_ZWaveParametersTest
 {
@@ -23,7 +22,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public void BareMinimumJsonWorks()
         {
-            var obj = OpenZWaveDBInformation.ParseJson("{\"database_id\": 113 }");
+            var obj = OpenZWaveDBInformation.ParseJson("{\"database_id\": 113, \"approved\":1, \"deleted\":0, }");
 
             Assert.AreEqual(obj.Id, "113");
 

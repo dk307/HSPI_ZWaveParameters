@@ -1,11 +1,8 @@
 ﻿using Hspi.Exceptions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Serilog;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,27 +10,21 @@ using System.Threading.Tasks;
 
 namespace Hspi.OpenZWaveDB
 {
-    internal class OpenZWaveDBInformation
+    internal abstract class OpenZWaveDBInformation
     {
-        public OpenZWaveDBInformation(int manufactureId, int productType, int productId, Version firmware,
-                                      IHttpQueryMaker fileCachingHttpQuery)
+        public OpenZWaveDBInformation(int manufactureId, int productType,
+                                      int productId, Version firmware)
         {
-            this.manufactureId = manufactureId;
-            this.productType = productType;
-            this.productId = productId;
-            this.firmware = firmware;
-            this.fileCachingHttpQuery = fileCachingHttpQuery;
+            this.ManufactureId = manufactureId;
+            this.ProductType = productType;
+            this.ProductId = productId;
+            this.Firmware = firmware;
         }
-
-        public ZWaveInformation? Data => data;
 
         public static ZWaveInformation ParseJson(string deviceJson)
         {
-            var serializer = new JsonSerializer();
-            using var stringReader = new StringReader(deviceJson);
-            using var reader = new JsonTextReader(stringReader);
-            var obj = serializer.Deserialize<ZWaveInformation>(reader);
-            if ((obj == null) || string.IsNullOrWhiteSpace(obj.Id))
+            var obj = JsonSerializer.Deserialize<ZWaveInformation>(deviceJson);
+            if (obj == null)
             {
                 throw new ShowErrorMessageException("Invalid Json from database");
             }
@@ -46,14 +37,19 @@ namespace Hspi.OpenZWaveDB
             return obj;
         }
 
+        public ZWaveInformation? Data { get; private set; }
+        public Version Firmware { get; init; }
+        public int ManufactureId { get; init; }
+        public int ProductId { get; init; }
+        public int ProductType { get; init; }
+
+        protected abstract Task<string> GetDeviceJson(CancellationToken token);
+
         public async Task Update(CancellationToken cancellationToken)
         {
             try
             {
-                var id = await GetDeviceId(cancellationToken).ConfigureAwait(false);
-
-                string deviceUrl = string.Format(deviceUrlFormat, id);
-                var deviceJson = await fileCachingHttpQuery.GetResponseAsString(deviceUrl, cancellationToken).ConfigureAwait(false);
+                var deviceJson = await GetDeviceJson(cancellationToken).ConfigureAwait(false);
 
                 var obj = ParseJson(deviceJson);
 
@@ -81,62 +77,12 @@ namespace Hspi.OpenZWaveDB
                     }
                 }
 
-                data = obj with { Parameters = finalParameters.AsReadOnly() };
+                Data = obj with { Parameters = finalParameters.AsReadOnly() };
             }
             catch (Exception ex)
             {
                 throw new Exception("Failed to get data from Open Z-Wave Database", ex);
             }
         }
-
-        private async Task<int> GetDeviceId(CancellationToken cancellationToken)
-        {
-            string listUrl = string.Format(listUrlFormat, manufactureId, productType, productId);
-            var listJson = await fileCachingHttpQuery.GetResponseAsString(listUrl, cancellationToken).ConfigureAwait(false);
-
-            var jobject = JObject.Parse(listJson);
-            var devices = jobject?["devices"]?.ToObject<ZWaveDevice[]>();
-
-            if (devices == null || devices.Length == 0)
-            {
-                throw new ShowErrorMessageException("Device not found in z-wave database");
-            }
-
-            Log.Debug("Found {count} devices for manufactureId:{manufactureId} productType:{productType} productId:{productId}",
-                      devices.Length, manufactureId, productType, productId);
-
-            int? id = null;
-            foreach (var device in devices)
-            {
-                if ((device.VersionMin != null) && (device.VersionMax != null))
-                {
-                    if ((firmware >= device.VersionMin) && (firmware <= device.VersionMax))
-                    {
-                        Log.Debug("Found Specific {@device} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}",
-                                     device, manufactureId, productType, productId, firmware);
-                        id = device.Id;
-                        break;
-                    }
-                }
-            }
-
-            if (id == null)
-            {
-                Log.Warning("No matching firmware found for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}. Picking first in list",
-                            manufactureId, productType, productId, firmware);
-                id = devices.First().Id;
-            }
-
-            return id ?? throw new ShowErrorMessageException("Device not found in the open zwave database");
-        }
-
-        private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
-        private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
-        private readonly IHttpQueryMaker fileCachingHttpQuery;
-        private readonly Version firmware;
-        private readonly int manufactureId;
-        private readonly int productId;
-        private readonly int productType;
-        private ZWaveInformation? data;
     }
 }

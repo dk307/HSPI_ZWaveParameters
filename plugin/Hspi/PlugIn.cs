@@ -3,12 +3,13 @@ using HomeSeer.PluginSdk;
 using Hspi.Exceptions;
 using Hspi.OpenZWaveDB;
 using Hspi.Utils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 #nullable enable
@@ -141,37 +142,48 @@ namespace Hspi
         {
             try
             {
-                var input = JObject.Parse(data);
+                
+                var input = JsonNode.Parse(data);
 
-                if (input["operation"]?.ToString() == DeviceConfigPageOperation)
+                if (input != null)
                 {
-                    var homeId = input["homeId"]?.ToString();
-                    var nodeId = (byte?)input["nodeId"];
-                    var parameter = (byte?)input["parameter"];
-
-                    if (string.IsNullOrWhiteSpace(homeId) || !nodeId.HasValue || !parameter.HasValue)
+                    if (((string?)input["operation"]) == DeviceConfigPageOperation)
                     {
-                        throw new ArgumentException("Input not valid");
+                        var homeId = input["homeId"]?.ToString();
+                        var nodeId = (byte?)input["nodeId"];
+                        var parameter = (byte?)input["parameter"];
+
+                        if (string.IsNullOrWhiteSpace(homeId) || !nodeId.HasValue || !parameter.HasValue)
+                        {
+                            throw new ArgumentException("Input not valid");
+                        }
+
+                        var connection = CreateZWaveConnection();
+                        int value = Task.Run(() => connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
+
+                        return JsonSerializer.Serialize(new ZWaveParameterGetResult()
+                        {
+                            Value = value
+                        });
                     }
-
-                    var connection = CreateZWaveConnection();
-                    int value = Task.Run(() => connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
-
-                    return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
-                    {
-                        Value = value
-                    });
                 }
                 throw new ArgumentException("Unknown operation");
             }
             catch (Exception ex)
             {
                 Log.Error("Failed to process PostBackProc for Update with {data} with {error}", data, ex.GetFullMessage());
-                return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
+                return JsonSerializer.Serialize(new ZWaveParameterGetResult()
                 {
                     ErrorMessage = ex.GetFullMessage(HTMLEndline)
                 });
             }
+        }
+
+        public void DownloadZWaveDatabase()
+        {
+            var http = new FileCachingHttpQuery();
+            var downloader = new OpenZWaveOfflineDatabase(http);
+            downloader.Download(ShutdownCancellationToken).Wait();
         }
 
         private void UpdateDebugLevel()

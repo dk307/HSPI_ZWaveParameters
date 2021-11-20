@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 #nullable enable
 
@@ -7,9 +7,10 @@ namespace Hspi.OpenZWaveDB
 {
     internal record ZWaveCommandClass
     {
-        [JsonProperty("commandclass_name")]
+        [JsonPropertyName("commandclass_name")]
         public string? Name { get; init; }
 
+        [JsonPropertyName("channels")]
         public IReadOnlyList<ZWaveCommandClassChannel>? Channels { get; init; }
 
         [JsonIgnore]

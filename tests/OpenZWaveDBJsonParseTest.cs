@@ -1,6 +1,7 @@
 ﻿using Hspi.Exceptions;
 using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Text.Json;
 
 namespace HSPI_ZWaveParametersTest
 {
@@ -10,7 +11,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public void EmptyThrowsException()
         {
-            Assert.ThrowsException<ShowErrorMessageException>(() => OpenZWaveDBInformation.ParseJson(string.Empty));
+            Assert.ThrowsException<JsonException>(() => OpenZWaveDBInformation.ParseJson(string.Empty));
         }
 
         [TestMethod]
@@ -22,9 +23,9 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public void BareMinimumJsonWorks()
         {
-            var obj = OpenZWaveDBInformation.ParseJson("{\"database_id\": 113, \"approved\":1, \"deleted\":0, }");
+            var obj = OpenZWaveDBInformation.ParseJson("{\"database_id\": 113, \"approved\":1, \"deleted\":0}");
 
-            Assert.AreEqual(obj.Id, "113");
+            Assert.AreEqual(obj.Id, 113);
 
             Assert.IsNull(obj.Description);
             Assert.IsNull(obj.Label);
@@ -39,7 +40,7 @@ namespace HSPI_ZWaveParametersTest
         {
             var obj = OpenZWaveDBInformation.ParseJson(Resource.BasicTopLevelOpenZwaveDBJson);
 
-            Assert.AreEqual(obj.Id, "1113");
+            Assert.AreEqual(obj.Id, 1113);
             Assert.AreEqual(obj.Description, "description");
             Assert.AreEqual(obj.Label, "LZW30-SN");
             Assert.AreEqual(obj.Overview, "overview");
@@ -129,7 +130,6 @@ namespace HSPI_ZWaveParametersTest
 
             Assert.IsNotNull(obj.Parameters);
             Assert.AreEqual(obj.Parameters.Count, 1);
-
             Assert.AreEqual(obj.Parameters[0].ReadOnly, true);
         }
 

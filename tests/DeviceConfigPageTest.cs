@@ -131,7 +131,7 @@ namespace HSPI_ZWaveParametersTest
                                     Resource.AeonLabsOpenZWaveDBDeviceListJson);
 
             TestHelper.SetupRequest(httpQueryMock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75",
-                                    "{ database_id:1034, approved:1, deleted:0}");
+                                    "{ \"database_id\":1034, \"approved\":1, \"deleted\":0}");
 
             var zwaveData = TestHelper.AeonLabsZWaveData;
             var mock = SetupZWaveConnection(deviceRef, zwaveData);

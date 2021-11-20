@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using static System.FormattableString;
 
 #nullable enable
@@ -9,32 +9,49 @@ namespace Hspi.OpenZWaveDB
 {
     internal record ZWaveDeviceParameter
     {
-        [JsonProperty("param_id")]
+        [JsonPropertyName("param_id")]
         public byte ParameterId { get; init; }
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public int Id { get; init; }
 
+        [JsonPropertyName("label")]
         public string? Label { get; init; }
+
+        [JsonPropertyName("description")]
         public string? Description { get; init; }
+
+        [JsonPropertyName("overview")]
         public string? Overview { get; init; }
+
+        [JsonPropertyName("units")]
         public string? Units { get; init; }
-        public int Advanced { get; init; }
+
+        [JsonPropertyName("size")]
         public byte Size { get; init; }
+
+        [JsonPropertyName("bitmask")]
         public int Bitmask { get; init; }
+
+        [JsonPropertyName("minimum")]
         public int Minimum { get; init; }
+
+        [JsonPropertyName("maximum")]
         public int Maximum { get; init; }
+
+        [JsonPropertyName("default")]
         public int Default { get; init; }
 
-        [JsonProperty("read_only")]
-        private string? ReadOnlyJson { get; init; }
+        [JsonPropertyName("read_only")]
+        public string? ReadOnlyJson { get; init; }
 
-        [JsonProperty("write_only")]
-        private string? WriteOnlyJson { get; init; }
+        [JsonPropertyName("write_only")]
+        public string? WriteOnlyJson { get; init; }
 
-        [JsonProperty("limit_options")]
-        private string? LimitOptionsJson { get; init; }
+        [JsonPropertyName("limit_options")]
+        public string? LimitOptionsJson { get; init; }
 
+        [JsonPropertyName("options")]
         public IReadOnlyList<ZWaveDeviceParameterOption>? Options { get; init; }
 
         [JsonIgnore]

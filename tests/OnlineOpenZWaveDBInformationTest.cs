@@ -10,18 +10,29 @@ using System.Threading.Tasks;
 namespace HSPI_ZWaveParametersTest
 {
     [TestClass]
-    public class OpenZWaveDBInformationTest
+    public class OnlineOpenZWaveDBInformationTest
     {
         [TestMethod]
-        public async Task HttpErrorThrowsException()
+        public async Task CorrectFirmwareIsSelected()
         {
             var mock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
 
-            mock.Setup(x => x.GetResponseAsString(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                 .Throws(new HttpRequestException());
+            TestHelper.SetupRequest(mock, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
+                                    Resource.HomeseerDimmerOpenZWaveDBDeviceListJson);
 
-            var obj = new OpenZWaveDBInformation(69, 0, 0, new Version(0, 0, 0), mock.Object);
-            await Assert.ThrowsExceptionAsync<Exception>(() => obj.Update(CancellationToken.None)).ConfigureAwait(false);
+            TestHelper.SetupRequest(mock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040",
+                                    Resource.HomeseerDimmerOpenZWaveDBFullJson);
+
+            TestHelper.SetupRequest(mock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=806",
+                                    Resource.HomeseerDimmerOpenZWaveDBFullOlderJson);
+
+            var obj1 = new OnlineOpenZWaveDBInformation(12, 17479, 12342, new Version(5, 9, 0), mock.Object);
+            await obj1.Update(CancellationToken.None);
+            Assert.AreEqual(obj1.Data.Id, 806);
+
+            var obj2 = new OnlineOpenZWaveDBInformation(12, 17479, 12342, new Version(5, 14, 0), mock.Object);
+            await obj2.Update(CancellationToken.None);
+            Assert.AreEqual(obj2.Data.Id, 1040);
 
             mock.Verify();
         }
@@ -37,34 +48,9 @@ namespace HSPI_ZWaveParametersTest
             TestHelper.SetupRequest(mock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75",
                                     Resource.AeonLabsOpenZWaveDBDeviceJson);
 
-            var obj1 = new OpenZWaveDBInformation(134, 3, 6, new Version(1, 43, 0), mock.Object);
+            var obj1 = new OnlineOpenZWaveDBInformation(134, 3, 6, new Version(1, 43, 0), mock.Object);
             await obj1.Update(CancellationToken.None);
-            Assert.AreEqual(obj1.Data.Id, "75");
-
-            mock.Verify();
-        }
-
-        [TestMethod]
-        public async Task CorrectFirmwareIsSelected()
-        {
-            var mock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
-
-            TestHelper.SetupRequest(mock, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
-                                    Resource.HomeseerDimmerOpenZWaveDBDeviceListJson);
-
-            TestHelper.SetupRequest(mock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040",
-                                    Resource.HomeseerDimmerOpenZWaveDBFullJson);
-
-            TestHelper.SetupRequest(mock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=806",
-                                    Resource.HomeseerDimmerOpenZWaveDBFullOlderJson);
-
-            var obj1 = new OpenZWaveDBInformation(12, 17479, 12342, new Version(5, 9, 0), mock.Object);
-            await obj1.Update(CancellationToken.None);
-            Assert.AreEqual(obj1.Data.Id, "806");
-
-            var obj2 = new OpenZWaveDBInformation(12, 17479, 12342, new Version(5, 14, 0), mock.Object);
-            await obj2.Update(CancellationToken.None);
-            Assert.AreEqual(obj2.Data.Id, "1040");
+            Assert.AreEqual(obj1.Data.Id, 75);
 
             mock.Verify();
         }
@@ -80,42 +66,25 @@ namespace HSPI_ZWaveParametersTest
             TestHelper.SetupRequest(mock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=806",
                                     Resource.HomeseerDimmerOpenZWaveDBFullOlderJson);
 
-            var obj1 = new OpenZWaveDBInformation(12, 17479, 12342, new Version(5, 10, 0), mock.Object);
+            var obj1 = new OnlineOpenZWaveDBInformation(12, 17479, 12342, new Version(5, 10, 0), mock.Object);
             await obj1.Update(CancellationToken.None);
-            Assert.AreEqual(obj1.Data.Id, "806");
+            Assert.AreEqual(obj1.Data.Id, 806);
 
             mock.Verify();
         }
 
-        [DataTestMethod]
-        [DataRow("{\"database_id\" : 7756, \"approved\": 0, \"deleted\": 0, \"label\": \"HS-WD200+\"}", DisplayName = "Non Approved")]
-        [DataRow("{\"database_id\" : 7756, \"approved\": 1, \"deleted\": 1, \"label\": \"HS-WD200+\"}", DisplayName = "Deleted")] // Deleted
-        public async Task VariousErrorInJsonThrowsException(string json)
+        [TestMethod]
+        public async Task HttpErrorThrowsException()
         {
-            var httpQueryMock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
+            var mock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
 
-            TestHelper.SetupRequest(httpQueryMock, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
-                                    Resource.HomeseerDimmerOpenZWaveDBDeviceListJson);
+            mock.Setup(x => x.GetResponseAsString(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                 .Throws(new HttpRequestException());
 
-            TestHelper.SetupRequest(httpQueryMock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=806", json);
+            var obj = new OnlineOpenZWaveDBInformation(69, 0, 0, new Version(0, 0, 0), mock.Object);
+            await Assert.ThrowsExceptionAsync<Exception>(() => obj.Update(CancellationToken.None)).ConfigureAwait(false);
 
-            var obj1 = new OpenZWaveDBInformation(12, 17479, 12342, new Version(5, 10, 0), httpQueryMock.Object);
-
-            bool thrown = false;
-            try
-            {
-                await obj1.Update(CancellationToken.None).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                thrown = true;
-                Assert.IsInstanceOfType(ex.InnerException, typeof(ShowErrorMessageException));
-                Assert.IsTrue(ex.InnerException.Message.Contains("Non-Approved Or Deleted Device"));
-            }
-
-            Assert.IsTrue(thrown);
-
-            httpQueryMock.Verify();
+            mock.Verify();
         }
 
         [TestMethod]
@@ -126,7 +95,7 @@ namespace HSPI_ZWaveParametersTest
             TestHelper.SetupRequest(httpQueryMock, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x026E%204252:5A31",
                                     "{\"search_filter\":{\"manufacturer\":622,\"filter\":\"4252:5A31\"},\"total\":0,\"devices\":[]}");
 
-            var obj1 = new OpenZWaveDBInformation(622, 16978, 23089, new Version(11, 2, 0), httpQueryMock.Object);
+            var obj1 = new OnlineOpenZWaveDBInformation(622, 16978, 23089, new Version(11, 2, 0), httpQueryMock.Object);
 
             bool thrown = false;
             try
@@ -156,7 +125,7 @@ namespace HSPI_ZWaveParametersTest
             TestHelper.SetupRequest(mock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040",
                                     Resource.HomeseerDimmerOpenZWaveDBFullJson);
 
-            var obj2 = new OpenZWaveDBInformation(12, 17479, 12342, new Version(5, 14, 0), mock.Object);
+            var obj2 = new OnlineOpenZWaveDBInformation(12, 17479, 12342, new Version(5, 14, 0), mock.Object);
             await obj2.Update(CancellationToken.None);
 
             Assert.IsNotNull(obj2.Data.Parameters);
@@ -167,6 +136,37 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(obj2.Data.Parameters[14].SubParameters.Count, 6);
 
             mock.Verify();
+        }
+
+        [DataTestMethod]
+        [DataRow("{\"database_id\" : 7756, \"approved\": 0, \"deleted\": 0, \"label\": \"HS-WD200+\"}", DisplayName = "Non Approved")]
+        [DataRow("{\"database_id\" : 7756, \"approved\": 1, \"deleted\": 1, \"label\": \"HS-WD200+\"}", DisplayName = "Deleted")] // Deleted
+        public async Task VariousErrorInJsonThrowsException(string json)
+        {
+            var httpQueryMock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
+
+            TestHelper.SetupRequest(httpQueryMock, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
+                                    Resource.HomeseerDimmerOpenZWaveDBDeviceListJson);
+
+            TestHelper.SetupRequest(httpQueryMock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=806", json);
+
+            var obj1 = new OnlineOpenZWaveDBInformation(12, 17479, 12342, new Version(5, 10, 0), httpQueryMock.Object);
+
+            bool thrown = false;
+            try
+            {
+                await obj1.Update(CancellationToken.None).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                thrown = true;
+                Assert.IsInstanceOfType(ex.InnerException, typeof(ShowErrorMessageException));
+                Assert.IsTrue(ex.InnerException.Message.Contains("Non-Approved Or Deleted Device"));
+            }
+
+            Assert.IsTrue(thrown);
+
+            httpQueryMock.Verify();
         }
     }
 }

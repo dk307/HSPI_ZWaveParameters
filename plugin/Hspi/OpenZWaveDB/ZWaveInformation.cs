@@ -1,28 +1,55 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 #nullable enable
 
 namespace Hspi.OpenZWaveDB
 {
+    internal record ZWaveInformationBasic
+    {
+        [JsonPropertyName("database_id")]
+        public string? Id { get; init; }
+
+        [JsonPropertyName("approved")]
+        public string? Approved { get; init; }
+
+        [JsonPropertyName("deleted")]
+        public string? Deleted { get; init; }
+
+        [JsonPropertyName("device_ref")]
+        public string? DeviceRef { get; init; }
+    }
+
     internal record ZWaveInformation
     {
-        [JsonProperty("database_id")]
-        public string? Id { get; init; }
-        public string? Overview { get; init; }
-        public string? Description { get; init; }
-        public string? Label { get; init; }
-        public ZWaveDeviceManufacturer? Manufacturer { get; init; }
+        [JsonPropertyName("database_id")]
+        public int Id { get; init; }
 
+        [JsonPropertyName("approved")]
         public byte Approved { get; init; }
+
+        [JsonPropertyName("deleted")]
         public byte Deleted { get; init; }
 
-        [JsonProperty("parameters")]
+        [JsonPropertyName("overview")]
+        public string? Overview { get; init; }
+
+        [JsonPropertyName("description")]
+        public string? Description { get; init; }
+
+        [JsonPropertyName("label")]
+        public string? Label { get; init; }
+
+        [JsonPropertyName("manufacturer")]
+        public ZWaveDeviceManufacturer? Manufacturer { get; init; }
+
+        [JsonPropertyName("parameters")]
         public IReadOnlyList<ZWaveDeviceParameter>? Parameters { get; init; }
 
-        [JsonProperty("endpoints")]
+        [JsonPropertyName("endpoints")]
         public IReadOnlyList<ZWaveEndPoints>? EndPoints { get; init; }
 
         public ZWaveCommandClassChannel? GetCommandClassChannelForParameter(int parameter)
@@ -33,7 +60,7 @@ namespace Hspi.OpenZWaveDB
         }
 
         [JsonIgnore]
-        public Uri WebUrl => new(string.Format(webUrlFormat, Id), UriKind.Absolute);
+        public Uri WebUrl => new(string.Format(CultureInfo.InvariantCulture, webUrlFormat, Id), UriKind.Absolute);
 
         private const string webUrlFormat = "https://www.opensmarthouse.org/zwavedatabase/{0}";
     }

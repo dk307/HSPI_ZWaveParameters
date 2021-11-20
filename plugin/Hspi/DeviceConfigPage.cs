@@ -33,7 +33,7 @@ namespace Hspi
             var pageFactory = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
             var zwaveData = zwaveConnection.GetDeviceZWaveData(this.deviceOrFeatureRef);
 
-            var openZWaveData = new OpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType,
+            var openZWaveData = new OnlineOpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType,
                                                            zwaveData.ProductId, zwaveData.Firmware, httpQueryMaker);
 
             await openZWaveData.Update(cancellationToken).ConfigureAwait(false);
@@ -234,7 +234,7 @@ namespace Hspi
 
                 if (listening)
                 {
-                    scripts.Add(string.Format(HtmlSnippets.ClickRefreshButtonScript, parametersView.Id, allButtonId));
+                    scripts.Add(string.Format(CultureInfo.InvariantCulture, HtmlSnippets.ClickRefreshButtonScript, parametersView.Id, allButtonId));
                 }
             }
 
@@ -267,7 +267,7 @@ namespace Hspi
 
             allButtonId = NewId();
             string allButton =
-                string.Format("<button id=\"{1}\" type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshAllZWaveParameters('{0}')\"> Refresh all parameters</button>",
+                string.Format(CultureInfo.InvariantCulture, "<button id=\"{1}\" type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshAllZWaveParameters('{0}')\"> Refresh all parameters</button>",
                                 containerToClickButtonId, allButtonId);
 
             page = page.WithLabel(NewId(), string.Empty, allButton);
@@ -322,7 +322,7 @@ namespace Hspi
             {
                 scripts.Add(Invariant($"<script>$('#{currentWrapperControlValueId}').hide()</script>"));
                 string refreshButton =
-                        string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave waves-effect waves-light\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\">Refresh</button>",
+                        string.Format(CultureInfo.InvariantCulture, "<button type =\"button\" class=\"btn btn-secondary refresh-z-wave waves-effect waves-light\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\">Refresh</button>",
                                       homeId, nodeId, parameter.ParameterId, currentMessageValueId, currentWrapperControlValueId, elementId);
 
                 views.Add(AddRawHtml(refreshButton, false));

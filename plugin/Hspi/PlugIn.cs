@@ -89,7 +89,7 @@ namespace Hspi
             {
                 factoryForOpenZWaveDatabase = (zwaveData) =>
                     offlineOpenZWaveDatabase.Create(zwaveData.ManufactureId, zwaveData.ProductType,
-                                                                 zwaveData.ProductId, zwaveData.Firmware, ShutdownCancellationToken);
+                                                    zwaveData.ProductId, zwaveData.Firmware, ShutdownCancellationToken);
                    
             }
 

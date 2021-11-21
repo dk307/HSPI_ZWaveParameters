@@ -34,6 +34,9 @@ namespace Hspi.OpenZWaveDB
                 await loadTask.ConfigureAwait(false);
                 string filePath = FindInEntries(manufacturerId, productType, productId, firmware);
 
+                Log.Information("Found Specific {@file} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}",
+                                Path.GetFileName(filePath), manufacturerId, productType, productId, firmware);
+
                 using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 return await OpenZWaveDatabase.ParseJson(fileStream).ConfigureAwait(false);
             }
@@ -47,8 +50,10 @@ namespace Hspi.OpenZWaveDB
                                      Version firmware)
         {
             string? filePath = null;
-            var refDevice = string.Format(CultureInfo.InvariantCulture, "{1:X4}:{2:X4}", productType, productId);
+            var refDevice = string.Format(CultureInfo.InvariantCulture, "{0:X4}:{1:X4}", productType, productId);
             var key = new Tuple<int, string>(manufacturerId, refDevice);
+
+            var t = entries.Keys.Where(x => x.Item1 == manufacturerId);
 
             if (entries.TryGetValue(key, out var valueList))
             {
@@ -71,8 +76,7 @@ namespace Hspi.OpenZWaveDB
                 }
             }
 
-            throw new ShowErrorMessageException("Device not found in the open zwave database");
-            return filePath;
+            return filePath ?? throw new ShowErrorMessageException("Device not found in the open zwave database");
         }
 
         public async Task Load(CancellationToken cancellationToken)
@@ -136,7 +140,7 @@ namespace Hspi.OpenZWaveDB
                 using var data = await JsonDocument.ParseAsync(fileStream,
                                                                cancellationToken: cancellationToken);
 
-                var manufacturerId = data.RootElement.GetProperty("manufacturer").GetProperty("id").GetInt32();
+                var manufacturerId = data.RootElement.GetProperty("manufacturer").GetProperty("reference").GetInt32();
                 var deviceRef = data.RootElement.GetProperty("device_ref").GetString();
                 var versionMin = data.RootElement.GetProperty("version_min").Deserialize<Version>();
                 var versionMax = data.RootElement.GetProperty("version_max").Deserialize<Version>();
@@ -145,7 +149,7 @@ namespace Hspi.OpenZWaveDB
 
                 foreach (var entry in deviceRefEntries)
                 {
-                    var key = new Tuple<int, string>(manufacturerId, entry);
+                    var key = new Tuple<int, string>(manufacturerId, entry.ToUpperInvariant());
                     var value = new Entry(versionMin, versionMax, file);
                     dict[key] = value;
                 }

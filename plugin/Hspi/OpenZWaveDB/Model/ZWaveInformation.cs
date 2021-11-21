@@ -18,9 +18,6 @@ namespace Hspi.OpenZWaveDB.Model
 
         [JsonPropertyName("deleted")]
         public string? Deleted { get; init; }
-
-        [JsonPropertyName("device_ref")]
-        public string? DeviceRef { get; init; }
     }
 
     public record ZWaveInformation

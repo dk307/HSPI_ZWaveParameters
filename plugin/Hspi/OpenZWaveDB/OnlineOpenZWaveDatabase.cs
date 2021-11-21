@@ -13,15 +13,26 @@ using System.Threading.Tasks;
 
 namespace Hspi.OpenZWaveDB
 {
-    internal class OnlineOpenZWaveDatabase : OpenZWaveDatabase
+    internal class OnlineOpenZWaveDatabase
     {
         public OnlineOpenZWaveDatabase(int manufactureId, int productType, int productId, Version firmware,
                                             IHttpQueryMaker queryMaker)
-            : base(manufactureId, productType, productId, firmware)
         {
+            this.ManufactureId = manufactureId;
+            this.ProductType = productType;
+            this.ProductId = productId;
+            this.Firmware = firmware;
+
             this.serverInterface = new OpenZWaveDatabaseOnlineInterface(queryMaker);
         }
 
+        public Version Firmware { get; init; }
+
+        public int ManufactureId { get; init; }
+
+        public int ProductId { get; init; }
+
+        public int ProductType { get; init; }
         public static async Task<ZWaveInformation> Create(int manufactureId, int productType, int productId, Version firmware,
                                             IHttpQueryMaker queryMaker, CancellationToken cancellationToken)
         {
@@ -29,10 +40,17 @@ namespace Hspi.OpenZWaveDB
             return await onlineOpenZWaveDBInformation.Create(cancellationToken).ConfigureAwait(false);
         }
 
-        protected override async Task<Stream> GetDeviceJson(CancellationToken cancellationToken)
+        public async Task<ZWaveInformation> Create(CancellationToken cancellationToken)
         {
-            var id = await GetDeviceId(cancellationToken).ConfigureAwait(false);
-            return await serverInterface.GetDeviceId(id, cancellationToken).ConfigureAwait(false);
+            try
+            {
+                var stream = await GetDeviceJson(cancellationToken).ConfigureAwait(false);
+                return await OpenZWaveDatabase.ParseJson(stream).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to get data from Open Z-Wave Database", ex);
+            }
         }
 
         private async Task<int> GetDeviceId(CancellationToken cancellationToken)
@@ -76,6 +94,11 @@ namespace Hspi.OpenZWaveDB
             return id ?? throw new ShowErrorMessageException("Device not found in the open zwave database");
         }
 
+        private async Task<Stream> GetDeviceJson(CancellationToken cancellationToken)
+        {
+            var id = await GetDeviceId(cancellationToken).ConfigureAwait(false);
+            return await serverInterface.GetDeviceId(id, cancellationToken).ConfigureAwait(false);
+        }
         private readonly OpenZWaveDatabaseOnlineInterface serverInterface;
     }
 }

@@ -74,15 +74,27 @@ namespace Hspi
 
         protected virtual IDeviceConfigPage CreateDeviceConfigPage(int deviceOrFeatureRef)
         {
-            Func<ZWaveData, Task<ZWaveInformation>> factoryForOpenZWaveDBInformation = (zwaveData) =>
-               {
-                   return OnlineOpenZWaveDatabase.Create(zwaveData.ManufactureId, zwaveData.ProductType,
-                                                             zwaveData.ProductId, zwaveData.Firmware,
-                                                             new HttpQueryMaker(), ShutdownCancellationToken);
-               };
+            bool useOnline = false;
+
+            Func<ZWaveData, Task<ZWaveInformation>> factoryForOpenZWaveDatabase;
+
+            if (useOnline)
+            {
+                factoryForOpenZWaveDatabase = (zwaveData) =>
+                             OnlineOpenZWaveDatabase.Create(zwaveData.ManufactureId, zwaveData.ProductType,
+                                                            zwaveData.ProductId, zwaveData.Firmware,
+                                                            new HttpQueryMaker(), ShutdownCancellationToken);
+            }
+            else
+            {
+                factoryForOpenZWaveDatabase = (zwaveData) =>
+                    offlineOpenZWaveDatabase.Create(zwaveData.ManufactureId, zwaveData.ProductType,
+                                                                 zwaveData.ProductId, zwaveData.Firmware, ShutdownCancellationToken);
+                   
+            }
 
             return new DeviceConfigPage(deviceOrFeatureRef, CreateZWaveConnection(),
-                                        factoryForOpenZWaveDBInformation);
+                                       factoryForOpenZWaveDatabase);
         }
 
         protected virtual IZWaveConnection CreateZWaveConnection()
@@ -99,6 +111,8 @@ namespace Hspi
                 LoadSettingsFromIni();
                 settingsPages = new SettingsPages(Settings);
                 UpdateDebugLevel();
+
+                offlineOpenZWaveDatabase.StartLoadAsync(ShutdownCancellationToken);
 
                 Log.Information("Plugin Started");
             }
@@ -212,5 +226,6 @@ namespace Hspi
         private const string HTMLEndline = "<BR>";
         private readonly IDictionary<int, IDeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, IDeviceConfigPage>();
         private SettingsPages? settingsPages;
+        private readonly OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new OfflineOpenZWaveDatabase(new HttpQueryMaker());
     }
 }

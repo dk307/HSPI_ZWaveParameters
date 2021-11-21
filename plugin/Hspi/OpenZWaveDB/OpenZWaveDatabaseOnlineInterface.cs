@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,30 +7,30 @@ using System.Threading.Tasks;
 
 namespace Hspi.OpenZWaveDB
 {
-    internal class OpenZWaveDatabaseOnlineInterface
+    internal sealed class OpenZWaveDatabaseOnlineInterface
     {
-        public OpenZWaveDatabaseOnlineInterface(IHttpQueryMaker fileCachingHttpQuery)
+        public OpenZWaveDatabaseOnlineInterface(IHttpQueryMaker queryMaker)
         {
-            this.fileCachingHttpQuery = fileCachingHttpQuery;
+            this.queryMaker = queryMaker;
         }
 
-        public async Task<string> GetDeviceId(int deviceId, CancellationToken cancellationToken)
+        public async Task<Stream> GetDeviceId(int deviceId, CancellationToken cancellationToken)
         {
             string deviceUrl = string.Format(CultureInfo.InvariantCulture, deviceUrlFormat, deviceId);
-            return await fileCachingHttpQuery.GetResponseAsString(deviceUrl, cancellationToken).ConfigureAwait(false);
+            return await queryMaker.GetUtf8JsonResponse(deviceUrl, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<string> Search(int manufactureId,
+        public async Task<Stream> Search(int manufactureId,
                                          int productType,
                                          int productId,
                                          CancellationToken cancellationToken)
         {
             string listUrl = string.Format(CultureInfo.InvariantCulture, listUrlFormat, manufactureId, productType, productId);
-            return await fileCachingHttpQuery.GetResponseAsString(listUrl, cancellationToken).ConfigureAwait(false);
+            return await queryMaker.GetUtf8JsonResponse(listUrl, cancellationToken).ConfigureAwait(false);
         }
 
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
-        private readonly IHttpQueryMaker fileCachingHttpQuery;
+        private readonly IHttpQueryMaker queryMaker;
     }
 }

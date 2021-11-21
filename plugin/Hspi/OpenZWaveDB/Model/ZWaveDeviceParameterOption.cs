@@ -3,9 +3,9 @@ using static System.FormattableString;
 
 #nullable enable
 
-namespace Hspi.OpenZWaveDB
+namespace Hspi.OpenZWaveDB.Model
 {
-    internal record ZWaveDeviceParameterOption
+    public record ZWaveDeviceParameterOption
     {
         [JsonPropertyName("label")]
 

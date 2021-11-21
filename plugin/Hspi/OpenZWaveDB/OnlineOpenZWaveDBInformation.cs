@@ -1,6 +1,8 @@
 ﻿using Hspi.Exceptions;
+using Hspi.OpenZWaveDB.Model;
 using Serilog;
 using System;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -14,24 +16,31 @@ namespace Hspi.OpenZWaveDB
     internal class OnlineOpenZWaveDBInformation : OpenZWaveDBInformation
     {
         public OnlineOpenZWaveDBInformation(int manufactureId, int productType, int productId, Version firmware,
-                                            IHttpQueryMaker fileCachingHttpQuery)
+                                            IHttpQueryMaker queryMaker)
             : base(manufactureId, productType, productId, firmware)
         {
-            this.serverInterface = new OpenZWaveDatabaseOnlineInterface(fileCachingHttpQuery);
+            this.serverInterface = new OpenZWaveDatabaseOnlineInterface(queryMaker);
         }
 
-        protected override async Task<string> GetDeviceJson(CancellationToken cancellationToken)
+        public static async Task<ZWaveInformation> Create(int manufactureId, int productType, int productId, Version firmware,
+                                            IHttpQueryMaker queryMaker, CancellationToken cancellationToken)
+        {
+            OnlineOpenZWaveDBInformation onlineOpenZWaveDBInformation = new(manufactureId, productType, productId, firmware, queryMaker);
+            return await onlineOpenZWaveDBInformation.Create(cancellationToken).ConfigureAwait(false);
+        }
+
+        protected override async Task<Stream> GetDeviceJson(CancellationToken cancellationToken)
         {
             var id = await GetDeviceId(cancellationToken).ConfigureAwait(false);
-            var deviceJson = await serverInterface.GetDeviceId(id, cancellationToken).ConfigureAwait(false);
-            return deviceJson;
+            return await serverInterface.GetDeviceId(id, cancellationToken).ConfigureAwait(false);
         }
 
         private async Task<int> GetDeviceId(CancellationToken cancellationToken)
         {
-            var listJson = await serverInterface.Search(ManufactureId, ProductType, ProductId, cancellationToken).ConfigureAwait(false);
+            var listJsonStream = await serverInterface.Search(ManufactureId, ProductType,
+                                                              ProductId, cancellationToken).ConfigureAwait(false);
 
-            var jobject = JsonNode.Parse(listJson);
+            var jobject = JsonNode.Parse(listJsonStream);
             var devices = JsonSerializer.Deserialize<ZWaveDevice[]>(jobject?["devices"]);
 
             if (devices == null || devices.Length == 0)

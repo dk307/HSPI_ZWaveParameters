@@ -2,9 +2,9 @@
 
 using System.Text.Json.Serialization;
 
-namespace Hspi.OpenZWaveDB
+namespace Hspi.OpenZWaveDB.Model
 {
-    internal record ZWaveDeviceManufacturer
+    public record ZWaveDeviceManufacturer
     {
         [JsonPropertyName("label")]
 

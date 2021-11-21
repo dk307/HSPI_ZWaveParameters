@@ -20,19 +20,22 @@ namespace HSPI_ZWaveParametersTest
             TestHelper.SetupRequest(mock, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
                                     Resource.HomeseerDimmerOpenZWaveDBDeviceListJson);
 
-            TestHelper.SetupRequest(mock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040",
-                                    Resource.HomeseerDimmerOpenZWaveDBFullJson);
-
             TestHelper.SetupRequest(mock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=806",
                                     Resource.HomeseerDimmerOpenZWaveDBFullOlderJson);
 
             var obj1 = new OnlineOpenZWaveDBInformation(12, 17479, 12342, new Version(5, 9, 0), mock.Object);
-            await obj1.Update(CancellationToken.None);
-            Assert.AreEqual(obj1.Data.Id, 806);
+            var data1 = await obj1.Create(CancellationToken.None);
+            Assert.AreEqual(data1.Id, 806);
+
+            TestHelper.SetupRequest(mock, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
+                        Resource.HomeseerDimmerOpenZWaveDBDeviceListJson);
+
+            TestHelper.SetupRequest(mock, "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040",
+                        Resource.HomeseerDimmerOpenZWaveDBFullJson);
 
             var obj2 = new OnlineOpenZWaveDBInformation(12, 17479, 12342, new Version(5, 14, 0), mock.Object);
-            await obj2.Update(CancellationToken.None);
-            Assert.AreEqual(obj2.Data.Id, 1040);
+            var data2 = await obj2.Create(CancellationToken.None);
+            Assert.AreEqual(data2.Id, 1040);
 
             mock.Verify();
         }
@@ -49,8 +52,8 @@ namespace HSPI_ZWaveParametersTest
                                     Resource.AeonLabsOpenZWaveDBDeviceJson);
 
             var obj1 = new OnlineOpenZWaveDBInformation(134, 3, 6, new Version(1, 43, 0), mock.Object);
-            await obj1.Update(CancellationToken.None);
-            Assert.AreEqual(obj1.Data.Id, 75);
+            var data = await obj1.Create(CancellationToken.None);
+            Assert.AreEqual(data.Id, 75);
 
             mock.Verify();
         }
@@ -67,8 +70,8 @@ namespace HSPI_ZWaveParametersTest
                                     Resource.HomeseerDimmerOpenZWaveDBFullOlderJson);
 
             var obj1 = new OnlineOpenZWaveDBInformation(12, 17479, 12342, new Version(5, 10, 0), mock.Object);
-            await obj1.Update(CancellationToken.None);
-            Assert.AreEqual(obj1.Data.Id, 806);
+            var data = await obj1.Create(CancellationToken.None);
+            Assert.AreEqual(data.Id, 806);
 
             mock.Verify();
         }
@@ -78,11 +81,11 @@ namespace HSPI_ZWaveParametersTest
         {
             var mock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
 
-            mock.Setup(x => x.GetResponseAsString(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            mock.Setup(x => x.GetUtf8JsonResponse(It.IsAny<string>(), It.IsAny<CancellationToken>()))
                  .Throws(new HttpRequestException());
 
             var obj = new OnlineOpenZWaveDBInformation(69, 0, 0, new Version(0, 0, 0), mock.Object);
-            await Assert.ThrowsExceptionAsync<Exception>(() => obj.Update(CancellationToken.None)).ConfigureAwait(false);
+            await Assert.ThrowsExceptionAsync<Exception>(() => obj.Create(CancellationToken.None)).ConfigureAwait(false);
 
             mock.Verify();
         }
@@ -100,7 +103,7 @@ namespace HSPI_ZWaveParametersTest
             bool thrown = false;
             try
             {
-                await obj1.Update(CancellationToken.None).ConfigureAwait(false);
+                await obj1.Create(CancellationToken.None).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -126,14 +129,14 @@ namespace HSPI_ZWaveParametersTest
                                     Resource.HomeseerDimmerOpenZWaveDBFullJson);
 
             var obj2 = new OnlineOpenZWaveDBInformation(12, 17479, 12342, new Version(5, 14, 0), mock.Object);
-            await obj2.Update(CancellationToken.None);
+            var data2= await obj2.Create(CancellationToken.None);
 
-            Assert.IsNotNull(obj2.Data.Parameters);
-            Assert.AreEqual(obj2.Data.Parameters.Count, 15);
+            Assert.IsNotNull(data2.Parameters);
+            Assert.AreEqual(data2.Parameters.Count, 15);
 
-            Assert.AreEqual(obj2.Data.Parameters[14].ParameterId, 31);
-            Assert.AreEqual(obj2.Data.Parameters[14].HasSubParameters, true);
-            Assert.AreEqual(obj2.Data.Parameters[14].SubParameters.Count, 6);
+            Assert.AreEqual(data2.Parameters[14].ParameterId, 31);
+            Assert.AreEqual(data2.Parameters[14].HasSubParameters, true);
+            Assert.AreEqual(data2.Parameters[14].SubParameters.Count, 6);
 
             mock.Verify();
         }
@@ -155,7 +158,7 @@ namespace HSPI_ZWaveParametersTest
             bool thrown = false;
             try
             {
-                await obj1.Update(CancellationToken.None).ConfigureAwait(false);
+                await obj1.Create(CancellationToken.None).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

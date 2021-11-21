@@ -1,6 +1,8 @@
 ﻿using Hspi.Exceptions;
+using Hspi.OpenZWaveDB.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
@@ -21,9 +23,45 @@ namespace Hspi.OpenZWaveDB
             this.Firmware = firmware;
         }
 
+        public Version Firmware { get; init; }
+
+        public int ManufactureId { get; init; }
+
+        public int ProductId { get; init; }
+
+        public int ProductType { get; init; }
+
+        public static async Task<ZWaveInformation> ParseJson(Stream deviceJson)
+        {
+            var obj = await JsonSerializer.DeserializeAsync<ZWaveInformation>(deviceJson).ConfigureAwait(false);
+            CheckValidInformation(obj);
+            return CombineParameters(obj);
+        }
+
         public static ZWaveInformation ParseJson(string deviceJson)
         {
             var obj = JsonSerializer.Deserialize<ZWaveInformation>(deviceJson);
+            CheckValidInformation(obj);
+            return CombineParameters(obj);
+        }
+
+        public async Task<ZWaveInformation> Create(CancellationToken cancellationToken)
+        {
+            try
+            {
+                var stream = await GetDeviceJson(cancellationToken).ConfigureAwait(false);
+                return await ParseJson(stream).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to get data from Open Z-Wave Database", ex);
+            }
+        }
+
+        protected abstract Task<Stream> GetDeviceJson(CancellationToken token);
+
+        private static void CheckValidInformation(ZWaveInformation? obj)
+        {
             if (obj == null)
             {
                 throw new ShowErrorMessageException("Invalid Json from database");
@@ -33,56 +71,37 @@ namespace Hspi.OpenZWaveDB
             {
                 throw new ShowErrorMessageException("Non-Approved Or Deleted Device from database");
             }
-
-            return obj;
         }
 
-        public ZWaveInformation? Data { get; private set; }
-        public Version Firmware { get; init; }
-        public int ManufactureId { get; init; }
-        public int ProductId { get; init; }
-        public int ProductType { get; init; }
-
-        protected abstract Task<string> GetDeviceJson(CancellationToken token);
-
-        public async Task Update(CancellationToken cancellationToken)
+        private static ZWaveInformation CombineParameters(ZWaveInformation obj)
         {
-            try
+            var finalParameters = new List<ZWaveDeviceParameter>();
+            if (obj.Parameters != null)
             {
-                var deviceJson = await GetDeviceJson(cancellationToken).ConfigureAwait(false);
+                // process parameters
+                var map = obj.Parameters.GroupBy(x => x.ParameterId);
 
-                var obj = ParseJson(deviceJson);
-
-                var finalParameters = new List<ZWaveDeviceParameter>();
-                if (obj.Parameters != null)
+                foreach (var group in map)
                 {
-                    // process parameters
-                    var map = obj.Parameters.GroupBy(x => x.ParameterId);
-
-                    foreach (var group in map)
+                    if (group.Count() == 1)
                     {
-                        if (group.Count() == 1)
-                        {
-                            finalParameters.Add(group.First());
-                        }
-                        else
-                        {
-                            var result = group.First();
+                        finalParameters.Add(group.First());
+                    }
+                    else
+                    {
+                        var result = group.First();
 
-                            finalParameters.Add(result with
-                            {
-                                SubParameters = group.Skip(1).ToList().AsReadOnly(),
-                            });
-                        }
+                        finalParameters.Add(result with
+                        {
+                            SubParameters = group.Skip(1).ToList().AsReadOnly(),
+                        });
                     }
                 }
 
-                Data = obj with { Parameters = finalParameters.AsReadOnly() };
+                return obj with { Parameters = finalParameters.AsReadOnly() };
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Failed to get data from Open Z-Wave Database", ex);
-            }
+
+            return obj;
         }
     }
 }

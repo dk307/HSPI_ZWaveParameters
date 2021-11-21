@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace Hspi.OpenZWaveDB
+namespace Hspi.OpenZWaveDB.Model
 {
     internal record ZWaveInformationBasic
     {
@@ -23,7 +23,7 @@ namespace Hspi.OpenZWaveDB
         public string? DeviceRef { get; init; }
     }
 
-    internal record ZWaveInformation
+    public record ZWaveInformation
     {
         [JsonPropertyName("database_id")]
         public int Id { get; init; }

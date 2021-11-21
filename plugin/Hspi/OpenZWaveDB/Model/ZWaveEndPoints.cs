@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace Hspi.OpenZWaveDB
+namespace Hspi.OpenZWaveDB.Model
 {
-    internal record ZWaveEndPoints
+    public record ZWaveEndPoints
     {
         [JsonPropertyName("commandclass")]
 

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Hspi.OpenZWaveDB.Model;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -26,7 +27,9 @@ namespace Hspi.OpenZWaveDB
             {
                 await Task.Delay(100, token).ConfigureAwait(false); // wait to avoid RateLimit
                 deviceId++;
-                string json = await serverInterface.GetDeviceId(deviceId, token).ConfigureAwait(false);
+                using var stream = await serverInterface.GetDeviceId(deviceId, token).ConfigureAwait(false);
+                using TextReader reader = new StreamReader(stream);
+                string json = await reader.ReadToEndAsync().ConfigureAwait(false);
                 var data = JsonSerializer.Deserialize<ZWaveInformationBasic>(json);
 
                 if ((data == null) || (data.Deleted != "0") || (data.Approved == "0"))
@@ -41,21 +44,22 @@ namespace Hspi.OpenZWaveDB
 
         //public async Task Load(CancellationToken cancellationToken)
         //{
-        //    JsonSerializer serializer = new JsonSerializer();
 
         //    foreach (var file in Directory.EnumerateFiles(folderDBPath, "*.json"))
         //    {
         //        using var streamReader = new StreamReader(file, fileEncoding);
 
+        //         var info = await JsonSerializer.DeserializeAsync<ZWaveInformationBasic>(streamReader, cancellationToken: cancellationToken);
+
+
         //        //var stream = Reader.ReadToEndAsync().ConfigureAwait(false);
 
-        //        using JsonReader reader = new JsonTextReader(streamReader);
 
         //        // reader
         //    }
         //}
 
-        private static string GetDBFolderPath()
+    private static string GetDBFolderPath()
         {
             using var process = System.Diagnostics.Process.GetCurrentProcess();
             string mainExeFile = process.MainModule.FileName;

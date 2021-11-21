@@ -5,9 +5,9 @@ using static System.FormattableString;
 
 #nullable enable
 
-namespace Hspi.OpenZWaveDB
+namespace Hspi.OpenZWaveDB.Model
 {
-    internal record ZWaveDeviceParameter
+    public record ZWaveDeviceParameter
     {
         [JsonPropertyName("param_id")]
         public byte ParameterId { get; init; }

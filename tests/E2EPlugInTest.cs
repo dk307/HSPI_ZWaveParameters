@@ -3,12 +3,14 @@ using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
 using HomeSeer.PluginSdk.Logging;
 using Hspi;
+using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace HSPI_ZWaveParametersTest
 {
@@ -39,9 +41,9 @@ namespace HSPI_ZWaveParametersTest
             int deviceRef = 8475;
             CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
 
-            var deviceConfigPage = new DeviceConfigPage(new ZWaveConnection(hsControllerMock.Object),
-                                                                            deviceRef,
-                                                                            TestHelper.CreateAeonLabsSwitchHttpHandler().Object);
+            var deviceConfigPage = new DeviceConfigPage(deviceRef,
+                                                        new ZWaveConnection(hsControllerMock.Object),
+                                                        x => Task.FromResult(OpenZWaveDBInformation.ParseJson(Resource.AeonLabsOpenZWaveDBDeviceJson)));
 
             plugInMock.Protected()
                 .Setup<IDeviceConfigPage>("CreateDeviceConfigPage", deviceRef)

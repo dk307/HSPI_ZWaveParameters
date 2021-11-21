@@ -2,12 +2,12 @@
 using HomeSeer.PluginSdk;
 using Hspi.Exceptions;
 using Hspi.OpenZWaveDB;
+using Hspi.OpenZWaveDB.Model;
 using Hspi.Utils;
 using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
@@ -24,6 +24,13 @@ namespace Hspi
         }
 
         public override bool SupportsConfigDeviceAll => true;
+
+        public void DownloadZWaveDatabase()
+        {
+            var http = new HttpQueryMaker();
+            var downloader = new OpenZWaveOfflineDatabase(http);
+            downloader.Download(ShutdownCancellationToken).Wait();
+        }
 
         public override string GetJuiDeviceConfigPage(int deviceOrFeatureRef)
         {
@@ -67,7 +74,15 @@ namespace Hspi
 
         protected virtual IDeviceConfigPage CreateDeviceConfigPage(int deviceOrFeatureRef)
         {
-            return new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef, new FileCachingHttpQuery());
+            Func<ZWaveData, Task<ZWaveInformation>> factoryForOpenZWaveDBInformation = (zwaveData) =>
+               {
+                   return OnlineOpenZWaveDBInformation.Create(zwaveData.ManufactureId, zwaveData.ProductType,
+                                                             zwaveData.ProductId, zwaveData.Firmware,
+                                                             new HttpQueryMaker(), ShutdownCancellationToken);
+               };
+
+            return new DeviceConfigPage(deviceOrFeatureRef, CreateZWaveConnection(),
+                                        factoryForOpenZWaveDBInformation);
         }
 
         protected virtual IZWaveConnection CreateZWaveConnection()
@@ -92,12 +107,6 @@ namespace Hspi
                 Log.Error("Failed to initialize PlugIn with {error}", ex.GetFullMessage());
                 throw;
             }
-        }
-
-        protected override void OnShutdown()
-        {
-            Log.Information("Shutting down");
-            base.OnShutdown();
         }
 
         protected override bool OnDeviceConfigChange(Page deviceConfigPage, int devOrFeatRef)
@@ -138,11 +147,16 @@ namespace Hspi
             return base.OnSettingChange(pageId, currentView, changedView);
         }
 
+        protected override void OnShutdown()
+        {
+            Log.Information("Shutting down");
+            base.OnShutdown();
+        }
+
         private string HandleDeviceConfigPostBackProc(string data)
         {
             try
             {
-                
                 var input = JsonNode.Parse(data);
 
                 if (input != null)
@@ -179,13 +193,6 @@ namespace Hspi
             }
         }
 
-        public void DownloadZWaveDatabase()
-        {
-            var http = new FileCachingHttpQuery();
-            var downloader = new OpenZWaveOfflineDatabase(http);
-            downloader.Download(ShutdownCancellationToken).Wait();
-        }
-
         private void UpdateDebugLevel()
         {
             if (settingsPages != null)
@@ -201,9 +208,9 @@ namespace Hspi
             public int? Value { get; init; }
         }
 
-        private SettingsPages? settingsPages;
         private const string DeviceConfigPageOperation = "GET";
         private const string HTMLEndline = "<BR>";
         private readonly IDictionary<int, IDeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, IDeviceConfigPage>();
+        private SettingsPages? settingsPages;
     }
 }

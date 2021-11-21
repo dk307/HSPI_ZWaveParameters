@@ -241,7 +241,12 @@
     <ArtifactsDirectory>$(OutputPath)\Artifacts</ArtifactsDirectory>
     <_TransformExe>$(DevEnvDir)\TextTransform.exe</_TransformExe>
   </PropertyGroup>
-  <Target Name="ZipFinalFiles" DependsOnTargets="Build;" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+  
+   <Target Name="ZipDBFiles" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)\db" DestinationFile="$(OutputPath)\db.zip" Overwrite="true" />
+  </Target>
+
+  <Target Name="ZipFinalFiles" DependsOnTargets="Build;" AfterTargets="Build;ZipDBFiles" Condition="'$(Configuration)' == 'Release'">
     <RemoveDir Directories="$(ArtifactsDirectory)" />
     <MakeDir Directories="$(ArtifactsDirectory)" />
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)\HSPI_ZWaveParameters.exe">
@@ -274,6 +279,7 @@
       <ReleaseFiles Include="$(OutputPath)\AngleSharp.Css.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Text.Encoding.CodePages.dll" />
       <ReleaseFiles Include="$(OutputPath)\install.txt" />
+      <ReleaseFiles Include="$(OutputPath)\db.zip" />
     </ItemGroup>
     <Copy SourceFiles="@(ReleaseFiles)" DestinationFolder="$(ArtifactsDirectory)" />
     <ZipDirectory SourceDirectory="$(ArtifactsDirectory)" DestinationFile="$(OutputPath)\$(AssemblyName)_$(OutVersion).zip" Overwrite="true" />

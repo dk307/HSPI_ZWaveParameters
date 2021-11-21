@@ -1,5 +1,7 @@
 ﻿HSPI_ZWaveParameters.exe,.,0
 HSPI_ZWaveParameters.exe.config,.,0
+.,[DELALL],\data\ZWaveParameters\db
+db.zip,[UNZIP],.\data\ZWaveParameters\db
 System.Task.Json.dll,.\bin\ZWaveParameters,0
 Nito.AsyncEx.Coordination.dll,.\bin\ZWaveParameters,0
 Nito.AsyncEx.Tasks.dll,.\bin\ZWaveParameters,0

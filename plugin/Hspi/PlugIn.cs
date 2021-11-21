@@ -28,7 +28,7 @@ namespace Hspi
         public void DownloadZWaveDatabase()
         {
             var http = new HttpQueryMaker();
-            var downloader = new OpenZWaveOfflineDatabase(http);
+            var downloader = new OfflineOpenZWaveDatabase(http);
             downloader.Download(ShutdownCancellationToken).Wait();
         }
 
@@ -76,7 +76,7 @@ namespace Hspi
         {
             Func<ZWaveData, Task<ZWaveInformation>> factoryForOpenZWaveDBInformation = (zwaveData) =>
                {
-                   return OnlineOpenZWaveDBInformation.Create(zwaveData.ManufactureId, zwaveData.ProductType,
+                   return OnlineOpenZWaveDatabase.Create(zwaveData.ManufactureId, zwaveData.ProductType,
                                                              zwaveData.ProductId, zwaveData.Firmware,
                                                              new HttpQueryMaker(), ShutdownCancellationToken);
                };

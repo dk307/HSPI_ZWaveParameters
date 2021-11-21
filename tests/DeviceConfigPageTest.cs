@@ -145,7 +145,7 @@ namespace HSPI_ZWaveParametersTest
  
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
             var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object, 
-                x => Task.FromResult(OpenZWaveDBInformation.ParseJson(Resource.AeonLabsOpenZWaveDBDeviceJson)));
+                x => Task.FromResult(OpenZWaveDatabase.ParseJson(Resource.AeonLabsOpenZWaveDBDeviceJson)));
             await deviceConfigPage.BuildConfigPage(CancellationToken.None);
             return (mock, deviceConfigPage);
         }
@@ -166,7 +166,7 @@ namespace HSPI_ZWaveParametersTest
 
         private static Task<ZWaveInformation> GetFromJsonString(string json)
         {
-            return Task.FromResult(OpenZWaveDBInformation.ParseJson(json));
+            return Task.FromResult(OpenZWaveDatabase.ParseJson(json));
         }
 
         private static Mock<IZWaveConnection> SetupZWaveConnection(int deviceRef, ZWaveData zwaveData)

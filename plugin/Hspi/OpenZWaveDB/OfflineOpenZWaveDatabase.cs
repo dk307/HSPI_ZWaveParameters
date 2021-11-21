@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Hspi.OpenZWaveDB
 {
-    internal class OpenZWaveOfflineDatabase
+    internal class OfflineOpenZWaveDatabase
     {
-        public OpenZWaveOfflineDatabase(IHttpQueryMaker fileCachingHttpQuery, string? path = null)
+        public OfflineOpenZWaveDatabase(IHttpQueryMaker fileCachingHttpQuery, string? path = null)
         {
             this.serverInterface = new OpenZWaveDatabaseOnlineInterface(fileCachingHttpQuery);
             this.folderDBPath = path ?? GetDBFolderPath();

@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 
 namespace Hspi.OpenZWaveDB
 {
-    internal class OnlineOpenZWaveDBInformation : OpenZWaveDBInformation
+    internal class OnlineOpenZWaveDatabase : OpenZWaveDatabase
     {
-        public OnlineOpenZWaveDBInformation(int manufactureId, int productType, int productId, Version firmware,
+        public OnlineOpenZWaveDatabase(int manufactureId, int productType, int productId, Version firmware,
                                             IHttpQueryMaker queryMaker)
             : base(manufactureId, productType, productId, firmware)
         {
@@ -25,7 +25,7 @@ namespace Hspi.OpenZWaveDB
         public static async Task<ZWaveInformation> Create(int manufactureId, int productType, int productId, Version firmware,
                                             IHttpQueryMaker queryMaker, CancellationToken cancellationToken)
         {
-            OnlineOpenZWaveDBInformation onlineOpenZWaveDBInformation = new(manufactureId, productType, productId, firmware, queryMaker);
+            OnlineOpenZWaveDatabase onlineOpenZWaveDBInformation = new(manufactureId, productType, productId, firmware, queryMaker);
             return await onlineOpenZWaveDBInformation.Create(cancellationToken).ConfigureAwait(false);
         }
 

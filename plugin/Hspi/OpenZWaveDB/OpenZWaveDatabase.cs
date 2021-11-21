@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Hspi.OpenZWaveDB
 {
-    internal abstract class OpenZWaveDBInformation
+    internal abstract class OpenZWaveDatabase
     {
-        public OpenZWaveDBInformation(int manufactureId, int productType,
+        public OpenZWaveDatabase(int manufactureId, int productType,
                                       int productId, Version firmware)
         {
             this.ManufactureId = manufactureId;

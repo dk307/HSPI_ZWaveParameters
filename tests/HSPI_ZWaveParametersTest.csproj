@@ -52,7 +52,7 @@
     <Compile Include="SanitizeHtmlTest.cs" />
     <Compile Include="ZWaveConnectionTest.cs" />
     <Compile Include="PluginTest.cs" />
-    <Compile Include="OnlineOpenZWaveDBInformationTest.cs" />
+    <Compile Include="OnlineOpenZWaveDatabaseTest.cs" />
     <Compile Include="OpenZWaveDBJsonParseTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resource.Designer.cs">

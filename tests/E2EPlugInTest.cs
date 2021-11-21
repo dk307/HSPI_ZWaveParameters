@@ -43,7 +43,7 @@ namespace HSPI_ZWaveParametersTest
 
             var deviceConfigPage = new DeviceConfigPage(deviceRef,
                                                         new ZWaveConnection(hsControllerMock.Object),
-                                                        x => Task.FromResult(OpenZWaveDBInformation.ParseJson(Resource.AeonLabsOpenZWaveDBDeviceJson)));
+                                                        x => Task.FromResult(OpenZWaveDatabase.ParseJson(Resource.AeonLabsOpenZWaveDBDeviceJson)));
 
             plugInMock.Protected()
                 .Setup<IDeviceConfigPage>("CreateDeviceConfigPage", deviceRef)

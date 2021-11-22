@@ -27,9 +27,8 @@ namespace Hspi
 
         public void DownloadZWaveDatabase()
         {
-            var http = new HttpQueryMaker();
-            var downloader = new OfflineOpenZWaveDatabase(http);
-            downloader.Download(ShutdownCancellationToken).Wait();
+            var httpMaker = new HttpQueryMaker();
+            OfflineOpenZWaveDatabase.Download(httpMaker, token: ShutdownCancellationToken).Wait();
         }
 
         public override string GetJuiDeviceConfigPage(int deviceOrFeatureRef)
@@ -90,7 +89,6 @@ namespace Hspi
                 factoryForOpenZWaveDatabase = (zwaveData) =>
                     offlineOpenZWaveDatabase.Create(zwaveData.ManufactureId, zwaveData.ProductType,
                                                     zwaveData.ProductId, zwaveData.Firmware, ShutdownCancellationToken);
-                   
             }
 
             return new DeviceConfigPage(deviceOrFeatureRef, CreateZWaveConnection(),
@@ -226,6 +224,6 @@ namespace Hspi
         private const string HTMLEndline = "<BR>";
         private readonly IDictionary<int, IDeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, IDeviceConfigPage>();
         private SettingsPages? settingsPages;
-        private readonly OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new(new HttpQueryMaker());
+        private readonly OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new();
     }
 }

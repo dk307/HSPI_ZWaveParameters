@@ -16,13 +16,12 @@ namespace Hspi.OpenZWaveDB
     internal class OnlineOpenZWaveDatabase
     {
         public OnlineOpenZWaveDatabase(int manufactureId, int productType, int productId, Version firmware,
-                                            IHttpQueryMaker queryMaker)
+                                       IHttpQueryMaker queryMaker)
         {
             this.ManufactureId = manufactureId;
             this.ProductType = productType;
             this.ProductId = productId;
             this.Firmware = firmware;
-
             this.serverInterface = new OpenZWaveDatabaseOnlineInterface(queryMaker);
         }
 

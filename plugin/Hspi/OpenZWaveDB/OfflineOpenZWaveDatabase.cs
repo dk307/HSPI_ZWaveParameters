@@ -19,16 +19,42 @@ namespace Hspi.OpenZWaveDB
 {
     internal class OfflineOpenZWaveDatabase
     {
-        public OfflineOpenZWaveDatabase(IHttpQueryMaker queryMaker, string? path = null)
+        public OfflineOpenZWaveDatabase(string? path = null)
         {
-            this.serverInterface = new OpenZWaveDatabaseOnlineInterface(queryMaker);
             this.folderDBPath = path ?? GetDBFolderPath();
         }
 
         public int EntriesCount => entries.Count;
 
+        public static async Task Download(IHttpQueryMaker queryMaker,
+                                          string? databasePath = null,
+                                          int maxCount = 1500,
+                                          CancellationToken token = default(CancellationToken))
+        {
+            OpenZWaveDatabaseOnlineInterface serverInterface = new(queryMaker);
+
+            var folder = databasePath ?? GetDBFolderPath();
+            Directory.CreateDirectory(folder);
+
+            for (int deviceId = 1; deviceId <= maxCount; deviceId++) // 1500 based on current upper limit
+            {
+                using var stream = await serverInterface.GetDeviceId(deviceId, token).ConfigureAwait(false);
+                using TextReader reader = new StreamReader(stream);
+                string json = await reader.ReadToEndAsync().ConfigureAwait(false);
+                var data = JsonSerializer.Deserialize<ZWaveInformationBasic>(json);
+
+                if ((data == null) || (data.Deleted != 0) || (data.Approved == 0))
+                {
+                    continue;
+                }
+
+                string fullPath = Path.ChangeExtension(Path.Combine(folder, data.Id.ToString(CultureInfo.InvariantCulture)), ".json");
+                await SaveFile(json, fullPath).ConfigureAwait(false);
+            }
+        }
+
         public async Task<ZWaveInformation> Create(int manufacturerId, int productType, int productId,
-                                                   Version firmware, CancellationToken cancellationToken)
+                                                           Version firmware, CancellationToken cancellationToken)
         {
             try
             {
@@ -49,31 +75,6 @@ namespace Hspi.OpenZWaveDB
             catch (Exception ex)
             {
                 throw new Exception("Failed to get data from Offline Open Z-Wave Database", ex);
-            }
-        }
-
-        public async Task Download(CancellationToken token)
-        {
-            var folder = GetDBFolderPath();
-            Directory.CreateDirectory(folder);
-
-            int deviceId = 0;
-            while (deviceId < 1500) // 1500 based on current upper limit
-            {
-                await Task.Delay(100, token).ConfigureAwait(false); // wait to avoid RateLimit
-                deviceId++;
-                using var stream = await serverInterface.GetDeviceId(deviceId, token).ConfigureAwait(false);
-                using TextReader reader = new StreamReader(stream);
-                string json = await reader.ReadToEndAsync().ConfigureAwait(false);
-                var data = JsonSerializer.Deserialize<ZWaveInformationBasic>(json);
-
-                if ((data == null) || (data.Deleted != "0") || (data.Approved == "0"))
-                {
-                    continue;
-                }
-
-                string fullPath = Path.ChangeExtension(Path.Combine(folder, data.Id!), ".json");
-                await SaveFile(json, fullPath).ConfigureAwait(false);
             }
         }
 
@@ -140,7 +141,7 @@ namespace Hspi.OpenZWaveDB
         }
 
         private string FindInEntries(int manufacturerId, int productType, int productId,
-                                                                                     Version firmware)
+                                     Version firmware)
         {
             string? filePath = null;
             var refDevice = string.Format(CultureInfo.InvariantCulture, "{0:X4}:{1:X4}", productType, productId);
@@ -213,8 +214,6 @@ namespace Hspi.OpenZWaveDB
         private static readonly Encoding fileEncoding = Encoding.UTF8;
 
         private readonly string folderDBPath;
-
-        private readonly OpenZWaveDatabaseOnlineInterface serverInterface;
 
         private ImmutableDictionary<Tuple<int, string>, ImmutableList<Entry>> entries =
                                     ImmutableDictionary<Tuple<int, string>, ImmutableList<Entry>>.Empty;

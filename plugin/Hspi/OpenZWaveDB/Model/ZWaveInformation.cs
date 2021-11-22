@@ -11,13 +11,13 @@ namespace Hspi.OpenZWaveDB.Model
     internal record ZWaveInformationBasic
     {
         [JsonPropertyName("database_id")]
-        public string? Id { get; init; }
+        public int Id { get; init; }
 
         [JsonPropertyName("approved")]
-        public string? Approved { get; init; }
+        public int? Approved { get; init; }
 
         [JsonPropertyName("deleted")]
-        public string? Deleted { get; init; }
+        public int? Deleted { get; init; }
     }
 
     public record ZWaveInformation

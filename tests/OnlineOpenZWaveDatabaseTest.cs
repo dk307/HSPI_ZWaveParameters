@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace HSPI_ZWaveParametersTest
 {
+
     [TestClass]
     public class OnlineOpenZWaveDatabaseTest
     {

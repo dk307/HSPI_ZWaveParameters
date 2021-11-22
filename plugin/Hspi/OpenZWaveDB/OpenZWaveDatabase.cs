@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 #nullable enable
@@ -12,9 +13,11 @@ namespace Hspi.OpenZWaveDB
 {
     internal static class OpenZWaveDatabase
     {
-        public static async Task<ZWaveInformation> ParseJson(Stream deviceJson)
+        public static async Task<ZWaveInformation> ParseJson(Stream deviceJson, CancellationToken cancellationToken)
         {
-            var obj = await JsonSerializer.DeserializeAsync<ZWaveInformation>(deviceJson).ConfigureAwait(false);
+            var obj = await JsonSerializer.DeserializeAsync<ZWaveInformation>(deviceJson, 
+                                                                              cancellationToken: cancellationToken)
+                                          .ConfigureAwait(false);
             CheckValidInformation(obj);
             return CombineParameters(obj);
         }

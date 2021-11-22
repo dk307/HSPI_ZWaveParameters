@@ -45,7 +45,8 @@ namespace Hspi.OpenZWaveDB
             try
             {
                 var stream = await GetDeviceJson(cancellationToken).ConfigureAwait(false);
-                return await OpenZWaveDatabase.ParseJson(stream).ConfigureAwait(false);
+                return await OpenZWaveDatabase.ParseJson(stream, cancellationToken)
+                                              .ConfigureAwait(false);
             }
             catch (Exception ex)
             {

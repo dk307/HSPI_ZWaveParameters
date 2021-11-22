@@ -226,6 +226,6 @@ namespace Hspi
         private const string HTMLEndline = "<BR>";
         private readonly IDictionary<int, IDeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, IDeviceConfigPage>();
         private SettingsPages? settingsPages;
-        private readonly OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new OfflineOpenZWaveDatabase(new HttpQueryMaker());
+        private readonly OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new(new HttpQueryMaker());
     }
 }

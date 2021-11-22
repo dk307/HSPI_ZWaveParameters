@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="CompilerHelper.cs" />
     <Compile Include="E2EPlugInTest.cs" />
+    <Compile Include="OfflineOpenZWaveDatabaseTest.cs" />
     <Compile Include="SettingPagesTest.cs" />
     <Compile Include="DeviceConfigPageTest.cs" />
     <Compile Include="shared\ExceptionHelperTest.cs" />

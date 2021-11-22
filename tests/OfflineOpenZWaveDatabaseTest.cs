@@ -118,7 +118,8 @@ namespace HSPI_ZWaveParametersTest
 
         private string GetDatabasePath([CallerFilePath] string path = "")
         {
-            return Path.Combine(Path.GetDirectoryName(path), "..", "plugin", "db");
+            var parentDirectory = new DirectoryInfo(Path.GetDirectoryName(path));
+            return Path.Combine(parentDirectory.Parent.FullName, "plugin", "db");
         }
     }
 }

@@ -64,7 +64,7 @@ jobs:
   cache-use-build-ubuntu:
     name: Test on Ubuntu
     runs-on: ubuntu-latest
-    needs: [build-cache-test-win]    
+    needs: [build-cache-test-win]
 
     steps:
       - name: Checkout

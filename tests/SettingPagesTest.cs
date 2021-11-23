@@ -21,24 +21,27 @@ namespace HSPI_ZWaveParametersTest
 
             TestHelper.VeryHtmlValid(page.ToHtml());
 
+            Assert.IsTrue(page.ContainsViewWithId(SettingsPages.PreferOnlineDatabaseId));
             Assert.IsTrue(page.ContainsViewWithId(SettingsPages.LogToFileId));
             Assert.IsTrue(page.ContainsViewWithId(SettingsPages.LoggingDebugId));
         }
 
         [DataTestMethod]
-        [DataRow(false, false)]
-        [DataRow(true, false)]
-        [DataRow(false, true)]
-        [DataRow(true, true)]
-        public void DefaultValues(bool enableDefaultLogging, bool logToFileEnable)
+        [DataRow(false, false, false)]
+        [DataRow(true, false, false)]
+        [DataRow(false, true, false)]
+        [DataRow(true, false, true)]
+        [DataRow(true, true, true)]
+        public void DefaultValues(bool preferOnline, bool enableDefaultLogging, bool logToFileEnable)
         {
             var settingsCollection = new SettingsCollection
             {
-                SettingsPages.CreateDefault(enableDefaultLogging, logToFileEnable)
+                SettingsPages.CreateDefault(preferOnline, enableDefaultLogging, logToFileEnable)
             };
 
             var settingPages = new SettingsPages(settingsCollection);
 
+            Assert.AreEqual(settingPages.PreferOnlineDatabase, preferOnline);
             Assert.AreEqual(settingPages.DebugLoggingEnabled, enableDefaultLogging);
             Assert.AreEqual(settingPages.LogtoFileEnabled, logToFileEnable);
         }
@@ -62,7 +65,7 @@ namespace HSPI_ZWaveParametersTest
         {
             var settingsCollection = new SettingsCollection
             {
-                SettingsPages.CreateDefault(enableDefaultLogging: initialValue)
+                SettingsPages.CreateDefault(enableDebugLoggingDefault: initialValue)
             };
             var settingPages = new SettingsPages(settingsCollection);
 
@@ -78,13 +81,29 @@ namespace HSPI_ZWaveParametersTest
         {
             var settingsCollection = new SettingsCollection
             {
-                SettingsPages.CreateDefault(logToFileEnable: initialValue)
+                SettingsPages.CreateDefault(logToFileDefault: initialValue)
             };
             var settingPages = new SettingsPages(settingsCollection);
 
             ToggleView changedView = new(SettingsPages.LogToFileId, "name", !initialValue);
             Assert.IsTrue(settingPages.OnSettingChange(changedView));
             Assert.AreEqual(settingPages.LogtoFileEnabled, !initialValue);
+        }
+
+        [DataTestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public void OnSettingChangeWithPreferOnlineChange(bool initialValue)
+        {
+            var settingsCollection = new SettingsCollection
+            {
+                SettingsPages.CreateDefault(preferOnlineDatabaseDefault: initialValue)
+            };
+            var settingPages = new SettingsPages(settingsCollection);
+
+            ToggleView changedView = new(SettingsPages.PreferOnlineDatabaseId, "name", !initialValue);
+            Assert.IsTrue(settingPages.OnSettingChange(changedView));
+            Assert.AreEqual(settingPages.PreferOnlineDatabase, !initialValue);
         }
     }
 }

@@ -19,22 +19,21 @@ namespace Hspi.OpenZWaveDB
 {
     internal class OfflineOpenZWaveDatabase
     {
-        public OfflineOpenZWaveDatabase(string? path = null)
+        public OfflineOpenZWaveDatabase(string path)
         {
-            this.folderDBPath = path ?? GetDBFolderPath();
+            this.folderDBPath = path;
         }
 
         public int EntriesCount => entries.Count;
 
         public static async Task Download(IHttpQueryMaker queryMaker,
-                                          string? databasePath = null,
+                                          string databasePath,
                                           int maxCount = 1500,
                                           CancellationToken token = default(CancellationToken))
         {
             OpenZWaveDatabaseOnlineInterface serverInterface = new(queryMaker);
 
-            var folder = databasePath ?? GetDBFolderPath();
-            Directory.CreateDirectory(folder);
+            Directory.CreateDirectory(databasePath);
 
             for (int deviceId = 1; deviceId <= maxCount; deviceId++) // 1500 based on current upper limit
             {
@@ -48,13 +47,21 @@ namespace Hspi.OpenZWaveDB
                     continue;
                 }
 
-                string fullPath = Path.ChangeExtension(Path.Combine(folder, data.Id.ToString(CultureInfo.InvariantCulture)), ".json");
+                string fullPath = Path.ChangeExtension(Path.Combine(databasePath, data.Id.ToString(CultureInfo.InvariantCulture)), ".json");
                 await SaveFile(json, fullPath).ConfigureAwait(false);
             }
         }
 
+        public static string GetDefaultDatabaseFolderPath()
+        {
+            using var process = System.Diagnostics.Process.GetCurrentProcess();
+            string mainExeFile = process.MainModule.FileName;
+            string hsDir = Path.GetDirectoryName(mainExeFile);
+            return Path.Combine(hsDir, "data", PlugInData.PlugInId, "db");
+        }
+
         public async Task<ZWaveInformation> Create(int manufacturerId, int productType, int productId,
-                                                           Version firmware, CancellationToken cancellationToken)
+                                                                   Version firmware, CancellationToken cancellationToken)
         {
             try
             {
@@ -82,14 +89,6 @@ namespace Hspi.OpenZWaveDB
         {
             loadTask = Task.Run(async () => await Load(token), token);
             return loadTask;
-        }
-
-        private static string GetDBFolderPath()
-        {
-            using var process = System.Diagnostics.Process.GetCurrentProcess();
-            string mainExeFile = process.MainModule.FileName;
-            string hsDir = Path.GetDirectoryName(mainExeFile);
-            return Path.Combine(hsDir, "data", PlugInData.PlugInId, "db");
         }
 
         private static async Task<IDictionary<Tuple<int, string>, Entry>> LoadFile(string file,
@@ -212,7 +211,7 @@ namespace Hspi.OpenZWaveDB
                 Log.Information("Loaded database from {path} with {count} files with {deviceCount} devices",
                                 folderDBPath, tasks.Count, entries.Count);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 if (!ex.IsCancelException())
                 {

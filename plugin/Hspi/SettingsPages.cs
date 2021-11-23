@@ -8,25 +8,37 @@ namespace Hspi
     {
         public SettingsPages(SettingsCollection collection)
         {
-            DebugLoggingEnabled = collection[LoggingSettingPageId].GetViewById<ToggleView>(LoggingDebugId).IsEnabled;
-            LogtoFileEnabled = collection[LoggingSettingPageId].GetViewById<ToggleView>(LogToFileId).IsEnabled;
+            DebugLoggingEnabled = collection[SettingPageId].GetViewById<ToggleView>(LoggingDebugId).IsEnabled;
+            LogtoFileEnabled = collection[SettingPageId].GetViewById<ToggleView>(LogToFileId).IsEnabled;
+            PreferOnlineDatabase = collection[SettingPageId].GetViewById<ToggleView>(PreferOnlineDatabaseId).IsEnabled;
         }
 
         public bool DebugLoggingEnabled { get; private set; }
 
         public bool LogtoFileEnabled { get; private set; }
 
-        public static Page CreateDefault(bool enableDefaultLogging = false, bool logToFileEnable = false)
-        {
-            var loggingSettings = PageFactory.CreateSettingsPage(LoggingSettingPageId, "Logging");
-            loggingSettings = loggingSettings.WithToggle(LoggingDebugId, "Enable Debug Logging", enableDefaultLogging);
-            loggingSettings = loggingSettings.WithToggle(LogToFileId, "Log to file", logToFileEnable);
+        public bool PreferOnlineDatabase { get; private set; }
 
-            return loggingSettings.Page;
+        public static Page CreateDefault(bool preferOnlineDatabaseDefault = false,
+                                         bool enableDebugLoggingDefault = false,
+                                         bool logToFileDefault = false)
+        {
+            var settings = PageFactory.CreateSettingsPage(SettingPageId, "Settings");
+            settings = settings.WithToggle(PreferOnlineDatabaseId, "Prefer online database", preferOnlineDatabaseDefault);
+            settings = settings.WithToggle(LoggingDebugId, "Enable debug logging", enableDebugLoggingDefault);
+            settings = settings.WithToggle(LogToFileId, "Log to file", logToFileDefault);
+
+            return settings.Page;
         }
 
         public bool OnSettingChange(AbstractView changedView)
         {
+            if (changedView.Id == PreferOnlineDatabaseId)
+            {
+                PreferOnlineDatabase = ((ToggleView)changedView).IsEnabled;
+                return true;
+            }
+
             if (changedView.Id == LoggingDebugId)
             {
                 DebugLoggingEnabled = ((ToggleView)changedView).IsEnabled;
@@ -43,6 +55,7 @@ namespace Hspi
 
         internal const string LoggingDebugId = "DebugLogging";
         internal const string LogToFileId = "LogToFile";
-        internal const string LoggingSettingPageId = "setting_page_id";
+        internal const string PreferOnlineDatabaseId = "PreferOnlineDatabase";
+        internal const string SettingPageId = "setting_page_id";
     }
 }

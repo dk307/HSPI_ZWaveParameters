@@ -173,42 +173,53 @@ namespace Hspi.OpenZWaveDB
 
         private async Task Load(CancellationToken cancellationToken)
         {
-            Log.Information("Loading database from {path}", folderDBPath);
-
-            List<Task<IDictionary<Tuple<int, string>, Entry>>> tasks = new();
-
-            foreach (var file in Directory.EnumerateFiles(folderDBPath, "*.json",
-                                                          SearchOption.TopDirectoryOnly))
+            try
             {
-                tasks.Add(LoadFile(file, cancellationToken));
-            }
+                Log.Information("Loading database from {path}", folderDBPath);
 
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+                List<Task<IDictionary<Tuple<int, string>, Entry>>> tasks = new();
 
-            var data = new Dictionary<Tuple<int, string>, ImmutableList<Entry>>();
-
-            //collect and collapse results
-            foreach (var task in tasks)
-            {
-                var result = task.Result;
-
-                foreach (var pair in result)
+                foreach (var file in Directory.EnumerateFiles(folderDBPath, "*.json",
+                                                              SearchOption.TopDirectoryOnly))
                 {
-                    if (data.TryGetValue(pair.Key, out var value))
+                    tasks.Add(LoadFile(file, cancellationToken));
+                }
+
+                await Task.WhenAll(tasks).ConfigureAwait(false);
+
+                var data = new Dictionary<Tuple<int, string>, ImmutableList<Entry>>();
+
+                //collect and collapse results
+                foreach (var task in tasks)
+                {
+                    var result = task.Result;
+
+                    foreach (var pair in result)
                     {
-                        data[pair.Key] = value.Add(pair.Value)
-                                              .Sort((x, y) => Comparer<int>.Default.Compare(x.Id, y.Id));
-                    }
-                    else
-                    {
-                        data.Add(pair.Key, new List<Entry> { pair.Value }.ToImmutableList());
+                        if (data.TryGetValue(pair.Key, out var value))
+                        {
+                            data[pair.Key] = value.Add(pair.Value)
+                                                  .Sort((x, y) => Comparer<int>.Default.Compare(x.Id, y.Id));
+                        }
+                        else
+                        {
+                            data.Add(pair.Key, new List<Entry> { pair.Value }.ToImmutableList());
+                        }
                     }
                 }
-            }
 
-            Interlocked.Exchange(ref entries, data.ToImmutableDictionary());
-            Log.Information("Loaded database from {path} with {count} files with {deviceCount} devices",
-                            folderDBPath, tasks.Count, entries.Count);
+                Interlocked.Exchange(ref entries, data.ToImmutableDictionary());
+                Log.Information("Loaded database from {path} with {count} files with {deviceCount} devices",
+                                folderDBPath, tasks.Count, entries.Count);
+            }
+            catch(Exception ex)
+            {
+                if (!ex.IsCancelException())
+                {
+                    Log.Error("Failed to load Z-wave Database with {error}", ex.GetFullMessage());
+                }
+                throw;
+            }
         }
 
         private static readonly Encoding fileEncoding = Encoding.UTF8;

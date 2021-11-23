@@ -4,7 +4,7 @@ using Moq;
 using System;
 using System.Globalization;
 using System.IO;
-using System.Runtime.CompilerServices;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -116,10 +116,12 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(offlineOpenZWaveDatabase.EntriesCount, 1665);
         }
 
-        private string GetDatabasePath([CallerFilePath] string path = "")
+        private string GetDatabasePath()
         {
-            var parentDirectory = new DirectoryInfo(Path.GetDirectoryName(path));
-            return Path.Combine(parentDirectory.Parent.FullName, "plugin", "db");
+            string dllPath = Assembly.GetExecutingAssembly().Location;
+ 
+            var parentDirectory = new DirectoryInfo(Path.GetDirectoryName(dllPath));
+            return Path.Combine(parentDirectory.Parent.Parent.Parent.FullName, "plugin", "db");
         }
     }
 }

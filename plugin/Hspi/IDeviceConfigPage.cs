@@ -1,5 +1,6 @@
 ﻿using HomeSeer.Jui.Views;
 using Hspi.OpenZWaveDB;
+using Hspi.OpenZWaveDB.Model;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -1,4 +1,5 @@
 ﻿using Hspi.OpenZWaveDB;
+using Hspi.OpenZWaveDB.Model;
 using System.Collections.Generic;
 using System.Linq;
 using static System.FormattableString;

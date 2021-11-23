@@ -4,10 +4,10 @@ using Hspi.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using static Hspi.PlugIn;
@@ -57,7 +57,7 @@ namespace HSPI_ZWaveParametersTest
             var plugIn = pluginMock.Object;
             string pageJson = plugIn.GetJuiDeviceConfigPage(devOrFeatRef);
 
-            JObject result = JsonConvert.DeserializeObject<JObject>(pageJson);
+            var result = JsonNode.Parse(pageJson);
 
             Assert.IsNotNull(result);
             Assert.IsNotNull(result["views"][0]["value"], errorMessage);
@@ -181,9 +181,9 @@ namespace HSPI_ZWaveParametersTest
                  .Setup(x => x.GetConfiguration(input.homeId, input.nodeId, input.parameter, It.IsAny<CancellationToken>()))
                  .Returns(Task.FromResult(parameterValue));
 
-            var value = pluginMock.Object.PostBackProc("Update", JsonConvert.SerializeObject(input), "user", 0);
+            var value = pluginMock.Object.PostBackProc("Update", JsonSerializer.Serialize(input), "user", 0);
 
-            var result = JsonConvert.DeserializeObject<ZWaveParameterGetResult>(value);
+            var result = JsonSerializer.Deserialize<ZWaveParameterGetResult>(value);
             Assert.IsNull(result.ErrorMessage);
             Assert.AreEqual(result.Value, parameterValue);
         }
@@ -205,9 +205,9 @@ namespace HSPI_ZWaveParametersTest
             var input = new { operation, homeId, nodeId, parameter };
 
             var plugin = new PlugIn();
-            var value = plugin.PostBackProc("Update", JsonConvert.SerializeObject(input), "user", 0);
+            var value = plugin.PostBackProc("Update", JsonSerializer.Serialize(input), "user", 0);
 
-            var result = JsonConvert.DeserializeObject<ZWaveParameterGetResult>(value);
+            var result = JsonSerializer.Deserialize<ZWaveParameterGetResult>(value);
             Assert.IsNotNull(result.ErrorMessage);
             Assert.IsNull(result.Value);
         }
@@ -227,9 +227,9 @@ namespace HSPI_ZWaveParametersTest
                  .Setup(x => x.GetConfiguration(input.homeId, input.nodeId, input.parameter, It.IsAny<CancellationToken>()))
                  .ThrowsAsync(new ZWaveGetConfigurationFailedException());
 
-            var value = pluginMock.Object.PostBackProc("Update", JsonConvert.SerializeObject(input), "user", 0);
+            var value = pluginMock.Object.PostBackProc("Update", JsonSerializer.Serialize(input), "user", 0);
 
-            var result = JsonConvert.DeserializeObject<ZWaveParameterGetResult>(value);
+            var result = JsonSerializer.Deserialize<ZWaveParameterGetResult>(value);
             Assert.IsNotNull(result.ErrorMessage);
             Assert.IsNull(result.Value);
         }

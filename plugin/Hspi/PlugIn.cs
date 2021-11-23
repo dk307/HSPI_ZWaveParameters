@@ -2,13 +2,14 @@
 using HomeSeer.PluginSdk;
 using Hspi.Exceptions;
 using Hspi.OpenZWaveDB;
+using Hspi.OpenZWaveDB.Model;
 using Hspi.Utils;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 #nullable enable
@@ -23,6 +24,12 @@ namespace Hspi
         }
 
         public override bool SupportsConfigDeviceAll => true;
+
+        public void DownloadZWaveDatabase()
+        {
+            var httpMaker = new HttpQueryMaker();
+            OfflineOpenZWaveDatabase.Download(httpMaker, token: ShutdownCancellationToken).Wait();
+        }
 
         public override string GetJuiDeviceConfigPage(int deviceOrFeatureRef)
         {
@@ -66,7 +73,26 @@ namespace Hspi
 
         protected virtual IDeviceConfigPage CreateDeviceConfigPage(int deviceOrFeatureRef)
         {
-            return new DeviceConfigPage(CreateZWaveConnection(), deviceOrFeatureRef, new FileCachingHttpQuery());
+            bool useOnline = false;
+
+            Func<ZWaveData, Task<ZWaveInformation>> factoryForOpenZWaveDatabase;
+
+            if (useOnline)
+            {
+                factoryForOpenZWaveDatabase = (zwaveData) =>
+                             OnlineOpenZWaveDatabase.Create(zwaveData.ManufactureId, zwaveData.ProductType,
+                                                            zwaveData.ProductId, zwaveData.Firmware,
+                                                            new HttpQueryMaker(), ShutdownCancellationToken);
+            }
+            else
+            {
+                factoryForOpenZWaveDatabase = (zwaveData) =>
+                    offlineOpenZWaveDatabase.Create(zwaveData.ManufactureId, zwaveData.ProductType,
+                                                    zwaveData.ProductId, zwaveData.Firmware, ShutdownCancellationToken);
+            }
+
+            return new DeviceConfigPage(deviceOrFeatureRef, CreateZWaveConnection(),
+                                       factoryForOpenZWaveDatabase);
         }
 
         protected virtual IZWaveConnection CreateZWaveConnection()
@@ -84,6 +110,8 @@ namespace Hspi
                 settingsPages = new SettingsPages(Settings);
                 UpdateDebugLevel();
 
+                offlineOpenZWaveDatabase.StartLoadAsync(ShutdownCancellationToken);
+
                 Log.Information("Plugin Started");
             }
             catch (Exception ex)
@@ -91,12 +119,6 @@ namespace Hspi
                 Log.Error("Failed to initialize PlugIn with {error}", ex.GetFullMessage());
                 throw;
             }
-        }
-
-        protected override void OnShutdown()
-        {
-            Log.Information("Shutting down");
-            base.OnShutdown();
         }
 
         protected override bool OnDeviceConfigChange(Page deviceConfigPage, int devOrFeatRef)
@@ -137,37 +159,46 @@ namespace Hspi
             return base.OnSettingChange(pageId, currentView, changedView);
         }
 
+        protected override void OnShutdown()
+        {
+            Log.Information("Shutting down");
+            base.OnShutdown();
+        }
+
         private string HandleDeviceConfigPostBackProc(string data)
         {
             try
             {
-                var input = JObject.Parse(data);
+                var input = JsonNode.Parse(data);
 
-                if (input["operation"]?.ToString() == DeviceConfigPageOperation)
+                if (input != null)
                 {
-                    var homeId = input["homeId"]?.ToString();
-                    var nodeId = (byte?)input["nodeId"];
-                    var parameter = (byte?)input["parameter"];
-
-                    if (string.IsNullOrWhiteSpace(homeId) || !nodeId.HasValue || !parameter.HasValue)
+                    if (((string?)input["operation"]) == DeviceConfigPageOperation)
                     {
-                        throw new ArgumentException("Input not valid");
+                        var homeId = input["homeId"]?.ToString();
+                        var nodeId = (byte?)input["nodeId"];
+                        var parameter = (byte?)input["parameter"];
+
+                        if (string.IsNullOrWhiteSpace(homeId) || !nodeId.HasValue || !parameter.HasValue)
+                        {
+                            throw new ArgumentException("Input not valid");
+                        }
+
+                        var connection = CreateZWaveConnection();
+                        int value = Task.Run(() => connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
+
+                        return JsonSerializer.Serialize(new ZWaveParameterGetResult()
+                        {
+                            Value = value
+                        });
                     }
-
-                    var connection = CreateZWaveConnection();
-                    int value = Task.Run(() => connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
-
-                    return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
-                    {
-                        Value = value
-                    });
                 }
                 throw new ArgumentException("Unknown operation");
             }
             catch (Exception ex)
             {
                 Log.Error("Failed to process PostBackProc for Update with {data} with {error}", data, ex.GetFullMessage());
-                return JsonConvert.SerializeObject(new ZWaveParameterGetResult()
+                return JsonSerializer.Serialize(new ZWaveParameterGetResult()
                 {
                     ErrorMessage = ex.GetFullMessage(HTMLEndline)
                 });
@@ -189,9 +220,10 @@ namespace Hspi
             public int? Value { get; init; }
         }
 
-        private SettingsPages? settingsPages;
         private const string DeviceConfigPageOperation = "GET";
         private const string HTMLEndline = "<BR>";
         private readonly IDictionary<int, IDeviceConfigPage> cacheForUpdate = new ConcurrentDictionary<int, IDeviceConfigPage>();
+        private readonly OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new();
+        private SettingsPages? settingsPages;
     }
 }

@@ -5,7 +5,9 @@ using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -55,8 +57,9 @@ namespace HSPI_ZWaveParametersTest
         public static void SetupRequest(Mock<IHttpQueryMaker> mock,
                                         string deviceListUrl, string deviceListJson)
         {
-            mock.Setup(x => x.GetResponseAsString(deviceListUrl, It.IsAny<CancellationToken>()))
-                               .Returns(Task.FromResult(deviceListJson));
+            Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(deviceListJson));
+            mock.Setup(x => x.GetUtf8JsonResponse(deviceListUrl, It.IsAny<CancellationToken>()))
+                               .Returns(Task.FromResult(stream));
         }
 
         public static void SetupZWaveDataInHsControllerMock(Mock<IHsController> mock,

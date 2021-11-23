@@ -1,6 +1,6 @@
 ﻿using HomeSeer.Jui.Types;
 using HomeSeer.Jui.Views;
-using Hspi.OpenZWaveDB;
+using Hspi.OpenZWaveDB.Model;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -18,12 +18,13 @@ namespace Hspi
 {
     internal class DeviceConfigPage : IDeviceConfigPage
     {
-        public DeviceConfigPage(IZWaveConnection zwaveConnection, int deviceOrFeatureRef, IHttpQueryMaker httpQueryMaker)
+        public DeviceConfigPage(int deviceOrFeatureRef, IZWaveConnection zwaveConnection,
+                                Func<ZWaveData, Task<ZWaveInformation>> factoryForZWaveInformation)
         {
             Log.Debug("Creating Page for deviceRef:{deviceRef}", deviceOrFeatureRef);
             this.zwaveConnection = zwaveConnection;
+            this.factoryForZWaveInformation = factoryForZWaveInformation;
             this.deviceOrFeatureRef = deviceOrFeatureRef;
-            this.httpQueryMaker = httpQueryMaker;
         }
 
         public ZWaveInformation? Data { get; private set; }
@@ -33,17 +34,12 @@ namespace Hspi
             var pageFactory = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
             var zwaveData = zwaveConnection.GetDeviceZWaveData(this.deviceOrFeatureRef);
 
-            var openZWaveData = new OpenZWaveDBInformation(zwaveData.ManufactureId, zwaveData.ProductType,
-                                                           zwaveData.ProductId, zwaveData.Firmware, httpQueryMaker);
+            Data = await factoryForZWaveInformation(zwaveData).ConfigureAwait(false);
 
-            await openZWaveData.Update(cancellationToken).ConfigureAwait(false);
-
-            if (openZWaveData.Data == null)
+            if (Data == null)
             {
                 throw new Exception("Failed to get data from website");
             }
-
-            Data = openZWaveData.Data;
 
             var scripts = new List<string>();
 
@@ -121,10 +117,10 @@ namespace Hspi
                     }
 
                     zwaveConnection.SetConfiguration(zwaveData.HomeId,
-                                                          zwaveData.NodeId,
-                                                          parameterInfo.ParameterId,
-                                                          parameterInfo.Size,
-                                                          value.Value);
+                                                     zwaveData.NodeId,
+                                                     parameterInfo.ParameterId,
+                                                     parameterInfo.Size,
+                                                     value.Value);
                 }
                 else
                 {
@@ -234,7 +230,7 @@ namespace Hspi
 
                 if (listening)
                 {
-                    scripts.Add(string.Format(HtmlSnippets.ClickRefreshButtonScript, parametersView.Id, allButtonId));
+                    scripts.Add(string.Format(CultureInfo.InvariantCulture, HtmlSnippets.ClickRefreshButtonScript, parametersView.Id, allButtonId));
                 }
             }
 
@@ -267,7 +263,7 @@ namespace Hspi
 
             allButtonId = NewId();
             string allButton =
-                string.Format("<button id=\"{1}\" type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshAllZWaveParameters('{0}')\"> Refresh all parameters</button>",
+                string.Format(CultureInfo.InvariantCulture, "<button id=\"{1}\" type=\"button\" class=\"btn btn-secondary\" onclick=\"refreshAllZWaveParameters('{0}')\"> Refresh all parameters</button>",
                                 containerToClickButtonId, allButtonId);
 
             page = page.WithLabel(NewId(), string.Empty, allButton);
@@ -322,7 +318,7 @@ namespace Hspi
             {
                 scripts.Add(Invariant($"<script>$('#{currentWrapperControlValueId}').hide()</script>"));
                 string refreshButton =
-                        string.Format("<button type=\"button\" class=\"btn btn-secondary refresh-z-wave waves-effect waves-light\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\">Refresh</button>",
+                        string.Format(CultureInfo.InvariantCulture, "<button type =\"button\" class=\"btn btn-secondary refresh-z-wave waves-effect waves-light\" onclick=\"refreshZWaveParameter('{0}',{1},{2},'{3}','{4}','{5}')\">Refresh</button>",
                                       homeId, nodeId, parameter.ParameterId, currentMessageValueId, currentWrapperControlValueId, elementId);
 
                 views.Add(AddRawHtml(refreshButton, false));
@@ -344,7 +340,7 @@ namespace Hspi
         private const string NewLine = "<BR>";
         private const string ZWaveParameterPrefix = "zw_parameter_";
         private readonly int deviceOrFeatureRef;
-        private readonly IHttpQueryMaker httpQueryMaker;
+        private readonly Func<ZWaveData, Task<ZWaveInformation>> factoryForZWaveInformation;
         private readonly IZWaveConnection zwaveConnection;
         private int id = 0;
         private Page? page;

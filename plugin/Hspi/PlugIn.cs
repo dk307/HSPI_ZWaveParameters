@@ -35,10 +35,13 @@ namespace Hspi
         {
             try
             {
+                Log.Debug("Asking for page for {deviceOrFeatureRef}", deviceOrFeatureRef);
                 var page = CreateDeviceConfigPage(deviceOrFeatureRef);
                 Task.Run(() => page.BuildConfigPage(ShutdownCancellationToken)).Wait();
                 cacheForUpdate[deviceOrFeatureRef] = page;
-                return page?.GetPage()?.ToJsonString() ?? throw new Exception("Page is unexpectely null");
+                var devicePage =  page?.GetPage()?.ToJsonString() ?? throw new Exception("Page is unexpectely null");
+                Log.Debug("Returning page for {deviceOrFeatureRef}", deviceOrFeatureRef);
+                return devicePage;
             }
             catch (Exception ex)
             {
@@ -73,11 +76,12 @@ namespace Hspi
 
         protected virtual IDeviceConfigPage CreateDeviceConfigPage(int deviceOrFeatureRef)
         {
-            bool useOnline = false;
-
             Func<ZWaveData, Task<ZWaveInformation>> factoryForOpenZWaveDatabase;
 
-            if (useOnline)
+            bool preferOnline = settingsPages?.PreferOnlineDatabase ??
+                                    throw new InvalidOperationException("Plugin not initialized");
+
+            if (preferOnline)
             {
                 factoryForOpenZWaveDatabase = (zwaveData) =>
                              OnlineOpenZWaveDatabase.Create(zwaveData.ManufactureId, zwaveData.ProductType,
@@ -92,7 +96,7 @@ namespace Hspi
             }
 
             return new DeviceConfigPage(deviceOrFeatureRef, CreateZWaveConnection(),
-                                       factoryForOpenZWaveDatabase);
+                                        factoryForOpenZWaveDatabase);
         }
 
         protected virtual IZWaveConnection CreateZWaveConnection()
@@ -153,6 +157,10 @@ namespace Hspi
             if (settingsPages != null && settingsPages.OnSettingChange(changedView))
             {
                 UpdateDebugLevel();
+                if (changedView.Id == SettingsPages.PreferOnlineDatabaseId)
+                {
+                    cacheForUpdate.Clear();
+                }
                 return true;
             }
 

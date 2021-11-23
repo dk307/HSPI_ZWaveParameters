@@ -28,8 +28,9 @@ namespace HSPI_ZWaveParametersTest
             var settingPages = SettingsCollection.FromJsonString(plugIn.GetJuiSettingsPages());
             Assert.IsNotNull(settingPages);
 
-            var settings = settingPages[SettingsPages.LoggingSettingPageId].ToValueMap();
+            var settings = settingPages[SettingsPages.SettingPageId].ToValueMap();
 
+            Assert.AreEqual(settings[SettingsPages.PreferOnlineDatabaseId], false.ToString());
             Assert.AreEqual(settings[SettingsPages.LoggingDebugId], false.ToString());
             Assert.AreEqual(settings[SettingsPages.LogToFileId], false.ToString());
         }
@@ -73,6 +74,7 @@ namespace HSPI_ZWaveParametersTest
         {
             var settingsFromIni = new Dictionary<string, string>()
             {
+                { SettingsPages.PreferOnlineDatabaseId, true.ToString()},
                 { SettingsPages.LoggingDebugId, true.ToString()},
                 { SettingsPages.LogToFileId, true.ToString()},
             };
@@ -85,8 +87,9 @@ namespace HSPI_ZWaveParametersTest
             var settingPages = SettingsCollection.FromJsonString(plugIn.GetJuiSettingsPages());
             Assert.IsNotNull(settingPages);
 
-            var settings = settingPages[SettingsPages.LoggingSettingPageId].ToValueMap();
+            var settings = settingPages[SettingsPages.SettingPageId].ToValueMap();
 
+            Assert.AreEqual(settings[SettingsPages.PreferOnlineDatabaseId], true.ToString());
             Assert.AreEqual(settings[SettingsPages.LoggingDebugId], true.ToString());
             Assert.AreEqual(settings[SettingsPages.LogToFileId], true.ToString());
         }

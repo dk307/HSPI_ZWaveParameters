@@ -120,7 +120,7 @@ namespace Hspi
                                                      zwaveData.NodeId,
                                                      parameterInfo.ParameterId,
                                                      parameterInfo.Size,
-                                                     (int)value.Value);
+                                                     (int)value.Value); //truncate value if too long
                 }
                 else
                 {

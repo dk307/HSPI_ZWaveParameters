@@ -1,6 +1,7 @@
 ﻿using Hspi.Exceptions;
 using Hspi.OpenZWaveDB.Model;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -29,7 +30,7 @@ namespace Hspi.OpenZWaveDB
             return CombineParameters(obj);
         }
 
-        private static void CheckValidInformation(ZWaveInformation? obj)
+        private static void CheckValidInformation([NotNull]ZWaveInformation? obj)
         {
             if (obj == null)
             {

@@ -31,16 +31,16 @@ namespace Hspi.OpenZWaveDB.Model
         public byte Size { get; init; }
 
         [JsonPropertyName("bitmask")]
-        public int Bitmask { get; init; }
+        public long Bitmask { get; init; }
 
         [JsonPropertyName("minimum")]
-        public int Minimum { get; init; }
+        public long Minimum { get; init; }
 
         [JsonPropertyName("maximum")]
-        public int Maximum { get; init; }
+        public long Maximum { get; init; } // long because some json has wrong upper limit
 
         [JsonPropertyName("default")]
-        public int Default { get; init; }
+        public long Default { get; init; }
 
         [JsonPropertyName("read_only")]
         public string? ReadOnlyJson { get; init; }

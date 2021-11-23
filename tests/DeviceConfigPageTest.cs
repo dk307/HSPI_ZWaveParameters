@@ -7,6 +7,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,12 +18,38 @@ namespace HSPI_ZWaveParametersTest
     [TestClass]
     public class DeviceConfigPageTest
     {
+        public static IEnumerable<object[]> BuildConfigPageForAllPagesData()
+        {
+            foreach (var item in Directory.EnumerateFiles(TestHelper.GetOfflineDatabasePath(), "*.json", SearchOption.AllDirectories))
+            {
+                yield return new object[] { item };
+            }
+        }
+
         public static IEnumerable<object[]> GetSupportsDeviceConfigPageData()
         {
             yield return new object[] { TestHelper.AeonLabsZWaveData, GetFromJsonString(Resource.AeonLabsOpenZWaveDBDeviceJson) };
             yield return new object[] { TestHelper.AeonLabsZWaveData with { Listening = false }, GetFromJsonString(Resource.AeonLabsOpenZWaveDBDeviceJson) };
             yield return new object[] { TestHelper.HomeseerDimmerZWaveData, GetFromJsonString(Resource.HomeseerDimmerOpenZWaveDBFullJson) };
             yield return new object[] { TestHelper.AeonLabsZWaveData, GetFromJsonString(Resource.AeonLabsOpenZWaveDBDeviceJsonWithInvalidHtml) };
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(GetSupportsDeviceConfigPageData), DynamicDataSourceType.Method)]
+        public async Task BuildConfigPage(ZWaveData zwaveData, Task<ZWaveInformation> zwaveInformationTask)
+        {
+            await BuildConfigPageImpl(true, zwaveData, zwaveInformationTask);
+        }
+
+        [DataTestMethod]
+        [DynamicData(nameof(BuildConfigPageForAllPagesData), DynamicDataSourceType.Method)]
+        public async Task BuildConfigPageForAllPages(string filePath)
+        {
+            ZWaveData zwaveData = TestHelper.AeonLabsZWaveData;
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var zWaveInformation = await OpenZWaveDatabase.ParseJson(fileStream, CancellationToken.None);
+
+            await BuildConfigPageImpl((zWaveInformation?.Parameters.Count ?? 0) > 0, zwaveData, Task.FromResult(zWaveInformation));
         }
 
         [TestMethod]
@@ -59,6 +86,7 @@ namespace HSPI_ZWaveParametersTest
 
             Assert.ThrowsException<InvalidOperationException>(() => deviceConfigPage.OnDeviceConfigChange(changes.Page));
         }
+
         [TestMethod]
         public async Task OnDeviceConfigChangeWithSetForBitmask()
         {
@@ -80,71 +108,22 @@ namespace HSPI_ZWaveParametersTest
                 return (true, parameter.Default.ToString(CultureInfo.InvariantCulture), parameter.Default);
             });
         }
-        [DataTestMethod]
-        [DynamicData(nameof(GetSupportsDeviceConfigPageData), DynamicDataSourceType.Method)]
-        public async Task SupportsDeviceConfigPage(ZWaveData zwaveData, Task<ZWaveInformation> zwaveInformationTask)
-        {
-            int deviceRef = 34;
-            var mock = SetupZWaveConnection(deviceRef, zwaveData);
-
-            var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
-                                                        x => zwaveInformationTask);
-            await deviceConfigPage.BuildConfigPage(CancellationToken.None);
-            var page = deviceConfigPage.GetPage();
-
-            Assert.IsNotNull(page);
-
-            Assert.AreEqual(page.Views.Count, !zwaveData.Listening ? 5 : 4);
-
-            // verify header link
-            VerifyHeader(deviceConfigPage, page.Views[0]);
-
-            if (!zwaveData.Listening)
-            {
-                // verify valid non-listening message
-                TestHelper.VeryHtmlValid(page.Views[1].ToHtml());
-            }
-
-            // verify refresh button
-            TestHelper.VeryHtmlValid(page.Views[!zwaveData.Listening ? 2 : 1].ToHtml());
-
-            // verify parameters
-            VerifyParametersView(deviceConfigPage, (ViewGroup)page.Views[!zwaveData.Listening ? 3 : 2]);
-
-            // verify script
-            VerifyScript((LabelView)page.Views[!zwaveData.Listening ? 4 : 3], zwaveData.Listening);
-
-            Mock.VerifyAll(mock);
-        }
 
         [TestMethod]
         public async Task SupportsDeviceConfigPageForMinPage()
         {
-            int deviceRef = 334;
-
             var zwaveData = TestHelper.AeonLabsZWaveData;
-            var mock = SetupZWaveConnection(deviceRef, zwaveData);
-
-            var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
-                    x => GetFromJsonString("{ \"database_id\":1034, \"approved\":1, \"deleted\":0}"));
-            await deviceConfigPage.BuildConfigPage(CancellationToken.None);
-            var page = deviceConfigPage.GetPage();
-
-            Assert.AreEqual(page.Views.Count, 1);
-
-            // verify header link
-            VerifyHeader(deviceConfigPage, page.Views[0]);
-
-            Mock.VerifyAll(mock);
+            await BuildConfigPageImpl(false, zwaveData,
+                                      GetFromJsonString("{ \"database_id\":1034, \"approved\":1, \"deleted\":0}"));
         }
 
         private static async Task<(Mock<IZWaveConnection>, DeviceConfigPage)> CreateAeonLabsSwitchDeviceConfigPage()
         {
             int deviceRef = 3746;
             ZWaveData zwaveData = TestHelper.AeonLabsZWaveData;
- 
+
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
-            var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object, 
+            var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
                 x => Task.FromResult(OpenZWaveDatabase.ParseJson(Resource.AeonLabsOpenZWaveDBDeviceJson)));
             await deviceConfigPage.BuildConfigPage(CancellationToken.None);
             return (mock, deviceConfigPage);
@@ -202,11 +181,9 @@ namespace HSPI_ZWaveParametersTest
             foreach (var parameter in deviceConfigPage.Data.Parameters)
             {
                 //label
-                var labelNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/*[.=\"{deviceConfigPage.Data.LabelForParameter(parameter.ParameterId)}\"]"));
-
-                Assert.IsNotNull(labelNodes);
-                Assert.AreEqual(labelNodes.Count, 1);
-
+                string label = deviceConfigPage.Data.LabelForParameter(parameter.ParameterId);
+                Assert.IsTrue(view.Views.Any(x => x is LabelView labelView && labelView.Value.Contains(label)));
+ 
                 // input
                 var dropDownNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/select[@id=\"{ZWaveParameterPrefix}{parameter.Id}\"]"));
 
@@ -225,11 +202,68 @@ namespace HSPI_ZWaveParametersTest
             }
 
             // not write only should have refresh buttons
+            int refreshButtons = deviceConfigPage.Data.Parameters.Count(x => !x.WriteOnly);
+
             var refreshButtonNodes = htmlDocument.DocumentNode.SelectNodes("//*/button");
-            Assert.AreEqual(refreshButtonNodes.Count, deviceConfigPage.Data.Parameters.Count(x => !x.WriteOnly));
+            if (refreshButtons != 0)
+            {
+                Assert.IsNotNull(refreshButtonNodes);
+                Assert.AreEqual(refreshButtonNodes.Count, refreshButtons);
+            }
+            else
+            {
+                Assert.IsNull(refreshButtonNodes);
+            }
         }
 
-        private async Task TestOnDeviceConfigChange(Func<AbstractView, ZWaveDeviceParameter, (bool, string, int?)> changedData)
+        private async Task BuildConfigPageImpl(bool hasParamaters,
+                                               ZWaveData zwaveData,
+                                               Task<ZWaveInformation> zwaveInformationTask)
+        {
+            int deviceRef = 34;
+            var mock = SetupZWaveConnection(deviceRef, zwaveData);
+
+            var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
+                                                        x => zwaveInformationTask);
+            await deviceConfigPage.BuildConfigPage(CancellationToken.None);
+            var page = deviceConfigPage.GetPage();
+
+            Assert.IsNotNull(page);
+
+            int index = 0;
+
+            // verify header link
+            VerifyHeader(deviceConfigPage, page.Views[index++]);
+
+            if (hasParamaters)
+            {
+                if (!zwaveData.Listening)
+                {
+                    // verify valid non-listening message
+                    TestHelper.VeryHtmlValid(page.Views[index++].ToHtml());
+                }
+
+                // verify refresh button
+                if (deviceConfigPage.Data.HasRefreshableParameters)
+                {
+                    TestHelper.VeryHtmlValid(page.Views[index++].ToHtml());
+                }
+
+                // verify parameters
+                VerifyParametersView(deviceConfigPage, (ViewGroup)page.Views[index++]);
+
+                // verify script
+                bool autoRefresh = deviceConfigPage.Data.HasRefreshableParameters && zwaveData.Listening;
+                VerifyScript((LabelView)page.Views[index++], autoRefresh);
+            }
+
+            // no more views
+            Assert.AreEqual(page.Views.Count, index);
+
+            Mock.VerifyAll(mock);
+        }
+
+        private async Task TestOnDeviceConfigChange(Func<AbstractView, ZWaveDeviceParameter, (bool, string, long?)> changedData)
         {
             var (zwaveMock, deviceConfigPage) = await CreateHomeseerDimmerDeviceConfigPage();
 
@@ -267,7 +301,7 @@ namespace HSPI_ZWaveParametersTest
                                                             TestHelper.HomeseerDimmerZWaveData.NodeId,
                                                             parameter.ParameterId,
                                                             parameter.Size,
-                                                            expectedValue.Value));
+                                                            (int)expectedValue.Value));
                 }
             }
 
@@ -275,7 +309,7 @@ namespace HSPI_ZWaveParametersTest
             zwaveMock.Verify();
         }
 
-        private void VerifyScript(LabelView view, bool listening)
+        private void VerifyScript(LabelView view, bool hasRefreshAllButton)
         {
             HtmlAgilityPack.HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(view.ToHtml());
@@ -285,7 +319,7 @@ namespace HSPI_ZWaveParametersTest
             Assert.IsNotNull(scriptNodes);
 
             string last = scriptNodes.Last().OuterHtml;
-            Assert.AreEqual(last.Contains(".ready(function() {"), listening);
+            Assert.AreEqual(last.Contains(".ready(function() {"), hasRefreshAllButton);
         }
 
         private const string ZWaveParameterPrefix = "zw_parameter_";

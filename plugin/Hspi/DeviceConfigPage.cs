@@ -79,11 +79,11 @@ namespace Hspi
                     throw new Exception("Z-wave parameter information not found");
                 }
 
-                int? value = null;
+                long? value = null;
 
                 if (view is InputView inputView)
                 {
-                    var temp = Hspi.Utils.StringConverter.TryGetFromString<int>(view.GetStringValue());
+                    var temp = Hspi.Utils.StringConverter.TryGetFromString<long>(view.GetStringValue());
 
                     if (temp.HasValue)
                     {
@@ -120,7 +120,7 @@ namespace Hspi
                                                      zwaveData.NodeId,
                                                      parameterInfo.ParameterId,
                                                      parameterInfo.Size,
-                                                     value.Value);
+                                                     (int)value.Value); //truncate value if too long
                 }
                 else
                 {
@@ -204,11 +204,16 @@ namespace Hspi
             if (Data?.Parameters != null && Data?.Parameters.Count > 0)
             {
                 var parametersView = new ViewGroup(NewId(), string.Empty);
-                page = CreateAllParameterRefreshButton(page, scripts, parametersView.Id, out var allButtonId);
+
+                string? allButtonId = null;
+                if (Data.HasRefreshableParameters)
+                {
+                    page = CreateAllParameterRefreshButton(page, scripts, parametersView.Id, out allButtonId);
+                }
 
                 if (!listening)
                 {
-                    page = page.WithLabel(NewId(), "Device is non-listening one. Please wake the device and refresh the parameters.");
+                    page = page.WithLabel(NewId(), "Device is non-listening one. Please wake the device to refresh or uppdate the parameters.");
                 }
 
                 foreach (var parameter in Data.Parameters)
@@ -228,7 +233,7 @@ namespace Hspi
 
                 page = page.WithView(parametersView);
 
-                if (listening)
+                if (listening && allButtonId!= null)
                 {
                     scripts.Add(string.Format(CultureInfo.InvariantCulture, HtmlSnippets.ClickRefreshButtonScript, parametersView.Id, allButtonId));
                 }

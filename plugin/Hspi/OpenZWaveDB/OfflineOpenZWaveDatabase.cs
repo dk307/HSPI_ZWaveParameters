@@ -29,7 +29,7 @@ namespace Hspi.OpenZWaveDB
         public static async Task Download(IHttpQueryMaker queryMaker,
                                           string databasePath,
                                           int maxCount = 1500,
-                                          CancellationToken token = default(CancellationToken))
+                                          CancellationToken token = default)
         {
             OpenZWaveDatabaseOnlineInterface serverInterface = new(queryMaker);
 

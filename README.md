@@ -12,6 +12,7 @@ Features
 * Link to Open Z-Wave database site for device. You can view description, inclusion/exclusion information & manual on that site.
 * View Z-Wave parameters for a device.
 * Update Z-Wave parameters for a device.
+* Offline database bundled with plugin so that it does not need internet connection.
 
 
 

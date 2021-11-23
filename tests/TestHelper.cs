@@ -7,6 +7,7 @@ using Moq;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,15 @@ namespace HSPI_ZWaveParametersTest
                                                                 "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=75",
                                                                 Resource.AeonLabsOpenZWaveDBDeviceJson);
         }
+
+        public static string GetOfflineDatabasePath()
+        {
+            string dllPath = Assembly.GetExecutingAssembly().Location;
+
+            var parentDirectory = new DirectoryInfo(Path.GetDirectoryName(dllPath));
+            return Path.Combine(parentDirectory.Parent.Parent.Parent.FullName, "plugin", "db");
+        }
+
 
         public static Mock<IHttpQueryMaker> CreateHomeseerDimmerHttpHandler()
         {

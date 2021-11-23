@@ -10,10 +10,10 @@ using Moq.Protected;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace HSPI_ZWaveParametersTest
 {
+    // In these tests we also mock IHsController as compared to other tests
     [TestClass]
     public class E2EPlugInTest
     {
@@ -36,19 +36,46 @@ namespace HSPI_ZWaveParametersTest
         }
 
         [TestMethod]
-        public void CheckDevicePageIsReturned()
+        public void CheckDevicePageIsReturnedForOnlineCase()
         {
-            var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController();
+            var settingsFromIni = new Dictionary<string, string>()
+            {
+                { SettingsPages.PreferOnlineDatabaseId, true.ToString()}
+            };
+
+            var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController(settingsFromIni);
+
+            var httpQueryMock = TestHelper.CreateAeonLabsSwitchHttpHandler();
+
+            plugInMock.Protected()
+                .Setup<IHttpQueryMaker>("CreateHttpQueryMaker")
+                .Returns(httpQueryMock.Object);
+
             int deviceRef = 8475;
             CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
 
-            var deviceConfigPage = new DeviceConfigPage(deviceRef,
-                                                        new ZWaveConnection(hsControllerMock.Object),
-                                                        x => Task.FromResult(OpenZWaveDatabase.ParseJson(Resource.AeonLabsOpenZWaveDBDeviceJson)));
+            PlugIn plugIn = plugInMock.Object;
+            var pageJson = plugIn.GetJuiDeviceConfigPage(deviceRef);
 
-            plugInMock.Protected()
-                .Setup<IDeviceConfigPage>("CreateDeviceConfigPage", deviceRef)
-                .Returns(deviceConfigPage);
+            // assert page is not error
+            var page = Page.FromJsonString(pageJson);
+
+            Assert.AreEqual(page.Type, EPageType.DeviceConfig);
+            Assert.IsFalse(page.ContainsViewWithId("exception"));
+        }
+
+        [TestMethod]
+        public void CheckDevicePageIsReturnedForOfflineCase()
+        {
+            var settingsFromIni = new Dictionary<string, string>()
+            {
+                { SettingsPages.PreferOnlineDatabaseId, false.ToString()}
+            };
+
+            var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController(settingsFromIni);
+
+            int deviceRef = 8475;
+            CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
 
             PlugIn plugIn = plugInMock.Object;
             var pageJson = plugIn.GetJuiDeviceConfigPage(deviceRef);
@@ -132,6 +159,12 @@ namespace HSPI_ZWaveParametersTest
             mockHsController.Setup(x => x.GetIniSection("Settings", PlugInData.PlugInId + ".ini")).Returns(settingsFromIni);
             mockHsController.Setup(x => x.SaveINISetting("Settings", It.IsAny<string>(), It.IsAny<string>(), PlugInData.PlugInId + ".ini"));
             mockHsController.Setup(x => x.WriteLog(It.IsAny<ELogType>(), It.IsAny<string>(), PlugInData.PlugInName, It.IsAny<string>()));
+
+            var offLineDatabase = new OfflineOpenZWaveDatabase(TestHelper.GetOfflineDatabasePath());
+
+            mockPlugin.Protected()
+                      .Setup<OfflineOpenZWaveDatabase>("CreateOfflineOpenDBOfflineDatabase")
+                      .Returns(offLineDatabase);
 
             mockPlugin.Object.InitIO();
 

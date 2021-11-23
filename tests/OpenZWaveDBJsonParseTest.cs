@@ -133,6 +133,19 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(obj.Parameters[0].ReadOnly, true);
         }
 
+
+        [TestMethod]
+        public void ParameterNeedingLong()
+        {
+            var obj = OpenZWaveDatabase.ParseJson(Resource.ParameterWithLongValues);
+
+            Assert.IsNotNull(obj.Parameters);
+            Assert.AreEqual(obj.Parameters.Count, 1);
+            Assert.AreEqual(obj.Parameters[0].Default, 4294967103);
+            Assert.AreEqual(obj.Parameters[0].Maximum, 4294967103);
+            Assert.AreEqual(obj.Parameters[0].Default, 4294967103);
+        }
+
         [TestMethod]
         public void EndPointsAreParsed()
         {

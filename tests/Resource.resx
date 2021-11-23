@@ -1949,6 +1949,28 @@
     }]
 }</value>
   </data>
+  <data name="ParameterWithLongValues" xml:space="preserve">
+    <value>{
+ 
+  "database_id": 5623, 
+  "approved":1, 
+  "deleted":0,
+  "parameters": [
+        {
+      "param_id": 3,     
+      "size": 4,
+      "bitmask": 4294967103,
+      "default": 4294967103,
+      "minimum": 0,
+      "maximum": 4294967103,
+      "read_only": "0",
+      "write_only": "0",
+      "limit_options": "1",
+      "id": 7247,
+      "options": []
+    }]
+}</value>
+  </data>
   <data name="ParameterWithNoOptionOpenZWaveDBJson" xml:space="preserve">
     <value>{
  

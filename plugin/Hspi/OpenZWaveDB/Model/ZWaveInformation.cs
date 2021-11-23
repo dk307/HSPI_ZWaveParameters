@@ -57,6 +57,9 @@ namespace Hspi.OpenZWaveDB.Model
         }
 
         [JsonIgnore]
+        public bool HasRefreshableParameters => Parameters?.Any(x => !x.WriteOnly) ?? false;
+
+        [JsonIgnore]
         public Uri WebUrl => new(string.Format(CultureInfo.InvariantCulture, webUrlFormat, Id), UriKind.Absolute);
 
         private const string webUrlFormat = "https://www.opensmarthouse.org/zwavedatabase/{0}";

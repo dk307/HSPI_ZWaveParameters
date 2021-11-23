@@ -199,6 +199,34 @@ namespace HSPI_ZWaveParametersTest {
         ///  &quot;deleted&quot;:0,
         ///  &quot;parameters&quot;: [
         ///        {
+        ///      &quot;param_id&quot;: 3,     
+        ///      &quot;size&quot;: 4,
+        ///      &quot;bitmask&quot;: 4294967103,
+        ///      &quot;default&quot;: 4294967103,
+        ///      &quot;minimum&quot;: 0,
+        ///      &quot;maximum&quot;: 4294967103,
+        ///      &quot;read_only&quot;: &quot;0&quot;,
+        ///      &quot;write_only&quot;: &quot;0&quot;,
+        ///      &quot;limit_options&quot;: &quot;1&quot;,
+        ///      &quot;id&quot;: 7247,
+        ///      &quot;options&quot;: []
+        ///    }]
+        ///}.
+        /// </summary>
+        internal static string ParameterWithLongValues {
+            get {
+                return ResourceManager.GetString("ParameterWithLongValues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        /// 
+        ///  &quot;database_id&quot;: 5623, 
+        ///  &quot;approved&quot;:1, 
+        ///  &quot;deleted&quot;:0,
+        ///  &quot;parameters&quot;: [
+        ///        {
         ///      &quot;param_id&quot;: 3,
         ///      &quot;label&quot;: &quot;Auto Off Timer&quot;,
         ///      &quot;description&quot;: &quot;Auto Off Timer&quot;,

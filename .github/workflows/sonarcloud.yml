@@ -10,6 +10,14 @@ jobs:
     name: Build
     runs-on: windows-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Navigate to Workspace
+        run: cd $GITHUB_WORKSPACE
     
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
@@ -50,16 +58,7 @@ jobs:
         shell: powershell
         run: |
           New-Item -Path ~\.sonar\scanner -ItemType Directory
-          dotnet tool update dotnet-sonarscanner --tool-path ~\.sonar\scanner
-
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: true
-          fetch-depth: 0
-
-      - name: Navigate to Workspace
-        run: cd $GITHUB_WORKSPACE
+          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
 
       - name: Restore Nuget Packages
         run: nuget restore HSPI_ZWaveParameters.sln
@@ -70,7 +69,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          ~\.sonar\scanner\SonarScanner.MSBuild.exe begin /k:"dk307_HSPI_ZWaveParameters" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+          .\.sonar\scanner\SonarScanner.MSBuild.exe begin /k:"dk307_HSPI_ZWaveParameters" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           cd $GITHUB_WORKSPACE
           msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Debug"
-          ~\.sonar\scanner\SonarScanner.MSBuild.exe end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
+          .\.sonar\scanner\SonarScanner.MSBuild.exe end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

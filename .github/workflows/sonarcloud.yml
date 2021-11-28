@@ -23,8 +23,8 @@ jobs:
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE
     
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
+      - name: Setup VS Dev Environment
+        uses: seanmiddleditch/gha-setup-vsdevenv@v4
     
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.5

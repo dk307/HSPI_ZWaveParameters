@@ -38,7 +38,7 @@ namespace HSPI_ZWaveParametersTest
         [DynamicData(nameof(GetSupportsDeviceConfigPageData), DynamicDataSourceType.Method)]
         public async Task BuildConfigPage(ZWaveData zwaveData, Task<ZWaveInformation> zwaveInformationTask)
         {
-            await BuildConfigPageImpl(true, zwaveData, zwaveInformationTask);
+            await BuildConfigPageImpl(true, zwaveData, zwaveInformationTask).ConfigureAwait(false);
         }
 
         [DataTestMethod]
@@ -47,7 +47,8 @@ namespace HSPI_ZWaveParametersTest
         {
             ZWaveData zwaveData = TestHelper.AeonLabsZWaveData;
             using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var zWaveInformation = await OpenZWaveDatabase.ParseJson(fileStream, CancellationToken.None);
+            var zWaveInformation = await OpenZWaveDatabase.ParseJson(fileStream, CancellationToken.None)
+                                   .ConfigureAwait(false);
 
             await BuildConfigPageImpl((zWaveInformation?.Parameters.Count ?? 0) > 0, zwaveData, Task.FromResult(zWaveInformation));
         }
@@ -62,13 +63,13 @@ namespace HSPI_ZWaveParametersTest
                     return (true, Invariant($"0x{parameter.Default:x}"), parameter.Default);
                 }
                 return (false, null, null);
-            });
+            }).ConfigureAwait(false);
         }
 
         [TestMethod]
         public async Task OnDeviceConfigChangeWithNoChange()
         {
-            await TestOnDeviceConfigChange((view, parameter) => (false, null, null));
+            await TestOnDeviceConfigChange((view, parameter) => (false, null, null)).ConfigureAwait(false);
         }
 
         [TestMethod]
@@ -76,7 +77,6 @@ namespace HSPI_ZWaveParametersTest
         {
             int deviceRef = 3746;
             var zwaveData = TestHelper.HomeseerDimmerZWaveData;
-            var httpQueryMock = TestHelper.CreateHomeseerDimmerHttpHandler();
 
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
             var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
@@ -106,7 +106,7 @@ namespace HSPI_ZWaveParametersTest
             await TestOnDeviceConfigChange((view, parameter) =>
             {
                 return (true, parameter.Default.ToString(CultureInfo.InvariantCulture), parameter.Default);
-            });
+            }).ConfigureAwait(false);
         }
 
         [TestMethod]
@@ -114,7 +114,7 @@ namespace HSPI_ZWaveParametersTest
         {
             var zwaveData = TestHelper.AeonLabsZWaveData;
             await BuildConfigPageImpl(false, zwaveData,
-                                      GetFromJsonString("{ \"database_id\":1034, \"approved\":1, \"deleted\":0}"));
+                                      GetFromJsonString("{ \"database_id\":1034, \"approved\":1, \"deleted\":0}")).ConfigureAwait(false);
         }
 
         private static async Task<(Mock<IZWaveConnection>, DeviceConfigPage)> CreateAeonLabsSwitchDeviceConfigPage()
@@ -125,7 +125,7 @@ namespace HSPI_ZWaveParametersTest
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
             var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
                 x => Task.FromResult(OpenZWaveDatabase.ParseJson(Resource.AeonLabsOpenZWaveDBDeviceJson)));
-            await deviceConfigPage.BuildConfigPage(CancellationToken.None);
+            await deviceConfigPage.BuildConfigPage(CancellationToken.None).ConfigureAwait(false);
             return (mock, deviceConfigPage);
         }
 
@@ -139,7 +139,7 @@ namespace HSPI_ZWaveParametersTest
             var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
                   x => GetFromJsonString(Resource.AeonLabsOpenZWaveDBDeviceJson));
 
-            await deviceConfigPage.BuildConfigPage(CancellationToken.None);
+            await deviceConfigPage.BuildConfigPage(CancellationToken.None).ConfigureAwait(false);
             return (mock, deviceConfigPage);
         }
 
@@ -183,7 +183,7 @@ namespace HSPI_ZWaveParametersTest
                 //label
                 string label = deviceConfigPage.Data.LabelForParameter(parameter.ParameterId);
                 Assert.IsTrue(view.Views.Any(x => x is LabelView labelView && labelView.Value.Contains(label)));
- 
+
                 // input
                 var dropDownNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/select[@id=\"{ZWaveParameterPrefix}{parameter.Id}\"]"));
 
@@ -225,7 +225,7 @@ namespace HSPI_ZWaveParametersTest
 
             var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
                                                         x => zwaveInformationTask);
-            await deviceConfigPage.BuildConfigPage(CancellationToken.None);
+            await deviceConfigPage.BuildConfigPage(CancellationToken.None).ConfigureAwait(false);
             var page = deviceConfigPage.GetPage();
 
             Assert.IsNotNull(page);
@@ -265,7 +265,7 @@ namespace HSPI_ZWaveParametersTest
 
         private async Task TestOnDeviceConfigChange(Func<AbstractView, ZWaveDeviceParameter, (bool, string, long?)> changedData)
         {
-            var (zwaveMock, deviceConfigPage) = await CreateHomeseerDimmerDeviceConfigPage();
+            var (zwaveMock, deviceConfigPage) = await CreateHomeseerDimmerDeviceConfigPage().ConfigureAwait(false);
 
             Page page = deviceConfigPage.GetPage();
             var viewGroup = (ViewGroup)page.Views[2];

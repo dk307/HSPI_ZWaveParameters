@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Hspi
 {
-    internal partial class PlugIn : HspiBase
+    internal class PlugIn : HspiBase
     {
         public PlugIn()
             : base(PlugInData.PlugInId, PlugInData.PlugInName)
@@ -76,14 +76,6 @@ namespace Hspi
         protected override void BeforeReturnStatus()
         {
             this.Status = PluginStatus.Ok();
-        }
-
-        private static void CheckNotNull([NotNull] object? obj)
-        {
-            if (obj is null)
-            {
-                throw new InvalidOperationException("Plugin Not Initialized");
-            }
         }
 
         protected virtual IDeviceConfigPage CreateDeviceConfigPage(int deviceOrFeatureRef)
@@ -199,6 +191,13 @@ namespace Hspi
             base.OnShutdown();
         }
 
+        private static void CheckNotNull([NotNull] object? obj)
+        {
+            if (obj is null)
+            {
+                throw new InvalidOperationException("Plugin Not Initialized");
+            }
+        }
         private string HandleDeviceConfigPostBackProc(string data)
         {
             try
@@ -247,11 +246,7 @@ namespace Hspi
             Logger.ConfigureLogging(LogDebug, settingsPages.LogtoFileEnabled, HomeSeerSystem);
         }
 
-        internal struct ZWaveParameterGetResult
-        {
-            public string? ErrorMessage { get; init; }
-            public int? Value { get; init; }
-        }
+        internal record ZWaveParameterGetResult(string? ErrorMessage = null, int? Value = null);
 
         private const string DeviceConfigPageOperation = "GET";
         private const string HTMLEndline = "<BR>";

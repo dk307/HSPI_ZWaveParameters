@@ -14,7 +14,7 @@ namespace Hspi.OpenZWaveDB
     {
         static HttpQueryMaker()
         {
-            var handler = new HttpClientHandler()
+            var handler = new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             };

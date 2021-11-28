@@ -67,7 +67,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public void CheckDevicePageIsReturnedForOfflineCase()
         {
-            var settingsFromIni = new Dictionary<string, string>()
+            var settingsFromIni = new Dictionary<string, string>
             {
                 { SettingsPages.PreferOnlineDatabaseId, false.ToString()}
             };

@@ -43,10 +43,12 @@ jobs:
               ${{ runner.os }}-nuget-
 
       - name: Download and set up sonar-scanner
+        shell: powershell
         run: |
           New-Item -Force -ItemType directory -Path $HOME\.sonar
           curl -sSLo $HOME\.sonar\sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
           unzip -o $HOME\.sonar\sonar-scanner.zip -d $HOME\.sonar\
+          ls $HOME\.sonar
 
       - name: Restore Nuget Packages
         run: nuget restore ${{ env.SLN_FILE }}
@@ -55,10 +57,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        shell: cmd
+        shell: powershell
         run: |
-          dir $HOME\.sonar
+          ls $HOME\.sonar
           $HOME\.sonar\SonarScanner.MSBuild.exe begin /k:"dk307_HSPI_ZWaveParameters" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          cd $GITHUB_WORKSPACE
           msbuild.exe ${{ env.SLN_FILE }} /p:platform="Any CPU" /p:configuration="Debug"
           $HOME\.sonar\scanner\SonarScanner.MSBuild.exe end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

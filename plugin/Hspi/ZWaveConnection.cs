@@ -188,7 +188,7 @@ namespace Hspi
             }
             catch (Exception ex)
             {
-                throw new ZWavePluginNotRunningException("ZWave plugin not found", ex);
+                throw new ZWavePluginNotRunningException("Z-Wave plugin not found", ex);
             }
         }
 

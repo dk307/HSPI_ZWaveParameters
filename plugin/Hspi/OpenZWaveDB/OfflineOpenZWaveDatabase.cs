@@ -167,7 +167,7 @@ namespace Hspi.OpenZWaveDB
                 }
             }
 
-            return filePath ?? throw new ShowErrorMessageException("Device not found in the open zwave database");
+            return filePath ?? throw new ShowErrorMessageException("Device not found in the open Z-Wave database");
         }
 
         private async Task Load(CancellationToken cancellationToken)

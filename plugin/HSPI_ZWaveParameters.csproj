@@ -241,11 +241,9 @@
     <ArtifactsDirectory>$(OutputPath)\Artifacts</ArtifactsDirectory>
     <_TransformExe>$(DevEnvDir)\TextTransform.exe</_TransformExe>
   </PropertyGroup>
-  
-   <Target Name="ZipDBFiles" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="ZipDBFiles" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
     <ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)\db" DestinationFile="$(OutputPath)\db.zip" Overwrite="true" />
   </Target>
-
   <Target Name="ZipFinalFiles" DependsOnTargets="Build;" AfterTargets="Build;ZipDBFiles" Condition="'$(Configuration)' == 'Release'">
     <RemoveDir Directories="$(ArtifactsDirectory)" />
     <MakeDir Directories="$(ArtifactsDirectory)" />

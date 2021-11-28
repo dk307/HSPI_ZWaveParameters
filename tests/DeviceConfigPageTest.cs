@@ -90,7 +90,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public async Task OnDeviceConfigChangeWithSetForBitmask()
         {
-            await TestOnDeviceConfigChange((view, parameter) =>
+            await TestOnDeviceConfigChange((_, parameter) =>
             {
                 if (parameter.Bitmask != 0)
                 {

@@ -71,9 +71,9 @@ namespace Hspi
 
             foreach (var view in changes.Views)
             {
-                var id = ZWaveParameterFromId(view.Id);
+                var parameterId = ZWaveParameterFromId(view.Id);
 
-                var parameterInfo = Data.Parameters.FirstOrDefault(x => x.Id == id);
+                var parameterInfo = Data.Parameters.FirstOrDefault(x => x.Id == parameterId);
                 if ((parameterInfo == null) || (parameterInfo.Size == 0))
                 {
                     throw new Exception("Z-wave parameter information not found");
@@ -98,7 +98,7 @@ namespace Hspi
                 {
                     string selection = selectListView.GetStringValue();
                     if (int.TryParse(selection, NumberStyles.AllowTrailingWhite |
-                                                NumberStyles.AllowTrailingWhite,
+                                                NumberStyles.AllowLeadingWhite,
                                      CultureInfo.InvariantCulture, out var temp))
                     {
                         value = parameterInfo?.Options?[temp].Value;
@@ -255,7 +255,7 @@ namespace Hspi
         {
             if (Data == null)
             {
-                throw new InvalidOperationException("Existing ZWave data is null");
+                throw new InvalidOperationException("Existing Z-Wave data is null");
             }
         }
 
@@ -334,7 +334,7 @@ namespace Hspi
 
         private string NewId()
         {
-            return Invariant($"z_wave_parameter_{id++}");
+            return Invariant($"z_wave_parameter_{pageId++}");
         }
 
         private void SetPage(Page? value)
@@ -347,7 +347,7 @@ namespace Hspi
         private readonly int deviceOrFeatureRef;
         private readonly Func<ZWaveData, Task<ZWaveInformation>> factoryForZWaveInformation;
         private readonly IZWaveConnection zwaveConnection;
-        private int id = 0;
         private Page? page;
+        private int pageId = 0;
     }
 }

@@ -348,6 +348,6 @@ namespace Hspi
         private readonly Func<ZWaveData, Task<ZWaveInformation>> factoryForZWaveInformation;
         private readonly IZWaveConnection zwaveConnection;
         private Page? page;
-        private int pageId = 0;
+        private int pageId;
     }
 }

@@ -69,7 +69,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public async Task OnDeviceConfigChangeWithNoChange()
         {
-            await TestOnDeviceConfigChange((view, parameter) => (false, null, null)).ConfigureAwait(false);
+            await TestOnDeviceConfigChange((_, parameter) => (false, null, null)).ConfigureAwait(false);
         }
 
         [TestMethod]
@@ -97,7 +97,7 @@ namespace HSPI_ZWaveParametersTest
                     return (true, int.MaxValue.ToString(CultureInfo.InvariantCulture), parameter.Bitmask);
                 }
                 return (false, null, null);
-            });
+            }).ConfigureAwait(false);
         }
 
         [TestMethod]

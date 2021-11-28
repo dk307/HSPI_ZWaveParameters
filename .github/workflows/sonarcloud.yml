@@ -49,6 +49,7 @@ jobs:
           Invoke-WebRequest -Uri ${{ env.SONAR_SCANNER_DOWNLOAD_URL }} -OutFile $HOME\.sonar\sonar-scanner.zip
           unzip -o $HOME\.sonar\sonar-scanner.zip -d $HOME\.sonar\
           echo "$HOME\.sonar" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo ""%VSINSTALLDIR%\Team Tools\Dynamic Code Coverage Tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Restore Nuget Packages
         run: nuget restore ${{ env.SLN_FILE }}
@@ -62,5 +63,5 @@ jobs:
           SonarScanner.MSBuild.exe begin /k:"dk307_HSPI_ZWaveParameters" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           msbuild.exe ${{ env.SLN_FILE }} /p:platform="Any CPU" /p:configuration="Debug"
           vstest.console.exe .\tests\bin\Debug\HSPI_ZWaveParametersTest.dll  /Enablecodecoverage  /parallel /logger:trx
-          "%VSINSTALLDIR%\Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe" /analyze /output:"%CD%\VisualStudio.coveragexml" "%CD%\VisualStudio.coverage"
+          CodeCoverage.exe /analyze /output:"%CD%\VisualStudio.coveragexml" "%CD%\VisualStudio.coverage"
           SonarScanner.MSBuild.exe end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

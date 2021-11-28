@@ -8,12 +8,12 @@ Build State
 
 Features
 -----------
-* The plugin creates an extra page for the Z-Wave devices with ability to view & update device parameters.
-* The page contains a link to Open Z-Wave database site for device. You can view description, inclusion\exclusion information & manual on that site.
-* The page shows Z-Wave parameters for a device. Listening device's parameter values are loaded on page load. There is ability to refresh all or an individual parameter.
+* The plugin creates an extra page for the Z-Wave devices with the ability to view & update device parameters.
+* The page contains a link to the Open Z-Wave database site for the device. You can view description, inclusion\exclusion information & manual on that site.
+* The page shows Z-Wave parameters for a device. The listening device's parameter values are loaded on page load. There is the ability to refresh all or an individual parameter.
 * Ability to update any Z-Wave parameter for the device.
-* Offline database is bundled with plugin so that it does not need internet connection for operation.
-* Online Z-Wave database can be used directly by change the plugin settings. 
+* Offline database is bundled with the plugin so that it does not need an internet connection for operation.
+* Online Z-Wave database can be used directly by changing the plugin settings. 
 
 
 Page

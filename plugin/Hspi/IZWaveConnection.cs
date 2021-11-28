@@ -13,7 +13,7 @@ namespace Hspi
         Task<int> GetConfiguration(string homeId, byte nodeId, byte param,
                                    CancellationToken cancellationtoken);
 
-        ZWaveData GetDeviceZWaveData(int deviceOrFeatureRef);
+        ZWaveData GetDeviceZWaveData(int deviceRef);
 
         bool IsZwaveDevice(int devOrFeatRef);
 

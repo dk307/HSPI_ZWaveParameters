@@ -23,7 +23,7 @@ namespace HSPI_ZWaveParametersTest
             var (plugInMock, _) = CreateMockPluginAndHsController();
 
             PlugIn plugIn = plugInMock.Object;
-            Assert.AreEqual(plugIn.HasSettings, true);
+            Assert.IsTrue(plugIn.HasSettings);
 
             var settingPages = SettingsCollection.FromJsonString(plugIn.GetJuiSettingsPages());
             Assert.IsNotNull(settingPages);
@@ -109,7 +109,7 @@ namespace HSPI_ZWaveParametersTest
             var (plugInMock, _) = CreateMockPluginAndHsController(settingsFromIni);
 
             PlugIn plugIn = plugInMock.Object;
-            Assert.AreEqual(plugIn.HasSettings, true);
+            Assert.IsTrue(plugIn.HasSettings);
 
             var settingPages = SettingsCollection.FromJsonString(plugIn.GetJuiSettingsPages());
             Assert.IsNotNull(settingPages);

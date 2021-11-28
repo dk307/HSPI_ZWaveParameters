@@ -62,6 +62,8 @@ namespace Hspi.OpenZWaveDB.Model
         [JsonIgnore]
         public Uri WebUrl => new(string.Format(CultureInfo.InvariantCulture, webUrlFormat, Id), UriKind.Absolute);
 
+#pragma warning disable S1075 // URIs should not be hardcoded
         private const string webUrlFormat = "https://www.opensmarthouse.org/zwavedatabase/{0}";
+#pragma warning restore S1075 // URIs should not be hardcoded
     }
 }

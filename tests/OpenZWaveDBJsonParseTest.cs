@@ -56,7 +56,7 @@ namespace HSPI_ZWaveParametersTest
             var obj = OpenZWaveDatabase.ParseJson(Resource.ParameterWithOptionOpenZWaveDBJson);
 
             Assert.IsNotNull(obj.Parameters);
-            Assert.AreEqual(obj.Parameters.Count, 1);
+            Assert.AreEqual(1, obj.Parameters.Count);
 
             Assert.AreEqual(obj.Parameters[0].Id, 7228);
             Assert.AreEqual(obj.Parameters[0].ParameterId, 1);

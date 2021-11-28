@@ -110,7 +110,7 @@ namespace Hspi.OpenZWaveDB
 
                 var deviceRefEntries = deviceRef?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (var entry in deviceRefEntries ?? 
+                foreach (var entry in deviceRefEntries ??
                                       throw new ArgumentException("Ref entries in file are invalid", nameof(file)))
                 {
                     var key = new Tuple<int, string>(manufacturerId, entry.ToUpperInvariant());
@@ -189,12 +189,9 @@ namespace Hspi.OpenZWaveDB
 
                 var data = new Dictionary<Tuple<int, string>, ImmutableList<Entry>>();
 
-                //collect and collapse results
                 foreach (var task in tasks)
                 {
-                    var result = task.Result;
-
-                    foreach (var pair in result)
+                    foreach (var pair in task.Result)
                     {
                         if (data.TryGetValue(pair.Key, out var value))
                         {
@@ -230,6 +227,6 @@ namespace Hspi.OpenZWaveDB
                                     ImmutableDictionary<Tuple<int, string>, ImmutableList<Entry>>.Empty;
 
         private Task? loadTask;
-        private record Entry(Version VersionMin, Version VersionMax, string FilePath, int Id);
+        private sealed record Entry(Version VersionMin, Version VersionMax, string FilePath, int Id);
     }
 }

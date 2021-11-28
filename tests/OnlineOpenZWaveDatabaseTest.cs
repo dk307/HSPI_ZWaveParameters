@@ -36,7 +36,7 @@ namespace HSPI_ZWaveParametersTest
 
             var obj2 = new OnlineOpenZWaveDatabase(12, 17479, 12342, new Version(5, 14, 0), mock.Object);
             var data2 = await obj2.Create(CancellationToken.None);
-            Assert.AreEqual(data2.Id, 1040);
+            Assert.AreEqual(1040, data2.Id);
 
             mock.Verify();
         }

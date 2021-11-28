@@ -117,23 +117,10 @@ namespace HSPI_ZWaveParametersTest
                                       GetFromJsonString("{ \"database_id\":1034, \"approved\":1, \"deleted\":0}")).ConfigureAwait(false);
         }
 
-        private static async Task<(Mock<IZWaveConnection>, DeviceConfigPage)> CreateAeonLabsSwitchDeviceConfigPage()
-        {
-            int deviceRef = 3746;
-            ZWaveData zwaveData = TestHelper.AeonLabsZWaveData;
-
-            var mock = SetupZWaveConnection(deviceRef, zwaveData);
-            var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
-                x => Task.FromResult(OpenZWaveDatabase.ParseJson(Resource.AeonLabsOpenZWaveDBDeviceJson)));
-            await deviceConfigPage.BuildConfigPage(CancellationToken.None).ConfigureAwait(false);
-            return (mock, deviceConfigPage);
-        }
-
         private static async Task<(Mock<IZWaveConnection>, DeviceConfigPage)> CreateHomeseerDimmerDeviceConfigPage()
         {
             int deviceRef = 3746;
             var zwaveData = TestHelper.HomeseerDimmerZWaveData;
-            var httpQueryMock = TestHelper.CreateHomeseerDimmerHttpHandler();
 
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
             var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
@@ -162,7 +149,7 @@ namespace HSPI_ZWaveParametersTest
 
             HtmlAgilityPack.HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(labelHtml);
-            Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0);
+            Assert.AreEqual(0, htmlDocument.ParseErrors.Count());
 
             var node = htmlDocument.DocumentNode.SelectSingleNode("//*/a");
 
@@ -175,7 +162,7 @@ namespace HSPI_ZWaveParametersTest
         {
             HtmlAgilityPack.HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(view.ToHtml());
-            Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0, "Parameters HTML is ill formed");
+            Assert.AreEqual(0, htmlDocument.ParseErrors.Count(), "Parameters HTML is ill formed");
 
             // check each parameter is present
             foreach (var parameter in deviceConfigPage.Data.Parameters)
@@ -190,14 +177,14 @@ namespace HSPI_ZWaveParametersTest
                 if (parameter.HasOptions && !parameter.HasSubParameters)
                 {
                     Assert.IsNotNull(dropDownNodes);
-                    Assert.AreEqual(dropDownNodes.Count, 1);
+                    Assert.AreEqual(1, dropDownNodes.Count);
                 }
                 else
                 {
                     var inputNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/input[@id=\"{ZWaveParameterPrefix}{parameter.Id}\"]"));
 
                     Assert.IsNotNull(inputNodes);
-                    Assert.AreEqual(inputNodes.Count, 1);
+                    Assert.AreEqual(1, inputNodes.Count);
                 }
             }
 
@@ -313,7 +300,7 @@ namespace HSPI_ZWaveParametersTest
         {
             HtmlAgilityPack.HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(view.ToHtml());
-            Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0, "Script HTML is ill formed");
+            Assert.AreEqual(0, htmlDocument.ParseErrors.Count(), "Script HTML is ill formed");
 
             var scriptNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/script"));
             Assert.IsNotNull(scriptNodes);

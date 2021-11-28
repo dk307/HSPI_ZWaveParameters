@@ -35,16 +35,16 @@ namespace Hspi
                                               token: ShutdownCancellationToken).Wait();
         }
 
-        public override string GetJuiDeviceConfigPage(int deviceOrFeatureRef)
+        public override string GetJuiDeviceConfigPage(int devOrFeatRef)
         {
             try
             {
-                Log.Debug("Asking for page for {deviceOrFeatureRef}", deviceOrFeatureRef);
-                var page = CreateDeviceConfigPage(deviceOrFeatureRef);
+                Log.Debug("Asking for page for {deviceOrFeatureRef}", devOrFeatRef);
+                var page = CreateDeviceConfigPage(devOrFeatRef);
                 Task.Run(() => page.BuildConfigPage(ShutdownCancellationToken)).Wait();
-                cacheForUpdate[deviceOrFeatureRef] = page;
+                cacheForUpdate[devOrFeatRef] = page;
                 var devicePage = page?.GetPage()?.ToJsonString() ?? throw new InvalidOperationException("Page is unexpectedly null");
-                Log.Debug("Returning page for {deviceOrFeatureRef}", deviceOrFeatureRef);
+                Log.Debug("Returning page for {deviceOrFeatureRef}", devOrFeatRef);
                 return devicePage;
             }
             catch (Exception ex)
@@ -162,7 +162,9 @@ namespace Hspi
                 // This needs to Exception class to show error message
                 string errorMessage = ex.GetFullMessage();
                 Log.Error("Failed to process OnDeviceConfigChange for devOrFeatRef:{devOrFeatRef} with error {error}", devOrFeatRef, errorMessage);
+#pragma warning disable S112 // Needed for HS4 to serialize the exception
                 throw new Exception(errorMessage);
+#pragma warning restore S112 // General exceptions should never be thrown
             }
         }
 
@@ -204,27 +206,24 @@ namespace Hspi
             {
                 var input = JsonNode.Parse(data);
 
-                if (input != null)
+                if (input != null && ((string?)input["operation"]) == DeviceConfigPageOperation)
                 {
-                    if (((string?)input["operation"]) == DeviceConfigPageOperation)
+                    var homeId = input["homeId"]?.ToString();
+                    var nodeId = (byte?)input["nodeId"];
+                    var parameter = (byte?)input["parameter"];
+
+                    if (string.IsNullOrWhiteSpace(homeId) || !nodeId.HasValue || !parameter.HasValue)
                     {
-                        var homeId = input["homeId"]?.ToString();
-                        var nodeId = (byte?)input["nodeId"];
-                        var parameter = (byte?)input["parameter"];
-
-                        if (string.IsNullOrWhiteSpace(homeId) || !nodeId.HasValue || !parameter.HasValue)
-                        {
-                            throw new ArgumentException("Input not valid");
-                        }
-
-                        var connection = CreateZWaveConnection();
-                        int value = Task.Run(() => connection.GetConfiguration(homeId, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
-
-                        return JsonSerializer.Serialize(new ZWaveParameterGetResult()
-                        {
-                            Value = value
-                        });
+                        throw new ArgumentException("Input not valid");
                     }
+
+                    var connection = CreateZWaveConnection();
+                    int value = Task.Run(() => connection.GetConfiguration(homeId, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
+
+                    return JsonSerializer.Serialize(new ZWaveParameterGetResult()
+                    {
+                        Value = value
+                    });
                 }
                 throw new ArgumentException("Unknown operation");
             }

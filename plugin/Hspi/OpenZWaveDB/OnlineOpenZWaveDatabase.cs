@@ -72,15 +72,13 @@ namespace Hspi.OpenZWaveDB
             int? id = null;
             foreach (var device in devices)
             {
-                if ((device.VersionMin != null) && (device.VersionMax != null))
+                if ((device.VersionMin != null) && (device.VersionMax != null) && 
+                    (Firmware >= device.VersionMin) && (Firmware <= device.VersionMax))
                 {
-                    if ((Firmware >= device.VersionMin) && (Firmware <= device.VersionMax))
-                    {
-                        Log.Debug("Found Specific {@device} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}",
-                                     device, ManufactureId, ProductType, ProductId, Firmware);
-                        id = device.Id;
-                        break;
-                    }
+                    Log.Debug("Found Specific {@device} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}",
+                                 device, ManufactureId, ProductType, ProductId, Firmware);
+                    id = device.Id;
+                    break;
                 }
             }
 

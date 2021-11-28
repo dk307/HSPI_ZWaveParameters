@@ -188,12 +188,10 @@ namespace Hspi
 
         private static int ZWaveParameterFromId(string idParameter)
         {
-            if (idParameter.StartsWith(ZWaveParameterPrefix))
+            if (idParameter.StartsWith(ZWaveParameterPrefix) && 
+                int.TryParse(idParameter.Substring(ZWaveParameterPrefix.Length), out int id))
             {
-                if (int.TryParse(idParameter.Substring(ZWaveParameterPrefix.Length), out int id))
-                {
-                    return id;
-                }
+                return id;
             }
             throw new ArgumentException("Not a ZWave Parameter", nameof(idParameter));
         }

@@ -3,6 +3,7 @@ Homeseer 4 plugin to view & update Z-Wave device parameters. The parameter infor
 
 Build State
 -----------
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/355861c9858d4a68ace7fbba4f413fc3)](https://app.codacy.com/gh/dk307/HSPI_ZWaveParameters?utm_source=github.com&utm_medium=referral&utm_content=dk307/HSPI_ZWaveParameters&utm_campaign=Badge_Grade_Settings)
 [![Build Release](https://github.com/dk307/HSPI_ZWaveParameters/actions/workflows/buildrelease.yml/badge.svg)](https://github.com/dk307/HSPI_ZWaveParameters/actions/workflows/buildrelease.yml)
 [![Unit Tests](https://github.com/dk307/HSPI_ZWaveParameters/actions/workflows/tests.yml/badge.svg)](https://github.com/dk307/HSPI_ZWaveParameters/actions/workflows/tests.yml)
 

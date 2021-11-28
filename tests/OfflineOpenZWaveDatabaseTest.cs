@@ -1,4 +1,5 @@
-﻿using Hspi.OpenZWaveDB;
+﻿using Hspi.Exceptions;
+using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -45,9 +46,9 @@ namespace HSPI_ZWaveParametersTest
             OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new(TestHelper.GetOfflineDatabasePath());
             var _ = offlineOpenZWaveDatabase.StartLoadAsync(CancellationToken.None);
 
-            await Assert.ThrowsExceptionAsync<Exception>(() => offlineOpenZWaveDatabase.Create(0x783, 243,
-                                                                   234, Version.Parse("4.3"),
-                                                                   CancellationToken.None));
+            await Assert.ThrowsExceptionAsync<ShowErrorMessageException>(() => offlineOpenZWaveDatabase.Create(0x783, 243,
+                                                                         234, Version.Parse("4.3"),
+                                                                         CancellationToken.None));
         }
 
         [TestMethod]
@@ -65,7 +66,7 @@ namespace HSPI_ZWaveParametersTest
         {
             var dbPath = TestHelper.GetOfflineDatabasePath();
 
-            int maxCount = 5;
+            const int maxCount = 5;
             var queryMaker = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
 
             for (int i = 1; i <= maxCount; i++)

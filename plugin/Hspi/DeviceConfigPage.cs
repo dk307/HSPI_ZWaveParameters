@@ -38,7 +38,7 @@ namespace Hspi
 
             if (Data == null)
             {
-                throw new Exception("Failed to get data from website");
+                throw new InvalidOperationException("Failed to get data from website");
             }
 
             var scripts = new List<string>();
@@ -76,7 +76,7 @@ namespace Hspi
                 var parameterInfo = Data.Parameters.FirstOrDefault(x => x.Id == parameterId);
                 if ((parameterInfo == null) || (parameterInfo.Size == 0))
                 {
-                    throw new Exception("Z-wave parameter information not found");
+                    throw new InvalidOperationException("Z-Wave parameter information not found");
                 }
 
                 long? value = null;

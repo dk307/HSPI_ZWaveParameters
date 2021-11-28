@@ -81,7 +81,7 @@ namespace Hspi.OpenZWaveDB
             }
             catch (Exception ex)
             {
-                throw new Exception("Failed to get data from Offline Open Z-Wave Database", ex);
+                throw new ShowErrorMessageException("Failed to get data from Offline Open Z-Wave Database", ex);
             }
         }
 
@@ -110,7 +110,8 @@ namespace Hspi.OpenZWaveDB
 
                 var deviceRefEntries = deviceRef?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (var entry in deviceRefEntries ?? throw new Exception("Ref entries is null"))
+                foreach (var entry in deviceRefEntries ?? 
+                                      throw new ArgumentException("Ref entries in file are invalid", nameof(file)))
                 {
                     var key = new Tuple<int, string>(manufacturerId, entry.ToUpperInvariant());
                     var value = new Entry(versionMin ?? new Version(0, 0),

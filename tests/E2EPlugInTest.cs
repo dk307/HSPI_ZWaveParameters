@@ -51,7 +51,7 @@ namespace HSPI_ZWaveParametersTest
                 .Setup<IHttpQueryMaker>("CreateHttpQueryMaker")
                 .Returns(httpQueryMock.Object);
 
-            int deviceRef = 8475;
+            const int deviceRef = 8475;
             CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
 
             PlugIn plugIn = plugInMock.Object;
@@ -74,7 +74,7 @@ namespace HSPI_ZWaveParametersTest
 
             var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController(settingsFromIni);
 
-            int deviceRef = 8475;
+            const int deviceRef = 8475;
             CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
 
             PlugIn plugIn = plugInMock.Object;

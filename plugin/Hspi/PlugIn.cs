@@ -43,7 +43,7 @@ namespace Hspi
                 var page = CreateDeviceConfigPage(deviceOrFeatureRef);
                 Task.Run(() => page.BuildConfigPage(ShutdownCancellationToken)).Wait();
                 cacheForUpdate[deviceOrFeatureRef] = page;
-                var devicePage = page?.GetPage()?.ToJsonString() ?? throw new Exception("Page is unexpectedly null");
+                var devicePage = page?.GetPage()?.ToJsonString() ?? throw new InvalidOperationException("Page is unexpectedly null");
                 Log.Debug("Returning page for {deviceOrFeatureRef}", deviceOrFeatureRef);
                 return devicePage;
             }

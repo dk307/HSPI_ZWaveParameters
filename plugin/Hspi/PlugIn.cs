@@ -140,6 +140,7 @@ namespace Hspi
             }
         }
 
+        [SuppressMessage("Major Code Smell", "S112:General exceptions should never be thrown", Justification = "<Pending>")]
         protected override bool OnDeviceConfigChange(Page deviceConfigPage, int devOrFeatRef)
         {
             try
@@ -162,9 +163,7 @@ namespace Hspi
                 // This needs to Exception class to show error message
                 string errorMessage = ex.GetFullMessage();
                 Log.Error("Failed to process OnDeviceConfigChange for devOrFeatRef:{devOrFeatRef} with error {error}", devOrFeatRef, errorMessage);
-#pragma warning disable S112 // Needed for HS4 to serialize the exception
                 throw new Exception(errorMessage);
-#pragma warning restore S112 // General exceptions should never be thrown
             }
         }
 

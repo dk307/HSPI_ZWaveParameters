@@ -29,10 +29,12 @@ namespace Hspi.OpenZWaveDB
             return await queryMaker.GetUtf8JsonResponse(listUrl, cancellationToken).ConfigureAwait(false);
         }
 
-#pragma warning disable S1075 // URIs should not be hardcoded
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1075:URIs should not be hardcoded", Justification = "Used as format string")]
         private const string deviceUrlFormat = "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id={0}";
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Minor Code Smell", "S1075:URIs should not be hardcoded", Justification = "Used as format string")]
         private const string listUrlFormat = "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x{0:X4}%20{1:X4}:{2:X4}";
-#pragma warning restore S1075 // URIs should not be hardcoded
+
         private readonly IHttpQueryMaker queryMaker;
     }
 }

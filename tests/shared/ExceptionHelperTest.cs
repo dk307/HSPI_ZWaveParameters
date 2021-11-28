@@ -12,8 +12,8 @@ namespace HSPI_Test
         [TestMethod]
         public void SimpleExceptionMessage()
         {
-            Assert.AreEqual(ExceptionHelper.GetFullMessage(new Exception("message")), "message");
-            Assert.AreEqual(ExceptionHelper.GetFullMessage(new ArgumentException("message")), "message");
+            Assert.AreEqual("message", ExceptionHelper.GetFullMessage(new Exception("message")));
+            Assert.AreEqual("message", ExceptionHelper.GetFullMessage(new ArgumentException("message")));
         }
 
         [TestMethod]
@@ -39,7 +39,7 @@ namespace HSPI_Test
         public void MessageWithEOL()
         {
             var ex = new Exception("message", new Exception("inner exception"));
-            Assert.AreEqual(ExceptionHelper.GetFullMessage(ex, "<BR>"), "message<BR>inner exception");
+            Assert.AreEqual("message<BR>inner exception", ExceptionHelper.GetFullMessage(ex, "<BR>"));
         }
 
         [TestMethod]
@@ -47,7 +47,7 @@ namespace HSPI_Test
         {
             var exceptions = new List<Exception>() { new Exception("message1"), new Exception("message2") };
             var ex = new AggregateException("message8", exceptions);
-            Assert.AreEqual(ExceptionHelper.GetFullMessage(ex, "<BR>"), "message1<BR>message2");
+            Assert.AreEqual("message1<BR>message2", ExceptionHelper.GetFullMessage(ex, "<BR>"));
         }
 
         [TestMethod]

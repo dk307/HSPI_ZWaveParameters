@@ -25,7 +25,7 @@ namespace Hspi
             try
             {
                 object? value = null;
-                bool wasSuccessful = false;
+                object? wasSuccessful = null;
 
                 // we use lock because we read status later from another variable
                 using (var readLock = await getConfiguationLock.LockAsync(cancellationtoken).ConfigureAwait(false))
@@ -33,15 +33,15 @@ namespace Hspi
                     Log.Debug("Getting homeId:{homeId} nodeId:{nodeId} parameter:{parameter}", homeId, nodeId, param);
                     value = HomeSeerSystem.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
 
-                    wasSuccessful = (bool)HomeSeerSystem.LegacyPluginPropertyGet(ZWaveInterface, string.Empty, "Configuration_Get_Result");
+                    wasSuccessful = HomeSeerSystem.LegacyPluginPropertyGet(ZWaveInterface, string.Empty, "Configuration_Get_Result");
                 }
 
-                if (value == null || !wasSuccessful)
+                if (value == null || wasSuccessful == null || !(bool)wasSuccessful)
                 {
                     throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for node {nodeId} "));
                 }
 
-                int intValue = Convert.ToInt32(value);
+                int intValue = Convert.ToInt32(value, CultureInfo.InvariantCulture);
 
                 Log.Debug("For homeId:{homeId} nodeId:{nodeId} parameter:{parameter} got {value}", homeId, nodeId, param, intValue);
                 return intValue;

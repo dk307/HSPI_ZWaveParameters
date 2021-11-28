@@ -110,7 +110,7 @@ namespace HSPI_ZWaveParametersTest
         {
             HtmlAgilityPack.HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(html);
-            Assert.AreEqual(htmlDocument.ParseErrors.Count(), 0);
+            Assert.AreEqual(0, htmlDocument.ParseErrors.Count() );
         }
         public const string ZWaveInterface = "Z-Wave";
     }

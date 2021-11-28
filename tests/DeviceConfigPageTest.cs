@@ -69,7 +69,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public async Task OnDeviceConfigChangeWithNoChange()
         {
-            await TestOnDeviceConfigChange((_, parameter) => (false, null, null)).ConfigureAwait(false);
+            await TestOnDeviceConfigChange((_, _) => (false, null, null)).ConfigureAwait(false);
         }
 
         [TestMethod]

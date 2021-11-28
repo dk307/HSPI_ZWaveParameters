@@ -46,7 +46,7 @@ jobs:
         shell: powershell
         run: |
           New-Item -Force -ItemType directory -Path $HOME\.sonar
-          curl -sSLo $HOME\.sonar\sonar-scanner.zip ${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
+          Invoke-WebRequest -Uri ${{ env.SONAR_SCANNER_DOWNLOAD_URL }} -OutFile $HOME\.sonar\sonar-scanner.zip
           unzip -o $HOME\.sonar\sonar-scanner.zip -d $HOME\.sonar\
           ls $HOME\.sonar
 

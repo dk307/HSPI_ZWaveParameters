@@ -67,7 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
-        run: SonarScanner.MSBuild.exe begin /k:"dk307_HSPI_ZWaveParameters" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:"sonar.cs.dotcover.reportsPaths=**/dotCover.html"
+        run: SonarScanner.MSBuild.exe begin /k:"dk307_HSPI_ZWaveParameters" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:"sonar.cs.dotcover.reportsPaths=**\dotCover.html" /d:"sonar.cs.vstest.reportsPaths=**\*.trx"
 
       - name: Build Debug
         shell: powershell

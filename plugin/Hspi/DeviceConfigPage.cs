@@ -38,7 +38,7 @@ namespace Hspi
 
             if (Data == null)
             {
-                throw new InvalidOperationException("Failed to get data from website");
+                throw new InvalidOperationException("Failed to get data for Z-Wave device");
             }
 
             var scripts = new List<string>();

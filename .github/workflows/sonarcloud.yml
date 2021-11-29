@@ -72,7 +72,7 @@ jobs:
 
       - name: Run tests
         shell: powershell
-        run: dotCover.exe analyse /ReportType=HTML /Output="%CD%\dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=tests\bin\Debug\HSPI_ZWaveParametersTest.dll" /TargetArguments="/parallel" /DisableNGen
+        run: dotCover.exe analyse /ReportType=HTML /Output="%CD%\dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=tests\bin\Debug\HSPI_ZWaveParametersTest.dll /parallel" /DisableNGen
 
       - name: End Sonar Scanner
         env:

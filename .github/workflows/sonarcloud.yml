@@ -57,7 +57,7 @@ jobs:
       - name: Download and set up dotCover
         shell: powershell
         run: |
-          New-Item -Force -ItemType directory -Path $HOME\.sonar
+          New-Item -Force -ItemType directory -Path $HOME\.dotCover
           Invoke-WebRequest -Uri ${{ env.DOTCOVER_DOWNLOAD_URL }} -OutFile $HOME\.dotCover\dotCover.zip
           unzip -o $HOME\.sonar\dotCover.zip -d $HOME\.dotCover\
           echo "$HOME\.dotCover" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -73,5 +73,5 @@ jobs:
         run: |
           SonarScanner.MSBuild.exe begin /k:"dk307_HSPI_ZWaveParameters" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           msbuild.exe ${{ env.SLN_FILE }} /p:platform="Any CPU" /p:configuration="Debug"
-          dotCover.exe analyse /ReportType=HTML /Output="%CD%\dotCover.html" "/TargetExecutable=vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=.\tests\bin\Debug\HSPI_ZWaveParametersTest.dll"
+          dotCover.exe analyse /ReportType=HTML /Output="%CD%\dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=%CD%\tests\bin\Debug\HSPI_ZWaveParametersTest.dll"
           SonarScanner.MSBuild.exe end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

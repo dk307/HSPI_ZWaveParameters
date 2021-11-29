@@ -26,9 +26,6 @@ jobs:
     
       - name: Setup VS Dev Environment
         uses: seanmiddleditch/gha-setup-vsdevenv@v4
-
-      - name: Setup VSTest Path
-        uses: darenm/Setup-VSTest@v1
     
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.5
@@ -59,13 +56,13 @@ jobs:
         run: |
           New-Item -Force -ItemType directory -Path $HOME\.dotCover
           Invoke-WebRequest -Uri ${{ env.DOTCOVER_DOWNLOAD_URL }} -OutFile $HOME\.dotCover\dotCover.zip
-          unzip -o $HOME\.sonar\dotCover.zip -d $HOME\.dotCover\
+          unzip -o $HOME\.dotCover\dotCover.zip -d $HOME\.dotCover\
           echo "$HOME\.dotCover" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
   
       - name: Restore Nuget Packages
         run: nuget restore ${{ env.SLN_FILE }}
 
-      - name: Build and tun tests
+      - name: Build and run tests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

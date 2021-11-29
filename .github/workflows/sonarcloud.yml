@@ -7,6 +7,7 @@ on:
 
 env:
     SONAR_SCANNER_DOWNLOAD_URL: "https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/5.4.0.40033/sonar-scanner-msbuild-5.4.0.40033-net46.zip"
+    DOTCOVER_DOWNLOAD_URL: "https://download.jetbrains.com/resharper/dotUltimate.2021.2.2/JetBrains.dotCover.CommandLineTools.2021.2.2.zip"
     SONAR_SCANNER_VERSION : "5.4.0"
     SLN_FILE: "HSPI_ZWaveParameters.sln"
 jobs:
@@ -52,8 +53,15 @@ jobs:
           Invoke-WebRequest -Uri ${{ env.SONAR_SCANNER_DOWNLOAD_URL }} -OutFile $HOME\.sonar\sonar-scanner.zip
           unzip -o $HOME\.sonar\sonar-scanner.zip -d $HOME\.sonar\
           echo "$HOME\.sonar" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "%VSINSTALLDIR%\Team Tools\Dynamic Code Coverage Tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
+  
+      - name: Download and set up dotCover
+        shell: powershell
+        run: |
+          New-Item -Force -ItemType directory -Path $HOME\.sonar
+          Invoke-WebRequest -Uri ${{ env.DOTCOVER_DOWNLOAD_URL }} -OutFile $HOME\.dotCover\dotCover.zip
+          unzip -o $HOME\.sonar\dotCover.zip -d $HOME\.dotCover\
+          echo "$HOME\.dotCover" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+  
       - name: Restore Nuget Packages
         run: nuget restore ${{ env.SLN_FILE }}
 
@@ -65,6 +73,5 @@ jobs:
         run: |
           SonarScanner.MSBuild.exe begin /k:"dk307_HSPI_ZWaveParameters" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           msbuild.exe ${{ env.SLN_FILE }} /p:platform="Any CPU" /p:configuration="Debug"
-          vstest.console.exe .\tests\bin\Debug\HSPI_ZWaveParametersTest.dll  /Enablecodecoverage  /parallel /logger:trx
-          CodeCoverage.exe /analyze /output:"%CD%\VisualStudio.coveragexml" "%CD%\VisualStudio.coverage"
+          dotCover.exe analyse /ReportType=HTML /Output="%CD%\dotCover.html" "/TargetExecutable=vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=.\tests\bin\Debug\HSPI_ZWaveParametersTest.dll"
           SonarScanner.MSBuild.exe end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

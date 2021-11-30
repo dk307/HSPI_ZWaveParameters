@@ -53,6 +53,15 @@ jobs:
          restore-keys: |
               ${{ runner.os }}-${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
 
+      - name: Cache DotCover
+        uses: actions/cache@v2
+        id: dotCover
+        with:
+         path: ~/.dotCover
+         key: ${{ runner.os }}-${{ env.DOTCOVER_DOWNLOAD_URL }}
+         restore-keys: |
+              ${{ runner.os }}-${{ env.DOTCOVER_DOWNLOAD_URL }}
+
       - name: Download and set up sonar-scanner
         if: steps.sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
@@ -63,6 +72,7 @@ jobs:
           Remove-Item -Path $HOME\.sonar\sonar-scanner.zip
   
       - name: Download and set up dotCover
+        if: steps.dotCover.outputs.cache-hit != 'true'
         shell: powershell
         run: |
           New-Item -Force -ItemType directory -Path $HOME\.dotCover

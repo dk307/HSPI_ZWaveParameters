@@ -5,6 +5,8 @@ Homeseer 4 plugin to view & update Z-Wave device parameters. The parameter infor
 
 [![Build Release](https://github.com/dk307/HSPI_ZWaveParameters/actions/workflows/buildrelease.yml/badge.svg)](https://github.com/dk307/HSPI_ZWaveParameters/actions/workflows/buildrelease.yml)
 [![Unit Tests](https://github.com/dk307/HSPI_ZWaveParameters/actions/workflows/tests.yml/badge.svg)](https://github.com/dk307/HSPI_ZWaveParameters/actions/workflows/tests.yml)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=dk307_HSPI_ZWaveParameters&metric=coverage)](https://sonarcloud.io/summary/new_code?id=dk307_HSPI_ZWaveParameters)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dk307_HSPI_ZWaveParameters&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=dk307_HSPI_ZWaveParameters)
 
 ## Features
 

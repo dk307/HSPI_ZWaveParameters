@@ -45,7 +45,17 @@ jobs:
          restore-keys: |
               ${{ runner.os }}-nuget-
 
+      - name: Cache Sonar Scanner
+        uses: actions/cache@v2
+        id: sonar-scanner
+        with:
+         path: ~/.sonar
+         key: ${{ runner.os }}-${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
+         restore-keys: |
+              ${{ runner.os }}-${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
+
       - name: Download and set up sonar-scanner
+        if: steps.sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
         run: |
           New-Item -Force -ItemType directory -Path $HOME\.sonar

@@ -94,7 +94,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
-        run: SonarScanner.MSBuild.exe begin /k:"${{ env.SONAR_PROJECT_KEY }}" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:"sonar.cs.vstest.reportsPaths=**\*.trx"
+        run: SonarScanner.MSBuild.exe begin /k:"${{ env.SONAR_PROJECT_KEY }}" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:"sonar.cs.dotcover.reportsPaths=**\dotCover.html" /d:"sonar.cs.vstest.reportsPaths=**\*.trx"
 
       - name: Build Debug
         shell: powershell
@@ -104,6 +104,14 @@ jobs:
         shell: powershell
         run: dotCover.exe analyse /ReportType=HTML /Output="dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=${{ env.TEST_FILE }} /Parallel /logger:trx" /DisableNGen
 
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
+        with:
+          name: Windows Unit Tests            # Name of the check run which will be created
+          path: TestResults/*.trx    # Path to test results
+          reporter: dotnet-trx        # Format of test results
+
       - name: End Sonar Scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -111,10 +119,4 @@ jobs:
         shell: powershell
         run: SonarScanner.MSBuild.exe end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
-        # Using the trx-parser action
-      - name: Parse Trx files
-        uses: NasAmin/trx-parser@v0.2.0
-        id: trx-parser
-        with:
-          TRX_PATH: ${{ github.workspace }}/TestResults
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+     

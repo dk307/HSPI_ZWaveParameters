@@ -43,6 +43,7 @@ jobs:
         with:
          path: ~/.nuget/packages
          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+         restore-keys: ${{ runner.os }}-nuget-
         
       - name: Cache Sonar Scanner
         uses: actions/cache@v2
@@ -80,8 +81,7 @@ jobs:
           unzip -o $HOME\.dotCover\dotCover.zip -d $HOME\.dotCover\
           Remove-Item -Path $HOME\.dotCover\dotCover.zip
   
-      - name: Restore Nuget Packages
-        if: steps.nuget.outputs.cache-hit != 'true'
+      - name: Restore Nuget Packages        
         run: nuget restore ${{ env.SLN_FILE }}
 
       - name: Set Paths

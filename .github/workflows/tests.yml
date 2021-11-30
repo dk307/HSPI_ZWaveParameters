@@ -12,7 +12,6 @@ env:
     DOTCOVER_DOWNLOAD_URL: "https://download.jetbrains.com/resharper/dotUltimate.2021.2.2/JetBrains.dotCover.CommandLineTools.2021.2.2.zip"
     SLN_FILE: "HSPI_ZWaveParameters.sln"
     TEST_FILE_WIN: "tests\\bin\\Debug\\HSPI_ZWaveParametersTest.dll"
-    TEST_FILE_UBUNTU: "./tests/bin/Debug/HSPI_ZWaveParametersTest.dll"
 
 jobs:
   build-cache-test-win:
@@ -154,6 +153,8 @@ jobs:
 
       - run: ls -l ./tests/bin/Debug
       - name: Run Unit Tests
+        env:
+          TEST_FILE_UBUNTU: "./tests/bin/Debug/HSPI_ZWaveParametersTest.dll"
         run: dotnet vstest --Parallel --logger:trx ${{ TEST_FILE_UBUNTU }}
 
       - name: Test Report

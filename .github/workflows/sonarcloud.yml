@@ -60,7 +60,6 @@ jobs:
           New-Item -Force -ItemType directory -Path $HOME\.sonar
           Invoke-WebRequest -Uri ${{ env.SONAR_SCANNER_DOWNLOAD_URL }} -OutFile $HOME\.sonar\sonar-scanner.zip
           unzip -o $HOME\.sonar\sonar-scanner.zip -d $HOME\.sonar\
-          echo "$HOME\.sonar" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           Remove-Item -Path $HOME\.sonar\sonar-scanner.zip
   
       - name: Download and set up dotCover
@@ -69,12 +68,16 @@ jobs:
           New-Item -Force -ItemType directory -Path $HOME\.dotCover
           Invoke-WebRequest -Uri ${{ env.DOTCOVER_DOWNLOAD_URL }} -OutFile $HOME\.dotCover\dotCover.zip
           unzip -o $HOME\.dotCover\dotCover.zip -d $HOME\.dotCover\
-          echo "$HOME\.dotCover" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           Remove-Item -Path $HOME\.dotCover\dotCover.zip
   
       - name: Restore Nuget Packages
         if: steps.nuget.outputs.cache-hit != 'true'
         run: nuget restore ${{ env.SLN_FILE }}
+
+      - name: Set Paths
+        run: |
+            echo "$HOME\.sonar" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            echo "$HOME\.dotCover" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Start Sonar Scanner
         env:

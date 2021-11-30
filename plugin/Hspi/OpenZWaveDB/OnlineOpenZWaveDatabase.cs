@@ -49,6 +49,7 @@ namespace Hspi.OpenZWaveDB
             }
             catch (Exception ex)
             {
+                //wrap the exceptions
                 throw new Exception("Failed to get data from Open Z-Wave Database", ex);
             }
         }

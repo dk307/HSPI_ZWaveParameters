@@ -217,7 +217,7 @@ namespace Hspi
                     }
 
                     var connection = CreateZWaveConnection();
-                    int value = Task.Run(() => connection.GetConfiguration(homeId, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
+                    int value = Task.Run(() => connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
 
                     return JsonSerializer.Serialize(new ZWaveParameterGetResult()
                     {

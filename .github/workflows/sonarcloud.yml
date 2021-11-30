@@ -10,7 +10,8 @@ env:
     SONAR_SCANNER_DOWNLOAD_URL: "https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/5.4.0.40033/sonar-scanner-msbuild-5.4.0.40033-net46.zip"
     DOTCOVER_DOWNLOAD_URL: "https://download.jetbrains.com/resharper/dotUltimate.2021.2.2/JetBrains.dotCover.CommandLineTools.2021.2.2.zip"
     SLN_FILE: "HSPI_ZWaveParameters.sln"
-    TEST_FILE: "tests\\bin\\Debug\\HSPI_ZWaveParametersTest.dll"
+    TEST_FILE_WIN: "tests\\bin\\Debug\\HSPI_ZWaveParametersTest.dll"
+    TEST_FILE_UBUNTU: "./tests/bin/Debug/HSPI_ZWaveParametersTest.dll"
 
 jobs:
   build-cache-test-win:
@@ -109,7 +110,7 @@ jobs:
 
       - name: Run tests
         shell: powershell
-        run: dotCover.exe analyse /ReportType=HTML /Output="dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=${{ env.TEST_FILE }} /Parallel /logger:trx" /DisableNGen
+        run: dotCover.exe analyse /ReportType=HTML /Output="dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=${{ env.TEST_FILE_WIN }} /Parallel /logger:trx" /DisableNGen
 
       - name: Test Report
         uses: dorny/test-reporter@v1
@@ -136,6 +137,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
+          fetch-depth: 0
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
@@ -151,7 +153,7 @@ jobs:
 
       - run: ls -l ./tests/bin/Debug
       - name: Run Unit Tests
-        run: dotnet vstest --Parallel --logger:trx ./tests/bin/Debug/HSPI_ZWaveParametersTest.dll
+        run: dotnet vstest --Parallel --logger:trx ${{ TEST_FILE_UBUNTU }}
 
       - name: Test Report
         uses: dorny/test-reporter@v1

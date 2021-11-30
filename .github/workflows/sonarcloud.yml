@@ -102,7 +102,7 @@ jobs:
 
       - name: Run tests
         shell: powershell
-        run: dotCover.exe analyse /ReportType=HTML /Output="dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=${{ env.TEST_FILE }}" /DisableNGen
+        run: dotCover.exe analyse /ReportType=HTML /Output="dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=${{ env.TEST_FILE }} /Parallel /logger:trx" /DisableNGen
 
       - name: End Sonar Scanner
         env:

@@ -96,7 +96,7 @@ namespace Hspi
                 }
                 else
                 {
-                    throw new InvalidValueForTypeException("Selection/Input not valid");
+                    throw new InvalidValueForTypeException(Invariant($"Value not valid for #{parameterInfo.ParameterId}"));
                 }
             }
         }
@@ -349,12 +349,19 @@ namespace Hspi
                 value &= parameterInfo.Bitmask;
             }
 
+            if (value > int.MaxValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value),
+                                                      Invariant($"Value too large for #{parameterInfo.ParameterId}"));
+            }
+
             zwaveConnection.SetConfiguration(zwaveData.HomeId,
                                              zwaveData.NodeId,
                                              parameterInfo.ParameterId,
                                              parameterInfo.Size,
-                                             (int)value); //truncate value if too long
+                                             (int)value);
         }
+
         private const string NewLine = "<BR>";
         private const string ZWaveParameterPrefix = "zw_parameter_";
         private readonly int deviceOrFeatureRef;

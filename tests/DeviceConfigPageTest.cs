@@ -67,6 +67,21 @@ namespace HSPI_ZWaveParametersTest
         }
 
         [TestMethod]
+        public async Task OnDeviceConfigChangeWithOutofRangeValue()
+        {
+            var task = TestOnDeviceConfigChange((view, parameter) =>
+            {
+                if (view is InputView inputView)
+                {
+                    return (true, (((long)int.MaxValue) + 1).ToString(), parameter.Default);
+                }
+                return (false, null, null);
+            });
+
+            await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => task);
+        }
+
+        [TestMethod]
         public async Task OnDeviceConfigChangeWithNoChange()
         {
             await TestOnDeviceConfigChange((_, _) => (false, null, null)).ConfigureAwait(false);
@@ -252,7 +267,8 @@ namespace HSPI_ZWaveParametersTest
 
         private async Task TestOnDeviceConfigChange(Func<AbstractView, ZWaveDeviceParameter, (bool, string, long?)> changedData)
         {
-            var (zwaveMock, deviceConfigPage) = await CreateHomeseerDimmerDeviceConfigPage().ConfigureAwait(false);
+            var (zwaveMock, deviceConfigPage) = await CreateHomeseerDimmerDeviceConfigPage()
+                                                      .ConfigureAwait(false);
 
             Page page = deviceConfigPage.GetPage();
             var viewGroup = (ViewGroup)page.Views[2];

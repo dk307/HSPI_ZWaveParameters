@@ -82,6 +82,21 @@ namespace HSPI_ZWaveParametersTest
         }
 
         [TestMethod]
+        public async Task OnDeviceConfigChangeWithNonIntegerValue()
+        {
+            var task = TestOnDeviceConfigChange((view, parameter) =>
+            {
+                if (view is InputView inputView)
+                {
+                    return (true, "abcd", parameter.Default);
+                }
+                return (false, null, null);
+            });
+
+            await Assert.ThrowsExceptionAsync<InvalidValueForTypeException>(() => task);
+        }
+
+        [TestMethod]
         public async Task OnDeviceConfigChangeWithNoChange()
         {
             await TestOnDeviceConfigChange((_, _) => (false, null, null)).ConfigureAwait(false);

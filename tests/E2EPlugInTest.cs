@@ -51,7 +51,6 @@ namespace HSPI_ZWaveParametersTest
             VerifyCorrectDeviceConfigPage(deviceRef, plugIn);
 
             plugInMock.Verify();
-
         }
 
         [TestMethod]

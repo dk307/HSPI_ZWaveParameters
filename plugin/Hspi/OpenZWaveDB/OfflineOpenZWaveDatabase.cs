@@ -42,12 +42,12 @@ namespace Hspi.OpenZWaveDB
                 string json = await reader.ReadToEndAsync().ConfigureAwait(false);
                 var data = JsonSerializer.Deserialize<ZWaveInformationBasic>(json);
 
-                if ((data == null) || (data.Deleted != 0) || (data.Approved == 0))
+                if ((data == null) || (data.Id == null) || (data.Deleted != 0) || (data.Approved == 0))
                 {
                     continue;
                 }
 
-                string fullPath = Path.ChangeExtension(Path.Combine(databasePath, data.Id.ToString(CultureInfo.InvariantCulture)), ".json");
+                string fullPath = Path.ChangeExtension(Path.Combine(databasePath, data.Id.Value.ToString(CultureInfo.InvariantCulture)), ".json");
                 await SaveFile(json, fullPath).ConfigureAwait(false);
             }
         }
@@ -136,8 +136,10 @@ namespace Hspi.OpenZWaveDB
         {
             byte[] bytes = fileEncoding.GetBytes(json);
 
-            using var stream = File.Open(fullPath, FileMode.OpenOrCreate, FileAccess.Write);
+            using var stream = File.Open(fullPath, FileMode.Create, FileAccess.Write);
             await stream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
+
+            Log.Information("Wrote to {path}", fullPath);
         }
 
         private string FindInEntries(int manufacturerId, int productType, int productId,

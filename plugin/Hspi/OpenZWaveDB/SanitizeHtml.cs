@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Hspi.OpenZWaveDB
 {
-    internal class SanitizeHtml
+    internal sealed class SanitizeHtml
     {
         public SanitizeHtml()
         {

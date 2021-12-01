@@ -7,6 +7,7 @@ using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -17,6 +18,42 @@ namespace HSPI_ZWaveParametersTest
     [TestClass]
     public class E2EPlugInTest
     {
+        [TestMethod]
+        public void CheckDebugLevelSettingChange()
+        {
+            var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController();
+
+            PlugIn plugIn = plugInMock.Object;
+
+            var httpQueryMock = TestHelper.CreateAeonLabsSwitchHttpHandler();
+
+            plugInMock.Protected()
+                .Setup<IHttpQueryMaker>("CreateHttpQueryMaker")
+                .Returns(httpQueryMock.Object);
+
+            const int deviceRef = 8475;
+            CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
+
+            Assert.IsFalse(Log.Logger.IsEnabled(Serilog.Events.LogEventLevel.Debug));
+
+            var settingsCollection = new SettingsCollection
+            {
+                // invert all values
+                SettingsPages.CreateDefault(preferOnlineDatabaseDefault: true,
+                                            enableDebugLoggingDefault : true,
+                                            logToFileDefault : true)
+            };
+
+            Assert.IsTrue(plugIn.SaveJuiSettingsPages(settingsCollection.ToJsonString()));
+
+            Assert.IsTrue(Log.Logger.IsEnabled(Serilog.Events.LogEventLevel.Debug));
+
+            VerifyCorrectDeviceConfigPage(deviceRef, plugIn);
+
+            plugInMock.Verify();
+
+        }
+
         [TestMethod]
         public void CheckDefaultSettingAreLoadedDuringInitialize()
         {
@@ -33,6 +70,23 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(settings[SettingsPages.PreferOnlineDatabaseId], false.ToString());
             Assert.AreEqual(settings[SettingsPages.LoggingDebugId], false.ToString());
             Assert.AreEqual(settings[SettingsPages.LogToFileId], false.ToString());
+        }
+
+        [TestMethod]
+        public void CheckDevicePageIsReturnedForOfflineCase()
+        {
+            var settingsFromIni = new Dictionary<string, string>
+            {
+                { SettingsPages.PreferOnlineDatabaseId, false.ToString()}
+            };
+
+            var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController(settingsFromIni);
+
+            const int deviceRef = 8475;
+            CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
+
+            PlugIn plugIn = plugInMock.Object;
+            VerifyCorrectDeviceConfigPage(deviceRef, plugIn);
         }
 
         [TestMethod]
@@ -55,36 +109,9 @@ namespace HSPI_ZWaveParametersTest
             CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
 
             PlugIn plugIn = plugInMock.Object;
-            var pageJson = plugIn.GetJuiDeviceConfigPage(deviceRef);
+            VerifyCorrectDeviceConfigPage(deviceRef, plugIn);
 
-            // assert page is not error
-            var page = Page.FromJsonString(pageJson);
-
-            Assert.AreEqual(page.Type, EPageType.DeviceConfig);
-            Assert.IsFalse(page.ContainsViewWithId("exception"));
-        }
-
-        [TestMethod]
-        public void CheckDevicePageIsReturnedForOfflineCase()
-        {
-            var settingsFromIni = new Dictionary<string, string>
-            {
-                { SettingsPages.PreferOnlineDatabaseId, false.ToString()}
-            };
-
-            var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController(settingsFromIni);
-
-            const int deviceRef = 8475;
-            CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
-
-            PlugIn plugIn = plugInMock.Object;
-            var pageJson = plugIn.GetJuiDeviceConfigPage(deviceRef);
-
-            // assert page is not error
-            var page = Page.FromJsonString(pageJson);
-
-            Assert.AreEqual(page.Type, EPageType.DeviceConfig);
-            Assert.IsFalse(page.ContainsViewWithId("exception"));
+            httpQueryMock.Verify();
         }
 
         [TestMethod]
@@ -169,6 +196,17 @@ namespace HSPI_ZWaveParametersTest
             mockPlugin.Object.InitIO();
 
             return (mockPlugin, mockHsController);
+        }
+
+        private static void VerifyCorrectDeviceConfigPage(int deviceRef, PlugIn plugIn)
+        {
+            var pageJson = plugIn.GetJuiDeviceConfigPage(deviceRef);
+
+            // assert page is not error
+            var page = Page.FromJsonString(pageJson);
+
+            Assert.AreEqual(page.Type, EPageType.DeviceConfig);
+            Assert.IsFalse(page.ContainsViewWithId("exception"));
         }
     }
 }

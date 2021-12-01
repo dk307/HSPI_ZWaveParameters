@@ -163,7 +163,7 @@ namespace Hspi
                     return parameterInfo.Options[temp].Value;
                 }
 
-                throw new InvalidValueForTypeException(Invariant($"Value not found in options for {parameterInfo.Label}")); ;
+                throw new InvalidValueForTypeException(Invariant($"Value not found in options for {parameterInfo.Label}"));
             }
 
             throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));

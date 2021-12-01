@@ -6,42 +6,101 @@ on:
   pull_request:
     branches: [ main ]
 
-jobs:  
-  build-cache-test-win:   
+env:
+    SONAR_PROJECT_KEY: "dk307_HSPI_ZWaveParameters"
+    SONAR_SCANNER_DOWNLOAD_URL: "https://github.com/SonarSource/sonar-scanner-msbuild/releases/download/5.4.0.40033/sonar-scanner-msbuild-5.4.0.40033-net46.zip"
+    DOTCOVER_DOWNLOAD_URL: "https://download.jetbrains.com/resharper/dotUltimate.2021.2.2/JetBrains.dotCover.CommandLineTools.2021.2.2.zip"
+    SLN_FILE: "HSPI_ZWaveParameters.sln"
+    TEST_FILE_WIN: "tests\\bin\\Debug\\HSPI_ZWaveParametersTest.dll"
+    TEST_FILE_UBUNTU: "./tests/bin/Debug/HSPI_ZWaveParametersTest.dll"
+
+jobs:
+  build-cache-test-win:
     name: Build, cache and test on Windows
     runs-on: windows-latest
-    
-    steps:      
+    steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           submodules: true
-      
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
-
-      - name: Setup VSTest Path
-        uses: darenm/Setup-VSTest@v1
-
-      - name: Cache Nuget Packages
-        uses: actions/cache@v2
-        with:
-         path: ~/.nuget/packages
-         key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-         restore-keys: |
-              ${{ runner.os }}-nuget-
- 
-      - name: Setup NuGet
-        uses: NuGet/setup-nuget@v1.0.5
+          fetch-depth: 0
 
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE
+    
+      - name: Setup VS Dev Environment
+        uses: seanmiddleditch/gha-setup-vsdevenv@v4
+    
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.5
 
+      - name: Set up JDK 11 for Sonarcloud
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+   
+      - name: Cache Nuget Packages
+        uses: actions/cache@v2
+        id: nuget
+        with:
+         path: ~/.nuget/packages
+         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+         restore-keys: ${{ runner.os }}-nuget-
+        
+      - name: Cache Sonar Scanner
+        uses: actions/cache@v2
+        id: sonar-scanner
+        with:
+         path: ~/.sonar
+         key: ${{ runner.os }}-${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
+         restore-keys: |
+              ${{ runner.os }}-${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
+
+      - name: Cache DotCover
+        uses: actions/cache@v2
+        id: dotCover
+        with:
+         path: ~/.dotCover
+         key: ${{ runner.os }}-${{ env.DOTCOVER_DOWNLOAD_URL }}
+         restore-keys: |
+              ${{ runner.os }}-${{ env.DOTCOVER_DOWNLOAD_URL }}
+
+      - name: Download and set up sonar-scanner
+        if: steps.sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Force -ItemType directory -Path $HOME\.sonar
+          Invoke-WebRequest -Uri ${{ env.SONAR_SCANNER_DOWNLOAD_URL }} -OutFile $HOME\.sonar\sonar-scanner.zip
+          unzip -o $HOME\.sonar\sonar-scanner.zip -d $HOME\.sonar\
+          Remove-Item -Path $HOME\.sonar\sonar-scanner.zip
+  
+      - name: Download and set up dotCover
+        if: steps.dotCover.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Force -ItemType directory -Path $HOME\.dotCover
+          Invoke-WebRequest -Uri ${{ env.DOTCOVER_DOWNLOAD_URL }} -OutFile $HOME\.dotCover\dotCover.zip
+          unzip -o $HOME\.dotCover\dotCover.zip -d $HOME\.dotCover\
+          Remove-Item -Path $HOME\.dotCover\dotCover.zip
+  
       - name: Restore Nuget Packages
-        run: nuget restore HSPI_ZWaveParameters.sln
+        run: nuget restore ${{ env.SLN_FILE }}
 
-      - name: Build Solution
-        run: msbuild.exe HSPI_ZWaveParameters.sln /p:platform="Any CPU" /p:configuration="Debug"
+      - name: Set Paths
+        run: |
+            echo "$HOME\.sonar" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+            echo "$HOME\.dotCover" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Start Sonar Scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: SonarScanner.MSBuild.exe begin /k:"${{ env.SONAR_PROJECT_KEY }}" /o:"dk307" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:"sonar.cs.dotcover.reportsPaths=**\dotCover.html" /d:"sonar.cs.vstest.reportsPaths=**\*.trx"
+
+      - name: Build Debug
+        shell: powershell
+        run: msbuild.exe ${{ env.SLN_FILE }} /p:platform="Any CPU" /p:configuration="Debug"
 
       - name: Upload unit tests binaries
         id: unit-test-binaries
@@ -49,17 +108,25 @@ jobs:
         with:
          path: .\tests\bin\Debug
          name: ${{ github.sha }}
-             
-      - name: Run Unit Tests
-        run: vstest.console.exe .\tests\bin\Debug\HSPI_ZWaveParametersTest.dll /parallel /logger:trx
 
-        # Using the trx-parser action
-      - name: Parse Trx files
-        uses: NasAmin/trx-parser@v0.2.0
-        id: trx-parser
+      - name: Run tests
+        shell: powershell
+        run: dotCover.exe analyse /ReportType=HTML /Output="dotCover.html" "/TargetExecutable=%VSINSTALLDIR%\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe" /TargetWorkingDir=. "/TargetArguments=${{ env.TEST_FILE_WIN }} /Parallel /logger:trx" /DisableNGen
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
         with:
-          TRX_PATH: ${{ github.workspace }}/TestResults 
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+          name: Windows Unit Tests
+          path: TestResults/*.trx
+          reporter: dotnet-trx
+
+      - name: End Sonar Scanner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: SonarScanner.MSBuild.exe end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
   cache-use-build-ubuntu:
     name: Test on Ubuntu
@@ -71,6 +138,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
+          fetch-depth: 0
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
@@ -86,12 +154,12 @@ jobs:
 
       - run: ls -l ./tests/bin/Debug
       - name: Run Unit Tests
-        run: dotnet vstest --Parallel --logger:trx ./tests/bin/Debug/HSPI_ZWaveParametersTest.dll
+        run: dotnet vstest --Parallel --logger:trx ${{ env.TEST_FILE_UBUNTU }}
 
-        # Using the trx-parser action
-      - name: Parse Trx files
-        uses: NasAmin/trx-parser@v0.2.0
-        id: trx-parser
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
         with:
-          TRX_PATH: ${{ github.workspace }}/TestResults 
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
+          name: Ubuntu Unit Tests
+          path: TestResults/*.trx
+          reporter: dotnet-trx

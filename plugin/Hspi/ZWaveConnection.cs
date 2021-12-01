@@ -24,22 +24,27 @@ namespace Hspi
         {
             try
             {
+                object? value = null;
+                object? wasSuccessful = null;
+
                 // we use lock because we read status later from another variable
-                using var readLock = await getConfiguationLock.LockAsync(cancellationtoken).ConfigureAwait(false);
-                Log.Debug("Getting homeId:{homeId} nodeId:{nodeId} parameter:{parameter}", homeId, nodeId, param);
-                var value = (int)HomeSeerSystem.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
+                using (var readLock = await getConfiguationLock.LockAsync(cancellationtoken).ConfigureAwait(false))
+                {
+                    Log.Debug("Getting homeId:{homeId} nodeId:{nodeId} parameter:{parameter}", homeId, nodeId, param);
+                    value = HomeSeerSystem.LegacyPluginFunction(ZWaveInterface, string.Empty, "Configuration_Get", new object[3] { homeId, nodeId, param });
 
-                bool wasSuccessful = (bool)HomeSeerSystem.LegacyPluginPropertyGet(ZWaveInterface, string.Empty, "Configuration_Get_Result");
+                    wasSuccessful = HomeSeerSystem.LegacyPluginPropertyGet(ZWaveInterface, string.Empty, "Configuration_Get_Result");
+                }
 
-                readLock.Dispose();
-
-                if (!wasSuccessful)
+                if (value == null || wasSuccessful == null || !(bool)wasSuccessful)
                 {
                     throw new ZWaveGetConfigurationFailedException(Invariant($"Failed to get parameter {param} for node {nodeId} "));
                 }
 
-                Log.Debug("For homeId:{homeId} nodeId:{nodeId} parameter:{parameter} got {value}", homeId, nodeId, param, value);
-                return value;
+                int intValue = Convert.ToInt32(value, CultureInfo.InvariantCulture);
+
+                Log.Debug("For homeId:{homeId} nodeId:{nodeId} parameter:{parameter} got {value}", homeId, nodeId, param, intValue);
+                return intValue;
             }
             catch (ZWaveGetConfigurationFailedException)
             {
@@ -139,7 +144,6 @@ namespace Hspi
                         throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"));
 
                     default:
-                    case null:
                         CheckZWavePlugInRunning();
                         throw new ZWaveSetConfigurationFailedException(Invariant($"Failed to set parameter {param} for node {nodeId}"));
                 }
@@ -188,7 +192,7 @@ namespace Hspi
             }
             catch (Exception ex)
             {
-                throw new ZWavePluginNotRunningException("ZWave plugin not found", ex);
+                throw new ZWavePluginNotRunningException("Z-Wave plugin not found", ex);
             }
         }
 

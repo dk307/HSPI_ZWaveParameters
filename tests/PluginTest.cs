@@ -238,7 +238,7 @@ namespace HSPI_ZWaveParametersTest
         public void SupportsDeviceConfigPage()
         {
             var plugin = new PlugIn();
-            Assert.AreEqual(plugin.SupportsConfigDeviceAll, true);
+            Assert.IsTrue(plugin.SupportsConfigDeviceAll);
             Assert.AreEqual(plugin.Id, PlugInData.PlugInId);
             Assert.AreEqual(plugin.Name, PlugInData.PlugInName);
         }

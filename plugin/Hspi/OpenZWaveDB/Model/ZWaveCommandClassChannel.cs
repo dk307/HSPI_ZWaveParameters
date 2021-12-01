@@ -22,12 +22,9 @@ namespace Hspi.OpenZWaveDB.Model
             get
             {
                 var list = Config?.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
-                if (list != null && list.Length == 2)
+                if (list != null && list.Length == 2 && int.TryParse(list[1], out var value))
                 {
-                    if (int.TryParse(list[1], out var value))
-                    {
-                        return value;
-                    }
+                    return value;
                 }
                 return null;
             }

@@ -51,9 +51,13 @@ namespace Hspi.OpenZWaveDB.Model
 
         public ZWaveCommandClassChannel? GetCommandClassChannelForParameter(int parameter)
         {
-            return EndPoints?.FirstOrDefault()?.CommandClass?.
-                        FirstOrDefault(x => x.IsSetCommand)?.
-                        Channels.FirstOrDefault(x => x.ParameterId == parameter);
+            if (EndPoints?.Count > 0)
+            {
+                return EndPoints[0]?.CommandClass?.
+                            FirstOrDefault(x => x.IsSetCommand)?.
+                            Channels.FirstOrDefault(x => x.ParameterId == parameter);
+            }
+            return null;
         }
 
         [JsonIgnore]
@@ -62,6 +66,8 @@ namespace Hspi.OpenZWaveDB.Model
         [JsonIgnore]
         public Uri WebUrl => new(string.Format(CultureInfo.InvariantCulture, webUrlFormat, Id), UriKind.Absolute);
 
+#pragma warning disable S1075 // URIs should not be hardcoded
         private const string webUrlFormat = "https://www.opensmarthouse.org/zwavedatabase/{0}";
+#pragma warning restore S1075 // URIs should not be hardcoded
     }
 }

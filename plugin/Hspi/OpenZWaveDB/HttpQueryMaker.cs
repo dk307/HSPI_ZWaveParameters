@@ -12,14 +12,16 @@ namespace Hspi.OpenZWaveDB
 {
     internal class HttpQueryMaker : IHttpQueryMaker
     {
-        static HttpQueryMaker()
+ 
+        private static HttpClient CreateHttpClient()
         {
-            var handler = new HttpClientHandler()
+            var handler = new HttpClientHandler
             {
                 AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
             };
 
-            httpClientGlobal = new HttpClient(handler, true);
+            var obj = new HttpClient(handler, true);
+            return obj;
         }
 
         public HttpQueryMaker(HttpClient? httpClient = null)
@@ -48,7 +50,7 @@ namespace Hspi.OpenZWaveDB
             return await result.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
 
-        private static readonly HttpClient httpClientGlobal;
+        private static readonly HttpClient httpClientGlobal = CreateHttpClient();
         private readonly HttpClient httpClient;
     }
 }

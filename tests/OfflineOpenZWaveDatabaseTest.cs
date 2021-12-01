@@ -1,4 +1,5 @@
-﻿using Hspi.OpenZWaveDB;
+﻿using Hspi.Exceptions;
+using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
@@ -24,7 +25,7 @@ namespace HSPI_ZWaveParametersTest
             var zWaveInformation = OpenZWaveDatabase.ParseJson(File.ReadAllText(fromFilePath));
 
             OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new(TestHelper.GetOfflineDatabasePath());
-            var _ = offlineOpenZWaveDatabase.StartLoadAsync(CancellationToken.None);
+            var taskLoad = offlineOpenZWaveDatabase.StartLoadAsync(CancellationToken.None);
 
             var foundInfo = await offlineOpenZWaveDatabase.Create(manufacturerId, productType,
                                                                   productId, Version.Parse(firmware),
@@ -36,24 +37,24 @@ namespace HSPI_ZWaveParametersTest
             var json2 = JsonSerializer.Serialize(zWaveInformation);
 
             Assert.AreEqual(json1, json2);
+            Assert.IsTrue(taskLoad.IsCompleted);
         }
 
         [TestMethod]
         public async Task CreateThrowsOnFound()
         {
-            var mock = new Mock<IHttpQueryMaker>();
             OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new(TestHelper.GetOfflineDatabasePath());
-            var _ = offlineOpenZWaveDatabase.StartLoadAsync(CancellationToken.None);
+            var task = offlineOpenZWaveDatabase.StartLoadAsync(CancellationToken.None);
 
-            await Assert.ThrowsExceptionAsync<Exception>(() => offlineOpenZWaveDatabase.Create(0x783, 243,
-                                                                   234, Version.Parse("4.3"),
-                                                                   CancellationToken.None));
+            await Assert.ThrowsExceptionAsync<ShowErrorMessageException>(() => offlineOpenZWaveDatabase.Create(0x783, 243,
+                                                                         234, Version.Parse("4.3"),
+                                                                         CancellationToken.None));
+            Assert.IsTrue(task.IsCompleted);
         }
 
         [TestMethod]
         public void CreateWithoutLoad()
         {
-            var mock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
             OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new(TestHelper.GetOfflineDatabasePath());
 
             Assert.ThrowsExceptionAsync<InvalidOperationException>(() =>
@@ -65,7 +66,7 @@ namespace HSPI_ZWaveParametersTest
         {
             var dbPath = TestHelper.GetOfflineDatabasePath();
 
-            int maxCount = 5;
+            const int maxCount = 5;
             var queryMaker = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
 
             for (int i = 1; i <= maxCount; i++)
@@ -112,7 +113,7 @@ namespace HSPI_ZWaveParametersTest
             OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new(TestHelper.GetOfflineDatabasePath());
             await offlineOpenZWaveDatabase.StartLoadAsync(CancellationToken.None);
 
-            Assert.AreEqual(offlineOpenZWaveDatabase.EntriesCount, 1665);
+            Assert.AreEqual(1665, offlineOpenZWaveDatabase.EntriesCount);
         }
     }
 }

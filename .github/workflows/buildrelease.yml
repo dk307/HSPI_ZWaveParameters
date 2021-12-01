@@ -30,9 +30,8 @@ jobs:
         uses: actions/cache@v2
         with:
          path: ~/.nuget/packages
-         key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-         restore-keys: |
-              ${{ runner.os }}-nuget-
+         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+         restore-keys: ${{ runner.os }}-nuget-
 
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.7

@@ -26,7 +26,7 @@ namespace HSPI_ZWaveParametersTest
 
             var obj1 = new OnlineOpenZWaveDatabase(12, 17479, 12342, new Version(5, 9, 0), mock.Object);
             var data1 = await obj1.Create(CancellationToken.None);
-            Assert.AreEqual(data1.Id, 806);
+            Assert.AreEqual(806, data1.Id);
 
             TestHelper.SetupRequest(mock, "https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
                         Resource.HomeseerDimmerOpenZWaveDBDeviceListJson);
@@ -36,7 +36,7 @@ namespace HSPI_ZWaveParametersTest
 
             var obj2 = new OnlineOpenZWaveDatabase(12, 17479, 12342, new Version(5, 14, 0), mock.Object);
             var data2 = await obj2.Create(CancellationToken.None);
-            Assert.AreEqual(data2.Id, 1040);
+            Assert.AreEqual(1040, data2.Id);
 
             mock.Verify();
         }
@@ -54,7 +54,7 @@ namespace HSPI_ZWaveParametersTest
 
             var obj1 = new OnlineOpenZWaveDatabase(134, 3, 6, new Version(1, 43, 0), mock.Object);
             var data = await obj1.Create(CancellationToken.None);
-            Assert.AreEqual(data.Id, 75);
+            Assert.AreEqual(75, data.Id);
 
             mock.Verify();
         }
@@ -72,7 +72,7 @@ namespace HSPI_ZWaveParametersTest
 
             var obj1 = new OnlineOpenZWaveDatabase(12, 17479, 12342, new Version(5, 10, 0), mock.Object);
             var data = await obj1.Create(CancellationToken.None);
-            Assert.AreEqual(data.Id, 806);
+            Assert.AreEqual(806, data.Id);
 
             mock.Verify();
         }
@@ -133,11 +133,11 @@ namespace HSPI_ZWaveParametersTest
             var data2 = await obj2.Create(CancellationToken.None);
 
             Assert.IsNotNull(data2.Parameters);
-            Assert.AreEqual(data2.Parameters.Count, 15);
+            Assert.AreEqual(15, data2.Parameters.Count);
 
-            Assert.AreEqual(data2.Parameters[14].ParameterId, 31);
-            Assert.AreEqual(data2.Parameters[14].HasSubParameters, true);
-            Assert.AreEqual(data2.Parameters[14].SubParameters.Count, 6);
+            Assert.AreEqual(31, data2.Parameters[14].ParameterId);
+            Assert.IsTrue(data2.Parameters[14].HasSubParameters);
+            Assert.AreEqual(6, data2.Parameters[14].SubParameters.Count);
 
             mock.Verify();
         }

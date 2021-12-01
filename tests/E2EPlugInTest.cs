@@ -23,7 +23,7 @@ namespace HSPI_ZWaveParametersTest
             var (plugInMock, _) = CreateMockPluginAndHsController();
 
             PlugIn plugIn = plugInMock.Object;
-            Assert.AreEqual(plugIn.HasSettings, true);
+            Assert.IsTrue(plugIn.HasSettings);
 
             var settingPages = SettingsCollection.FromJsonString(plugIn.GetJuiSettingsPages());
             Assert.IsNotNull(settingPages);
@@ -51,7 +51,7 @@ namespace HSPI_ZWaveParametersTest
                 .Setup<IHttpQueryMaker>("CreateHttpQueryMaker")
                 .Returns(httpQueryMock.Object);
 
-            int deviceRef = 8475;
+            const int deviceRef = 8475;
             CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
 
             PlugIn plugIn = plugInMock.Object;
@@ -67,14 +67,14 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public void CheckDevicePageIsReturnedForOfflineCase()
         {
-            var settingsFromIni = new Dictionary<string, string>()
+            var settingsFromIni = new Dictionary<string, string>
             {
                 { SettingsPages.PreferOnlineDatabaseId, false.ToString()}
             };
 
             var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController(settingsFromIni);
 
-            int deviceRef = 8475;
+            const int deviceRef = 8475;
             CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
 
             PlugIn plugIn = plugInMock.Object;
@@ -109,7 +109,7 @@ namespace HSPI_ZWaveParametersTest
             var (plugInMock, _) = CreateMockPluginAndHsController(settingsFromIni);
 
             PlugIn plugIn = plugInMock.Object;
-            Assert.AreEqual(plugIn.HasSettings, true);
+            Assert.IsTrue(plugIn.HasSettings);
 
             var settingPages = SettingsCollection.FromJsonString(plugIn.GetJuiSettingsPages());
             Assert.IsNotNull(settingPages);

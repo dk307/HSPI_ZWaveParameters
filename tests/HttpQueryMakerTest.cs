@@ -20,8 +20,8 @@ namespace HSPI_ZWaveParametersTest
             var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpClient = handler.CreateClient();
 
-            string url = "http://google2.com";
-            string data = "def";
+            const string url = "https://google2.com";
+            const string data = "def";
 
             handler.SetupRequest(HttpMethod.Get, url)
                                 .ReturnsResponse(data, "application/json");
@@ -41,7 +41,7 @@ namespace HSPI_ZWaveParametersTest
             var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpClient = handler.CreateClient();
 
-            string url = "http://google2.com";
+            const string url = "https://google2.com";
 
             handler.SetupRequest(HttpMethod.Get, url)
                                 .ReturnsResponse(HttpStatusCode.Forbidden);
@@ -58,7 +58,7 @@ namespace HSPI_ZWaveParametersTest
             var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpClient = handler.CreateClient();
 
-            string url = "http://google2.com";
+            const string url = "https://google2.com";
 
             handler.SetupRequest(HttpMethod.Get, url)
                                 .ReturnsResponse("{}", "application/xml");
@@ -76,7 +76,7 @@ namespace HSPI_ZWaveParametersTest
             var handler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
             var httpClient = handler.CreateClient();
 
-            string url = "http://google2.com";
+            const string url = "https://google2.com";
 
             handler.SetupRequest(HttpMethod.Get, url)
                                 .ReturnsResponse(new byte[100],

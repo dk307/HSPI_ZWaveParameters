@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Hspi
 {
-    internal partial class PlugIn : HspiBase
+    internal class PlugIn : HspiBase
     {
         public PlugIn()
             : base(PlugInData.PlugInId, PlugInData.PlugInName)
@@ -35,16 +35,16 @@ namespace Hspi
                                               token: ShutdownCancellationToken).Wait();
         }
 
-        public override string GetJuiDeviceConfigPage(int deviceOrFeatureRef)
+        public override string GetJuiDeviceConfigPage(int devOrFeatRef)
         {
             try
             {
-                Log.Debug("Asking for page for {deviceOrFeatureRef}", deviceOrFeatureRef);
-                var page = CreateDeviceConfigPage(deviceOrFeatureRef);
+                Log.Debug("Asking for page for {deviceOrFeatureRef}", devOrFeatRef);
+                var page = CreateDeviceConfigPage(devOrFeatRef);
                 Task.Run(() => page.BuildConfigPage(ShutdownCancellationToken)).Wait();
-                cacheForUpdate[deviceOrFeatureRef] = page;
-                var devicePage = page?.GetPage()?.ToJsonString() ?? throw new Exception("Page is unexpectely null");
-                Log.Debug("Returning page for {deviceOrFeatureRef}", deviceOrFeatureRef);
+                cacheForUpdate[devOrFeatRef] = page;
+                var devicePage = page?.GetPage()?.ToJsonString() ?? throw new InvalidOperationException("Page is unexpectedly null");
+                Log.Debug("Returning page for {deviceOrFeatureRef}", devOrFeatRef);
                 return devicePage;
             }
             catch (Exception ex)
@@ -76,14 +76,6 @@ namespace Hspi
         protected override void BeforeReturnStatus()
         {
             this.Status = PluginStatus.Ok();
-        }
-
-        private static void CheckNotNull([NotNull] object? obj)
-        {
-            if (obj is null)
-            {
-                throw new InvalidOperationException("Plugin Not Initialized");
-            }
         }
 
         protected virtual IDeviceConfigPage CreateDeviceConfigPage(int deviceOrFeatureRef)
@@ -148,6 +140,7 @@ namespace Hspi
             }
         }
 
+        [SuppressMessage("Major Code Smell", "S112:General exceptions should never be thrown", Justification = "<Pending>")]
         protected override bool OnDeviceConfigChange(Page deviceConfigPage, int devOrFeatRef)
         {
             try
@@ -199,33 +192,37 @@ namespace Hspi
             base.OnShutdown();
         }
 
+        private static void CheckNotNull([NotNull] object? obj)
+        {
+            if (obj is null)
+            {
+                throw new InvalidOperationException("Plugin Not Initialized");
+            }
+        }
         private string HandleDeviceConfigPostBackProc(string data)
         {
             try
             {
                 var input = JsonNode.Parse(data);
 
-                if (input != null)
+                if (input != null && ((string?)input["operation"]) == DeviceConfigPageOperation)
                 {
-                    if (((string?)input["operation"]) == DeviceConfigPageOperation)
+                    var homeId = input["homeId"]?.ToString();
+                    var nodeId = (byte?)input["nodeId"];
+                    var parameter = (byte?)input["parameter"];
+
+                    if (string.IsNullOrWhiteSpace(homeId) || !nodeId.HasValue || !parameter.HasValue)
                     {
-                        var homeId = input["homeId"]?.ToString();
-                        var nodeId = (byte?)input["nodeId"];
-                        var parameter = (byte?)input["parameter"];
-
-                        if (string.IsNullOrWhiteSpace(homeId) || !nodeId.HasValue || !parameter.HasValue)
-                        {
-                            throw new ArgumentException("Input not valid");
-                        }
-
-                        var connection = CreateZWaveConnection();
-                        int value = Task.Run(() => connection.GetConfiguration(homeId, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
-
-                        return JsonSerializer.Serialize(new ZWaveParameterGetResult()
-                        {
-                            Value = value
-                        });
+                        throw new ArgumentException("Input not valid");
                     }
+
+                    var connection = CreateZWaveConnection();
+                    int value = Task.Run(() => connection.GetConfiguration(homeId!, nodeId.Value, parameter.Value, ShutdownCancellationToken)).Result;
+
+                    return JsonSerializer.Serialize(new ZWaveParameterGetResult()
+                    {
+                        Value = value
+                    });
                 }
                 throw new ArgumentException("Unknown operation");
             }
@@ -247,11 +244,7 @@ namespace Hspi
             Logger.ConfigureLogging(LogDebug, settingsPages.LogtoFileEnabled, HomeSeerSystem);
         }
 
-        internal struct ZWaveParameterGetResult
-        {
-            public string? ErrorMessage { get; init; }
-            public int? Value { get; init; }
-        }
+        internal record ZWaveParameterGetResult(string? ErrorMessage = null, int? Value = null);
 
         private const string DeviceConfigPageOperation = "GET";
         private const string HTMLEndline = "<BR>";

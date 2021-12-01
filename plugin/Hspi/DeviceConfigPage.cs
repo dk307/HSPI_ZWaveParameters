@@ -205,7 +205,7 @@ namespace Hspi
 
                 foreach (var parameter in Data.Parameters)
                 {
-                    string parameterLabel = Invariant($"{Bootstrap.ApplyStyle(Data.LabelForParameter(parameter.ParameterId), Bootstrap.Style.TextBold)}(#{parameter.ParameterId})");
+                    string parameterLabel = Invariant($"{Bootstrap.ApplyStyle(parameter.LabelForParameter(), Bootstrap.Style.TextBold)}(#{parameter.ParameterId})");
 
                     var currentViews = CreateGetSetViewsForParameter(scripts, parameter, homeId, nodeId);
                     var detailsLabel = CreateDescriptionViewForParameter(parameter.ParameterId);

@@ -62,20 +62,8 @@ namespace Hspi
             return string.Join(" ", listName.Where(s => !string.IsNullOrEmpty(s))).StripHtml();
         }
 
-        public static string LabelForParameter(this ZWaveInformation data, int parameterId)
+        public static string LabelForParameter(this ZWaveDeviceParameter parameter)
         {
-            var parameter = data.Parameters.First(x => x.ParameterId == parameterId);
-
-            if (parameter.HasSubParameters)
-            {
-                var channel = data.GetCommandClassChannelForParameter(parameterId);
-                var value = channel?.Label?.StripHtml();
-                if (value != null)
-                {
-                    return value;
-                }
-            }
-
             return parameter.Label?.StripHtml() ?? string.Empty;
         }
 

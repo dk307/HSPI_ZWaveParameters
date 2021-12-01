@@ -198,7 +198,7 @@ namespace HSPI_ZWaveParametersTest
             foreach (var parameter in deviceConfigPage.Data.Parameters)
             {
                 //label
-                string label = deviceConfigPage.Data.LabelForParameter(parameter.ParameterId);
+                string label = parameter.LabelForParameter();
                 Assert.IsTrue(view.Views.Any(x => x is LabelView labelView && labelView.Value.Contains(label)));
 
                 // input

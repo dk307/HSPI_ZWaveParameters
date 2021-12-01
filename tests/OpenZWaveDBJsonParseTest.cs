@@ -162,5 +162,15 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(31, obj.EndPoints[0].CommandClass[10].Channels[12].ParameterId);
             Assert.AreEqual("Status mode LEDs Blink status (Bitmask)", obj.EndPoints[0].CommandClass[10].Channels[12].Label);
         }
+
+        [TestMethod]
+        public void LabelsAreUpdatedForSubparameters()
+        {
+            var obj = OpenZWaveDatabase.ParseJson(Resource.HomeseerDimmerOpenZWaveDBFullJson);
+            Assert.IsNotNull(obj.Parameters);
+
+            Assert.AreEqual("Bottom LED Operation", obj.Parameters[0].Label);
+            Assert.AreEqual("Status mode LEDs Blink status (Bitmask)", obj.Parameters[14].Label);
+        }
     }
 }

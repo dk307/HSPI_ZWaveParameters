@@ -79,8 +79,7 @@ namespace Hspi
                     throw new InvalidOperationException("Z-Wave parameter information not found");
                 }
 
-                long? value = null;
-
+                long value;
                 if (view is SelectListView selectListView)
                 {
                     value = GetValueFromSelectListView(parameterInfo, selectListView);
@@ -90,14 +89,7 @@ namespace Hspi
                     value = GetValueFromView(view, parameterInfo);
                 }
 
-                if (value.HasValue)
-                {
-                    UpdateParameterValue(zwaveData, parameterInfo, value.Value);
-                }
-                else
-                {
-                    throw new InvalidValueForTypeException(Invariant($"Value not valid for #{parameterInfo.ParameterId}"));
-                }
+                UpdateParameterValue(zwaveData, parameterInfo, value);
             }
         }
 
@@ -158,7 +150,7 @@ namespace Hspi
             return Invariant($"{ZWaveParameterPrefix}{parameter}");
         }
 
-        private static long? GetValueFromSelectListView(ZWaveDeviceParameter parameterInfo,
+        private static long GetValueFromSelectListView(ZWaveDeviceParameter parameterInfo,
                                                         SelectListView selectListView)
         {
             string selection = selectListView.GetStringValue();
@@ -166,26 +158,21 @@ namespace Hspi
                                         NumberStyles.AllowLeadingWhite,
                              CultureInfo.InvariantCulture, out var temp))
             {
-                return parameterInfo?.Options?[temp].Value;
+                if (parameterInfo.Options != null && temp >= 0 && temp < parameterInfo.Options.Count)
+                {
+                    return parameterInfo.Options[temp].Value;
+                }
+
+                throw new InvalidValueForTypeException(Invariant($"Value not found in options for {parameterInfo.Label}")); ;
             }
-            else
-            {
-                throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));
-            }
+
+            throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));
         }
 
-        private static long? GetValueFromView(AbstractView view, ZWaveDeviceParameter parameterInfo)
+        private static long GetValueFromView(AbstractView view, ZWaveDeviceParameter parameterInfo)
         {
             var temp = Utils.StringConverter.TryGetFromString<long>(view.GetStringValue());
-
-            if (temp.HasValue)
-            {
-                return temp;
-            }
-            else
-            {
-                throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));
-            }
+            return temp ?? throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));
         }
 
         private static int ZWaveParameterFromId(string idParameter)
@@ -352,7 +339,7 @@ namespace Hspi
             if (value > int.MaxValue)
             {
                 throw new ArgumentOutOfRangeException(nameof(value),
-                                                      Invariant($"Value too large for #{parameterInfo.ParameterId}"));
+                                                      Invariant($"Value too large for #{parameterInfo.Label}"));
             }
 
             zwaveConnection.SetConfiguration(zwaveData.HomeId,

@@ -79,53 +79,17 @@ namespace Hspi
                     throw new InvalidOperationException("Z-Wave parameter information not found");
                 }
 
-                long? value = null;
-
-                if (view is InputView inputView)
+                long value;
+                if (view is SelectListView selectListView)
                 {
-                    var temp = Hspi.Utils.StringConverter.TryGetFromString<long>(view.GetStringValue());
-
-                    if (temp.HasValue)
-                    {
-                        value = temp;
-                    }
-                    else
-                    {
-                        throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));
-                    }
-                }
-                else if (view is SelectListView selectListView)
-                {
-                    string selection = selectListView.GetStringValue();
-                    if (int.TryParse(selection, NumberStyles.AllowTrailingWhite |
-                                                NumberStyles.AllowLeadingWhite,
-                                     CultureInfo.InvariantCulture, out var temp))
-                    {
-                        value = parameterInfo?.Options?[temp].Value;
-                    }
-                    else
-                    {
-                        throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));
-                    }
-                }
-
-                if (value.HasValue)
-                {
-                    if (parameterInfo.Bitmask != 0)
-                    {
-                        value = value.Value & parameterInfo.Bitmask;
-                    }
-
-                    zwaveConnection.SetConfiguration(zwaveData.HomeId,
-                                                     zwaveData.NodeId,
-                                                     parameterInfo.ParameterId,
-                                                     parameterInfo.Size,
-                                                     (int)value.Value); //truncate value if too long
+                    value = GetValueFromSelectListView(parameterInfo, selectListView);
                 }
                 else
                 {
-                    throw new InvalidValueForTypeException("Selection/Input not valid");
+                    value = GetValueFromView(view, parameterInfo);
                 }
+
+                UpdateParameterValue(zwaveData, parameterInfo, value);
             }
         }
 
@@ -186,9 +150,34 @@ namespace Hspi
             return Invariant($"{ZWaveParameterPrefix}{parameter}");
         }
 
+        private static long GetValueFromSelectListView(ZWaveDeviceParameter parameterInfo,
+                                                        SelectListView selectListView)
+        {
+            string selection = selectListView.GetStringValue();
+            if (int.TryParse(selection, NumberStyles.AllowTrailingWhite |
+                                        NumberStyles.AllowLeadingWhite,
+                             CultureInfo.InvariantCulture, out var temp))
+            {
+                if (parameterInfo.Options != null && temp >= 0 && temp < parameterInfo.Options.Count)
+                {
+                    return parameterInfo.Options[temp].Value;
+                }
+
+                throw new InvalidValueForTypeException(Invariant($"Value not found in options for {parameterInfo.Label}"));
+            }
+
+            throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));
+        }
+
+        private static long GetValueFromView(AbstractView view, ZWaveDeviceParameter parameterInfo)
+        {
+            var temp = Utils.StringConverter.TryGetFromString<long>(view.GetStringValue());
+            return temp ?? throw new InvalidValueForTypeException(Invariant($"Value not a integer for {parameterInfo.Label}"));
+        }
+
         private static int ZWaveParameterFromId(string idParameter)
         {
-            if (idParameter.StartsWith(ZWaveParameterPrefix, StringComparison.OrdinalIgnoreCase) && 
+            if (idParameter.StartsWith(ZWaveParameterPrefix, StringComparison.OrdinalIgnoreCase) &&
                 int.TryParse(idParameter.Substring(ZWaveParameterPrefix.Length), out int id))
             {
                 return id;
@@ -216,7 +205,7 @@ namespace Hspi
 
                 foreach (var parameter in Data.Parameters)
                 {
-                    string parameterLabel = Invariant($"{Bootstrap.ApplyStyle(Data.LabelForParameter(parameter.ParameterId), Bootstrap.Style.TextBold)}(#{parameter.ParameterId})");
+                    string parameterLabel = Invariant($"{Bootstrap.ApplyStyle(parameter.LabelForParameter(), Bootstrap.Style.TextBold)}(#{parameter.ParameterId})");
 
                     var currentViews = CreateGetSetViewsForParameter(scripts, parameter, homeId, nodeId);
                     var detailsLabel = CreateDescriptionViewForParameter(parameter.ParameterId);
@@ -231,7 +220,7 @@ namespace Hspi
 
                 page = page.WithView(parametersView);
 
-                if (listening && allButtonId!= null)
+                if (listening && allButtonId != null)
                 {
                     scripts.Add(string.Format(CultureInfo.InvariantCulture, HtmlSnippets.ClickRefreshButtonScript, parametersView.Id, allButtonId));
                 }
@@ -338,6 +327,26 @@ namespace Hspi
         private void SetPage(Page? value)
         {
             page = value;
+        }
+
+        private void UpdateParameterValue(ZWaveData zwaveData, ZWaveDeviceParameter parameterInfo, long value)
+        {
+            if (parameterInfo.Bitmask != 0)
+            {
+                value &= parameterInfo.Bitmask;
+            }
+
+            if (value > int.MaxValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value),
+                                                      Invariant($"Value too large for #{parameterInfo.Label}"));
+            }
+
+            zwaveConnection.SetConfiguration(zwaveData.HomeId,
+                                             zwaveData.NodeId,
+                                             parameterInfo.ParameterId,
+                                             parameterInfo.Size,
+                                             (int)value);
         }
 
         private const string NewLine = "<BR>";

@@ -126,7 +126,7 @@ namespace Hspi
         {
             try
             {
-                Log.Information("Updating homeId:{homeId} nodeId:{nodeId} param:{param} size:{size} bytes value:{value}",
+                Log.Information("Updating homeId:{homeId} nodeId:{nodeId} param:{param} size:{size} byte(s) value:{value}",
                                 homeId, nodeId, param, size, value);
 
                 var result = HomeSeerSystem.LegacyPluginFunction("Z-Wave", string.Empty, "SetDeviceParameterValue", new object[5] { homeId, nodeId, param, size, value }) as string;
@@ -135,7 +135,7 @@ namespace Hspi
                 {
                     case "Queued":
                     case "Success":
-                        Log.Information("Updated homeId:{homeId} nodeId:{nodeId} param:{param} size:{size} bytes value:{value} with {result}",
+                        Log.Information("Updated homeId:{homeId} nodeId:{nodeId} param:{param} size:{size} byte(s) value:{value} with {result}",
                                          homeId, nodeId, param, size, value, result);
                         break;
 

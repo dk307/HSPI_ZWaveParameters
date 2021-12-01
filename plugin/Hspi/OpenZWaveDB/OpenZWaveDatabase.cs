@@ -16,7 +16,7 @@ namespace Hspi.OpenZWaveDB
     {
         public static async Task<ZWaveInformation> ParseJson(Stream deviceJson, CancellationToken cancellationToken)
         {
-            var obj = await JsonSerializer.DeserializeAsync<ZWaveInformation>(deviceJson, 
+            var obj = await JsonSerializer.DeserializeAsync<ZWaveInformation>(deviceJson,
                                                                               cancellationToken: cancellationToken)
                                           .ConfigureAwait(false);
             CheckValidInformation(obj);
@@ -30,7 +30,7 @@ namespace Hspi.OpenZWaveDB
             return CombineParameters(obj);
         }
 
-        private static void CheckValidInformation([NotNull]ZWaveInformation? obj)
+        private static void CheckValidInformation([NotNull] ZWaveInformation? obj)
         {
             if (obj == null)
             {
@@ -60,10 +60,13 @@ namespace Hspi.OpenZWaveDB
                     else
                     {
                         var result = group.First();
+                        var channel = obj.GetCommandClassChannelForParameter(group.Key);
+                        var overrideLabel = channel?.Label;
 
                         finalParameters.Add(result with
                         {
                             SubParameters = group.Skip(1).ToList().AsReadOnly(),
+                            Label = overrideLabel ?? result.Label,
                         });
                     }
                 }

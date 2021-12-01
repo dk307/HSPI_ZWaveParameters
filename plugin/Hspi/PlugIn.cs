@@ -199,6 +199,7 @@ namespace Hspi
                 throw new InvalidOperationException("Plugin Not Initialized");
             }
         }
+
         private string HandleDeviceConfigPostBackProc(string data)
         {
             try

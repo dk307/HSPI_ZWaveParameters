@@ -67,6 +67,36 @@ namespace HSPI_ZWaveParametersTest
         }
 
         [TestMethod]
+        public async Task OnDeviceConfigChangeWithOutofRangeValue()
+        {
+            var task = TestOnDeviceConfigChange((view, parameter) =>
+            {
+                if (view is InputView inputView)
+                {
+                    return (true, (((long)int.MaxValue) + 1).ToString(), parameter.Default);
+                }
+                return (false, null, null);
+            });
+
+            await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(() => task);
+        }
+
+        [TestMethod]
+        public async Task OnDeviceConfigChangeWithNonIntegerValue()
+        {
+            var task = TestOnDeviceConfigChange((view, parameter) =>
+            {
+                if (view is InputView inputView)
+                {
+                    return (true, "abcd", parameter.Default);
+                }
+                return (false, null, null);
+            });
+
+            await Assert.ThrowsExceptionAsync<InvalidValueForTypeException>(() => task);
+        }
+
+        [TestMethod]
         public async Task OnDeviceConfigChangeWithNoChange()
         {
             await TestOnDeviceConfigChange((_, _) => (false, null, null)).ConfigureAwait(false);
@@ -124,7 +154,7 @@ namespace HSPI_ZWaveParametersTest
 
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
             var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
-                  x => GetFromJsonString(Resource.AeonLabsOpenZWaveDBDeviceJson));
+                  x => GetFromJsonString(Resource.HomeseerDimmerOpenZWaveDBFullJson));
 
             await deviceConfigPage.BuildConfigPage(CancellationToken.None).ConfigureAwait(false);
             return (mock, deviceConfigPage);
@@ -168,7 +198,7 @@ namespace HSPI_ZWaveParametersTest
             foreach (var parameter in deviceConfigPage.Data.Parameters)
             {
                 //label
-                string label = deviceConfigPage.Data.LabelForParameter(parameter.ParameterId);
+                string label = parameter.LabelForParameter();
                 Assert.IsTrue(view.Views.Any(x => x is LabelView labelView && labelView.Value.Contains(label)));
 
                 // input
@@ -252,7 +282,8 @@ namespace HSPI_ZWaveParametersTest
 
         private async Task TestOnDeviceConfigChange(Func<AbstractView, ZWaveDeviceParameter, (bool, string, long?)> changedData)
         {
-            var (zwaveMock, deviceConfigPage) = await CreateHomeseerDimmerDeviceConfigPage().ConfigureAwait(false);
+            var (zwaveMock, deviceConfigPage) = await CreateHomeseerDimmerDeviceConfigPage()
+                                                      .ConfigureAwait(false);
 
             Page page = deviceConfigPage.GetPage();
             var viewGroup = (ViewGroup)page.Views[2];

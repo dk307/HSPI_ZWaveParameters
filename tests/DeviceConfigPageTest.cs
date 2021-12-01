@@ -139,7 +139,7 @@ namespace HSPI_ZWaveParametersTest
 
             var mock = SetupZWaveConnection(deviceRef, zwaveData);
             var deviceConfigPage = new DeviceConfigPage(deviceRef, mock.Object,
-                  x => GetFromJsonString(Resource.AeonLabsOpenZWaveDBDeviceJson));
+                  x => GetFromJsonString(Resource.HomeseerDimmerOpenZWaveDBFullJson));
 
             await deviceConfigPage.BuildConfigPage(CancellationToken.None).ConfigureAwait(false);
             return (mock, deviceConfigPage);

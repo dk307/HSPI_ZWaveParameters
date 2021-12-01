@@ -86,7 +86,7 @@ namespace HSPI_ZWaveParametersTest
                  .Throws(new HttpRequestException());
 
             var obj = new OnlineOpenZWaveDatabase(69, 0, 0, new Version(0, 0, 0), mock.Object);
-            await Assert.ThrowsExceptionAsync<Exception>(() => obj.Create(CancellationToken.None)).ConfigureAwait(false);
+            await Assert.ThrowsExceptionAsync<ShowErrorMessageException>(() => obj.Create(CancellationToken.None)).ConfigureAwait(false);
 
             mock.Verify();
         }

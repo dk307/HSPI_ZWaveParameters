@@ -49,6 +49,7 @@ namespace Hspi
             }
             catch (Exception ex)
             {
+                Log.Error("Failed to create page for {devOrFeatRef} with error:{error}", devOrFeatRef, ex.GetFullMessage());
                 var page = PageFactory.CreateDeviceConfigPage(PlugInData.PlugInId, "Z-Wave Information");
                 page = page.WithView(new LabelView("exception", string.Empty, ex.GetFullMessage())
                 {

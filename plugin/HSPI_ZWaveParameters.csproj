@@ -264,24 +264,28 @@
     <ItemGroup>
       <ReleaseFiles Include="$(OutputPath)\HSPI_ZWaveParameters.exe" />
       <ReleaseFiles Include="$(OutputPath)\HSPI_ZWaveParameters.exe.config" />
-      <ReleaseFiles Include="$(OutputPath)\System.Text.Json.dll" />
+      <ReleaseFiles Include="$(OutputPath)\AngleSharp.Css.dll" />
+      <ReleaseFiles Include="$(OutputPath)\AngleSharp.dll" />
+      <ReleaseFiles Include="$(OutputPath)\Destructurama.Attributed.dll" />
+      <ReleaseFiles Include="$(OutputPath)\HtmlSanitizer.dll" />
+      <ReleaseFiles Include="$(OutputPath)\Microsoft.Bcl.AsyncInterfaces.dll" />
       <ReleaseFiles Include="$(OutputPath)\Nito.AsyncEx.Coordination.dll" />
       <ReleaseFiles Include="$(OutputPath)\Nito.AsyncEx.Tasks.dll" />
       <ReleaseFiles Include="$(OutputPath)\Nito.Collections.Deque.dll" />
       <ReleaseFiles Include="$(OutputPath)\Nito.Disposables.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Destructurama.Attributed.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Serilog.dll" />
       <ReleaseFiles Include="$(OutputPath)\Serilog.Sinks.Console.dll" />
       <ReleaseFiles Include="$(OutputPath)\Serilog.Sinks.File.dll" />
+      <ReleaseFiles Include="$(OutputPath)\Serilog.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Buffers.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Collections.Immutable.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Memory.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Numerics.Vectors.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Runtime.CompilerServices.Unsafe.dll" />
-      <ReleaseFiles Include="$(OutputPath)\HtmlSanitizer.dll" />
-      <ReleaseFiles Include="$(OutputPath)\AngleSharp.dll" />
-      <ReleaseFiles Include="$(OutputPath)\AngleSharp.Css.dll" />
       <ReleaseFiles Include="$(OutputPath)\System.Text.Encoding.CodePages.dll" />
+      <ReleaseFiles Include="$(OutputPath)\System.Text.Encodings.Web.dll" />
+      <ReleaseFiles Include="$(OutputPath)\System.Text.Json.dll" />
+      <ReleaseFiles Include="$(OutputPath)\System.Threading.Tasks.Extensions.dll" />
+      <ReleaseFiles Include="$(OutputPath)\System.ValueTuple.dll" />
       <ReleaseFiles Include="$(OutputPath)\install.txt" />
       <ReleaseFiles Include="$(OutputPath)\db.zip" />
     </ItemGroup>

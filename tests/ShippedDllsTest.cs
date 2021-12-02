@@ -6,7 +6,7 @@ using System.Reflection;
 namespace HSPI_ZWaveParametersTest
 {
     [TestClass]
-    public class DllCopiedTest
+    public class ShippedDllsTest
     {
         [TestMethod]
         public void InstallFileHasAllDlls()
@@ -15,22 +15,17 @@ namespace HSPI_ZWaveParametersTest
             var dllFilesPaths = Directory.GetFiles(path, "*.dll");
             Assert.AreNotEqual(0, dllFilesPaths.Length);
 
-            var dllFiles = dllFilesPaths.Select(x => Path.GetExtension(x)).ToList();
+            var dllFiles = dllFilesPaths.Select(x => Path.GetFileName(x)).ToList();
 
-            // Parse install
-            var lines = File.ReadLines(Path.Combine(path, "install.txt"));
+            // files not shipped
+            dllFiles.Remove("HSCF.dll");
+            dllFiles.Remove("PluginSdk.dll");
+            dllFiles.Remove("Newtonsoft.Json.dll");
 
-            var installDlls = lines.SelectMany(x =>
-            {
-                var filename = x.Split(new[] { ',' }).FirstOrDefault();
-                if (Path.GetExtension(filename) == ".dll")
-                {
-                    return new string[] { filename };
-                }
-                return new string[] { };
-            }).ToList();
+            // Parse shipped dlls
+            var installDlls = File.ReadLines(Path.Combine(path, "DllsToShip.txt")).ToList();
 
-            CollectionAssert.AreEquivalent(installDlls, dllFiles);
+            CollectionAssert.AreEquivalent(installDlls, dllFiles, "Dlls in output is not same as shipped dlls");
         }
 
         private static string GetInstallFilePath()

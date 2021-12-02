@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Hspi</RootNamespace>
     <AssemblyName>HSPI_ZWaveParameters</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -174,12 +174,6 @@
     <PackageReference Include="Nito.AsyncEx.Coordination">
       <Version>5.1.2</Version>
     </PackageReference>
-    <PackageReference Include="Nito.AsyncEx.Tasks">
-      <Version>5.1.2</Version>
-    </PackageReference>
-    <PackageReference Include="Nito.Disposables">
-      <Version>2.2.1</Version>
-    </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.10.0</Version>
     </PackageReference>
@@ -200,35 +194,20 @@
     <PackageReference Include="System.Drawing.Primitives">
       <Version>4.3.0</Version>
     </PackageReference>
-    <PackageReference Include="System.IO">
-      <Version>4.3.0</Version>
-    </PackageReference>
     <PackageReference Include="System.Net.Http">
       <Version>4.3.4</Version>
-    </PackageReference>
-    <PackageReference Include="System.Runtime">
-      <Version>4.3.1</Version>
-    </PackageReference>
-    <PackageReference Include="System.Security.Cryptography.Algorithms">
-      <Version>4.3.1</Version>
-    </PackageReference>
-    <PackageReference Include="System.Security.Cryptography.Encoding">
-      <Version>4.3.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.Security.Cryptography.Primitives">
-      <Version>4.3.0</Version>
-    </PackageReference>
-    <PackageReference Include="System.Security.Cryptography.X509Certificates">
-      <Version>4.3.2</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Json">
       <Version>6.0.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="install.txt">
+    <AdditionalFiles Include="DllsToShip.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </AdditionalFiles>
+    <AdditionalFiles Include="install.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </AdditionalFiles>
     <None Include="Resources\logo.ico" />
     <Content Include="updater_override.tt" />
   </ItemGroup>
@@ -245,12 +224,25 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <ArtifactsDirectory>$(OutputPath)\Artifacts</ArtifactsDirectory>
+    <ShippedDllsDirectory>$(OutputPath)\Dlls</ShippedDllsDirectory>
     <_TransformExe>$(DevEnvDir)\TextTransform.exe</_TransformExe>
   </PropertyGroup>
   <Target Name="ZipDBFiles" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
     <ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)\db" DestinationFile="$(OutputPath)\db.zip" Overwrite="true" />
   </Target>
-  <Target Name="ZipFinalFiles" DependsOnTargets="Build;" AfterTargets="Build;ZipDBFiles" Condition="'$(Configuration)' == 'Release'">
+  <Target Name="ZipDllFiles" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <RemoveDir Directories="$(ShippedDllsDirectory)" />
+    <MakeDir Directories="$(ShippedDllsDirectory)" />
+    <ReadLinesFromFile File="$(MSBuildProjectDirectory)\DllsToShip.txt">
+      <Output TaskParameter="Lines" ItemName="DllFiles" />
+    </ReadLinesFromFile>
+    <CombinePath BasePath="$(OutputPath)" Paths="@(DllFiles)">
+      <Output TaskParameter="CombinedPaths" ItemName="DllFilePaths" />
+    </CombinePath>
+    <Copy SourceFiles="@(DllFilePaths)" DestinationFolder="$(ShippedDllsDirectory)" />
+    <ZipDirectory SourceDirectory="$(ShippedDllsDirectory)" DestinationFile="$(OutputPath)\dlls.zip" Overwrite="true" />
+  </Target>
+  <Target Name="ZipFinalFiles" DependsOnTargets="Build;" AfterTargets="Build;ZipDBFiles;ZipDllFiles" Condition="'$(Configuration)' == 'Release'">
     <RemoveDir Directories="$(ArtifactsDirectory)" />
     <MakeDir Directories="$(ArtifactsDirectory)" />
     <GetAssemblyIdentity AssemblyFiles="$(OutputPath)\HSPI_ZWaveParameters.exe">
@@ -264,29 +256,8 @@
     <ItemGroup>
       <ReleaseFiles Include="$(OutputPath)\HSPI_ZWaveParameters.exe" />
       <ReleaseFiles Include="$(OutputPath)\HSPI_ZWaveParameters.exe.config" />
-      <ReleaseFiles Include="$(OutputPath)\AngleSharp.Css.dll" />
-      <ReleaseFiles Include="$(OutputPath)\AngleSharp.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Destructurama.Attributed.dll" />
-      <ReleaseFiles Include="$(OutputPath)\HtmlSanitizer.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Microsoft.Bcl.AsyncInterfaces.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Nito.AsyncEx.Coordination.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Nito.AsyncEx.Tasks.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Nito.Collections.Deque.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Nito.Disposables.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Serilog.Sinks.Console.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Serilog.Sinks.File.dll" />
-      <ReleaseFiles Include="$(OutputPath)\Serilog.dll" />
-      <ReleaseFiles Include="$(OutputPath)\System.Buffers.dll" />
-      <ReleaseFiles Include="$(OutputPath)\System.Collections.Immutable.dll" />
-      <ReleaseFiles Include="$(OutputPath)\System.Memory.dll" />
-      <ReleaseFiles Include="$(OutputPath)\System.Numerics.Vectors.dll" />
-      <ReleaseFiles Include="$(OutputPath)\System.Runtime.CompilerServices.Unsafe.dll" />
-      <ReleaseFiles Include="$(OutputPath)\System.Text.Encoding.CodePages.dll" />
-      <ReleaseFiles Include="$(OutputPath)\System.Text.Encodings.Web.dll" />
-      <ReleaseFiles Include="$(OutputPath)\System.Text.Json.dll" />
-      <ReleaseFiles Include="$(OutputPath)\System.Threading.Tasks.Extensions.dll" />
-      <ReleaseFiles Include="$(OutputPath)\System.ValueTuple.dll" />
       <ReleaseFiles Include="$(OutputPath)\install.txt" />
+      <ReleaseFiles Include="$(OutputPath)\dlls.zip" />
       <ReleaseFiles Include="$(OutputPath)\db.zip" />
     </ItemGroup>
     <Copy SourceFiles="@(ReleaseFiles)" DestinationFolder="$(ArtifactsDirectory)" />

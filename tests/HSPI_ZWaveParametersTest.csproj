@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HSPI_ZWaveParametersTest</RootNamespace>
     <AssemblyName>HSPI_ZWaveParametersTest</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
@@ -21,6 +21,7 @@
     </NuGetPackageImportStamp>
     <LangVersion>9.0</LangVersion>
     <SonarQubeTestProject>True</SonarQubeTestProject>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,6 +45,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CompilerHelper.cs" />
+    <Compile Include="ShippedDllsTest.cs" />
     <Compile Include="E2EPlugInTest.cs" />
     <Compile Include="OfflineOpenZWaveDatabaseTest.cs" />
     <Compile Include="SettingPagesTest.cs" />
@@ -130,6 +132,9 @@
     </PackageReference>
     <PackageReference Include="MSTest.TestFramework">
       <Version>2.2.8</Version>
+    </PackageReference>
+    <PackageReference Include="Serilog">
+      <Version>2.10.0</Version>
     </PackageReference>
     <PackageReference Include="SonarAnalyzer.CSharp">
       <Version>8.32.0.39516</Version>

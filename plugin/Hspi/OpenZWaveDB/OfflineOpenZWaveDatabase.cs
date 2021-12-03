@@ -73,7 +73,7 @@ namespace Hspi.OpenZWaveDB
                 await loadTask.ConfigureAwait(false);
                 string filePath = FindInEntries(manufacturerId, productType, productId, firmware);
 
-                Log.Information("Found Specific {@file} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}",
+                Log.Information("Found {@file} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}",
                                 Path.GetFileName(filePath), manufacturerId, productType, productId, firmware);
 
                 using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);

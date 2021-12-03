@@ -32,7 +32,7 @@ namespace HSPI_ZWaveParametersTest
         {
             string dllPath = Assembly.GetExecutingAssembly().Location;
             var parentDirectory = new DirectoryInfo(Path.GetDirectoryName(dllPath));
-            return Path.Combine(parentDirectory.Parent.Parent.Parent.FullName, "plugin", "bin", "debug");
+            return Path.Combine(parentDirectory.Parent.Parent.Parent.FullName, "plugin", "bin", "Debug");
         }
     }
 }

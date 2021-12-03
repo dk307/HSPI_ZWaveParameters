@@ -157,7 +157,7 @@ jobs:
         id: test-binaries
         uses: actions/download-artifact@v2
         with:
-         path: .\plugin\bin\Debug
+         path: ./plugin/bin/Debug
          name: Dll-Files-${{ github.sha }}
 
       - name: Download unit tests binaries

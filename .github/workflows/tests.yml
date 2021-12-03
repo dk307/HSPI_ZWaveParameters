@@ -155,7 +155,7 @@ jobs:
 
       - name: Download binaries
         id: test-binaries
-        uses: actions/upload-artifact@v2
+        uses: actions/download-artifact@v2
         with:
          path: .\plugin\bin\Debug
          name: Dll-Files-${{ github.sha }}

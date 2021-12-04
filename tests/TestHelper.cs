@@ -36,15 +36,6 @@ namespace HSPI_ZWaveParametersTest
             return Path.Combine(parentDirectory.Parent.Parent.Parent.FullName, "plugin", "db");
         }
 
-
-        public static Mock<IHttpQueryMaker> CreateHomeseerDimmerHttpHandler()
-        {
-            return CreateMockHttpHandler("https://www.opensmarthouse.org/dmxConnect/api/zwavedatabase/device/list.php?filter=manufacturer:0x000C%204447:3036",
-                                         Resource.HomeseerDimmerOpenZWaveDBDeviceListJson,
-                                         "https://opensmarthouse.org/dmxConnect/api/zwavedatabase/device/read.php?device_id=1040",
-                                         Resource.HomeseerDimmerOpenZWaveDBFullJson);
-        }
-
         public static Mock<IHttpQueryMaker> CreateMockHttpHandler(string deviceListUrl, string deviceListJson, string deviceUrl, string deviceJson)
         {
             var mock = new Mock<IHttpQueryMaker>(MockBehavior.Strict);
@@ -110,8 +101,9 @@ namespace HSPI_ZWaveParametersTest
         {
             HtmlAgilityPack.HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(html);
-            Assert.AreEqual(0, htmlDocument.ParseErrors.Count() );
+            Assert.AreEqual(0, htmlDocument.ParseErrors.Count());
         }
+
         public const string ZWaveInterface = "Z-Wave";
     }
 }

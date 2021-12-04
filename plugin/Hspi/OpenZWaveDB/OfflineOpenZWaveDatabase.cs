@@ -26,8 +26,10 @@ namespace Hspi.OpenZWaveDB
 
         public int EntriesCount => entries.Count;
 
+        private static bool IsMonoRunTime => Type.GetType("Mono.Runtime") != null;
+
         public static async Task Download(IHttpQueryMaker queryMaker,
-                                          string databasePath,
+                                                  string databasePath,
                                           int maxCount = 1500,
                                           CancellationToken token = default)
         {
@@ -54,9 +56,8 @@ namespace Hspi.OpenZWaveDB
 
         public static string GetDefaultDatabaseFolderPath()
         {
-            using var process = System.Diagnostics.Process.GetCurrentProcess();
-            string mainExeFile = process.MainModule.FileName;
-            string hsDir = Path.GetDirectoryName(mainExeFile);
+            string codeBase = new Uri(typeof(OfflineOpenZWaveDatabase).Assembly.CodeBase).LocalPath;
+            string hsDir = Path.GetDirectoryName(codeBase);
             return Path.Combine(hsDir, "data", PlugInData.PlugInId, "db");
         }
 
@@ -73,10 +74,10 @@ namespace Hspi.OpenZWaveDB
                 await loadTask.ConfigureAwait(false);
                 string filePath = FindInEntries(manufacturerId, productType, productId, firmware);
 
-                Log.Information("Found Specific {@file} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}",
+                Log.Information("Found {@file} for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}",
                                 Path.GetFileName(filePath), manufacturerId, productType, productId, firmware);
 
-                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 32 * 1024);
                 return await OpenZWaveDatabase.ParseJson(fileStream, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception ex)
@@ -97,7 +98,7 @@ namespace Hspi.OpenZWaveDB
             var dict = new Dictionary<Tuple<int, string>, Entry>();
             try
             {
-                using var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var fileStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, false);
 
                 using var data = await JsonDocument.ParseAsync(fileStream,
                                                                cancellationToken: cancellationToken);
@@ -136,7 +137,7 @@ namespace Hspi.OpenZWaveDB
         {
             byte[] bytes = fileEncoding.GetBytes(json);
 
-            using var stream = File.Open(fullPath, FileMode.Create, FileAccess.Write);
+            using var stream = File.Open(fullPath, FileMode.Create, FileAccess.Write, FileShare.None);
             await stream.WriteAsync(bytes, 0, bytes.Length).ConfigureAwait(false);
 
             Log.Information("Wrote to {path}", fullPath);
@@ -184,7 +185,14 @@ namespace Hspi.OpenZWaveDB
                 foreach (var file in Directory.EnumerateFiles(folderDBPath, "*.json",
                                                               SearchOption.TopDirectoryOnly))
                 {
-                    tasks.Add(LoadFile(file, cancellationToken));
+                    var fileLoadTask = LoadFile(file, cancellationToken);
+                    tasks.Add(fileLoadTask);
+
+                    if (IsMonoRunTime)
+                    {
+                        // mono loads file one by one to avoid too many handles open
+                        await fileLoadTask.ConfigureAwait(false);
+                    }
                 }
 
                 await Task.WhenAll(tasks).ConfigureAwait(false);
@@ -220,7 +228,6 @@ namespace Hspi.OpenZWaveDB
                 throw;
             }
         }
-
         private static readonly Encoding fileEncoding = Encoding.UTF8;
 
         private readonly string folderDBPath;

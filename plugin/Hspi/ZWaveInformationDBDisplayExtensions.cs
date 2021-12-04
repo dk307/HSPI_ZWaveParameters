@@ -44,7 +44,12 @@ namespace Hspi
                     list.Add(Invariant($"Range: {parameter.Minimum} - {parameter.Maximum} {parameter.Units?.StripHtml()}"));
                 }
 
-                list.Add(Invariant($"Default: {parameter.DefaultValueDescription.StripHtml()}"));
+                string defaultValueDescription = parameter.DefaultValueDescription;
+                if (!string.IsNullOrWhiteSpace(defaultValueDescription))
+                {
+                    list.Add(Invariant($"Default: {defaultValueDescription.StripHtml()}"));
+                }
+                
             }
 
             return list;

@@ -115,5 +115,17 @@ namespace HSPI_ZWaveParametersTest
 
             Assert.AreEqual(1676, offlineOpenZWaveDatabase.EntriesCount);
         }
+
+        [TestMethod]
+        public void GetDefaultDatabasePath()
+        {
+            string path = OfflineOpenZWaveDatabase.GetDefaultDatabaseFolderPath();
+
+            string codeBase = new Uri(typeof(OfflineOpenZWaveDatabaseTest).Assembly.CodeBase).LocalPath;
+            string hsDir = Path.GetDirectoryName(codeBase);
+            var expectedPath = Path.Combine(hsDir, "data", "ZWaveParameters", "db");
+
+            Assert.AreEqual(expectedPath, path);
+        }
     }
 }

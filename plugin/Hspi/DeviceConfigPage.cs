@@ -200,7 +200,7 @@ namespace Hspi
 
                 if (!listening)
                 {
-                    page = page.WithLabel(NewId(), "Device is non-listening one. Please wake the device to refresh or uppdate the parameters.");
+                    page = page.WithLabel(NewId(), "Device is non-listening. Please wake the device to refresh or update the parameters.");
                 }
 
                 foreach (var parameter in Data.Parameters)

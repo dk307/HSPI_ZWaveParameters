@@ -13,7 +13,7 @@ Homeseer 4 plugin to view & update Z-Wave device parameters. The parameter infor
 * The plugin creates an extra page for the Z-Wave devices with the ability to view & update device parameters.
 * The page contains a link to the Open Z-Wave database site for the device. You can view description, inclusion\exclusion information & manual on that site.
 * The page shows Z-Wave parameters for the device. The listening device's parameter values are loaded on page load. There is the ability to refresh all or an individual parameter.
-* Ability to update any Z-Wave parameter for the device.
+* Ability to update Z-Wave parameter for the device.
 * Offline database is bundled with the plugin so that it does not need an internet connection for operation.
 * Online Z-Wave database can be used directly by changing the plugin settings. 
 

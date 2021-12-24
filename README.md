@@ -1,5 +1,5 @@
 # <img src="/asserts/HS4%20128px.png" width="32px" height="32px"> Z-Wave Parameters Plugin
-Homeseer 4 plugin to view & update Z-Wave device parameters. The parameter information is fetched from [open z-wave database](https://www.opensmarthouse.org/zwavedatabase/).
+Homeseer 4 plugin to view & update Z-Wave device parameters. The parameter information is fetched from [open z-wave database](https://www.opensmarthouse.org/zwavedatabase/). It uses Z-Wave plugin to get and set the parameter of the device.
 
 ## Build State
 

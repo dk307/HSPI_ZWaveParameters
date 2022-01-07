@@ -159,7 +159,7 @@
       <Version>1.3.1</Version>
     </PackageReference>
     <PackageReference Include="HtmlSanitizer">
-      <Version>6.0.453</Version>
+      <Version>7.0.473</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
       <Version>6.0.0</Version>

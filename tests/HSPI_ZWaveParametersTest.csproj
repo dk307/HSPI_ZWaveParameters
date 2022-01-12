@@ -86,7 +86,7 @@
       <Version>1.11.39</Version>
     </PackageReference>
     <PackageReference Include="HtmlSanitizer">
-      <Version>6.0.453</Version>
+      <Version>7.0.473</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces">
       <Version>6.0.0</Version>

@@ -16,11 +16,7 @@ namespace Hspi.OpenZWaveDB
                 KeepChildNodes = true,
             };
 
-            htmlStriper = new(allowedTags: Array.Empty<string>(),
-                              allowedCssProperties: Array.Empty<string>(),
-                              allowedSchemes: Array.Empty<string>(),
-                              allowedAttributes: Array.Empty<string>(),
-                              uriAttributes: Array.Empty<string>())
+            htmlStriper = new(allowedTags: Array.Empty<string>())
             {
                 KeepChildNodes = true,
             };

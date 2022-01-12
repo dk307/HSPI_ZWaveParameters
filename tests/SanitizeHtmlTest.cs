@@ -8,13 +8,14 @@ namespace HSPI_ZWaveParametersTest
     {
         [DataTestMethod]
         [DataRow("abc def", "abc def", DisplayName ="Not Html" )]
+        [DataRow("<div>a</div>", "a", DisplayName ="div tag" )]
         [DataRow("<a href=\"https://www.w3schools.com\">Visit W3Schools.com!</a> Page", "Visit W3Schools.com! Page", DisplayName ="a Tag" )]
         [DataRow("<script>alert('Hello');</script>", "alert('Hello');", DisplayName ="script Tag" )]
         [DataRow("<p>Press <kbd>Ctrl</kbd> + <kbd>C</kbd> to copy text (Windows).</p>", "Press Ctrl + C to copy text (Windows).", DisplayName ="p Tag" )]
         public void StripHtml(string html, string sanitizedHtml)
         {
             var htmlSanitizer = new SanitizeHtml();
-            Assert.AreEqual(htmlSanitizer.Strip(html), sanitizedHtml);
+            Assert.AreEqual(sanitizedHtml, htmlSanitizer.Strip(html));
         }
 
         [DataTestMethod]
@@ -25,7 +26,7 @@ namespace HSPI_ZWaveParametersTest
         public void SanitizeHtml(string html, string sanitizedHtml)
         {
             var htmlSanitizer = new SanitizeHtml();
-            Assert.AreEqual(htmlSanitizer.Sanitize(html), sanitizedHtml);
+            Assert.AreEqual(sanitizedHtml, htmlSanitizer.Sanitize(html));
         }
     }
 }

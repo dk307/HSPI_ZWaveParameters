@@ -1,6 +1,6 @@
 ﻿HSPI_ZWaveParameters.exe,.,0
 HSPI_ZWaveParameters.exe.config,.,0
-.,[DELALL],\Data\ZWaveParameters\db
+.,[DELALL],.\Data\ZWaveParameters\db
 db.zip,[UNZIPOVER],.\Data\ZWaveParameters\db
-.,[DELALL],\bin\ZWaveParameters
+.,[DELALL],.\bin\ZWaveParameters
 dlls.zip,[UNZIPOVER],.\bin\ZWaveParameters

@@ -113,7 +113,7 @@ namespace HSPI_ZWaveParametersTest
             OfflineOpenZWaveDatabase offlineOpenZWaveDatabase = new(TestHelper.GetOfflineDatabasePath());
             await offlineOpenZWaveDatabase.StartLoadAsync(CancellationToken.None);
 
-            Assert.AreEqual(1682, offlineOpenZWaveDatabase.EntriesCount);
+            Assert.AreEqual(1691, offlineOpenZWaveDatabase.EntriesCount);
         }
 
         [TestMethod]

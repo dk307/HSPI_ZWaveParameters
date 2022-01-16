@@ -58,7 +58,7 @@ namespace Hspi.OpenZWaveDB
         {
             string codeBase = new Uri(typeof(OfflineOpenZWaveDatabase).Assembly.CodeBase).LocalPath;
             string hsDir = Path.GetDirectoryName(codeBase);
-            return Path.Combine(hsDir, "data", PlugInData.PlugInId, "db");
+            return Path.Combine(hsDir, "Data", PlugInData.PlugInId, "db");
         }
 
         public async Task<ZWaveInformation> Create(int manufacturerId, int productType, int productId,

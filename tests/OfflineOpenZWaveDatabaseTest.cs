@@ -123,7 +123,7 @@ namespace HSPI_ZWaveParametersTest
 
             string codeBase = new Uri(typeof(OfflineOpenZWaveDatabaseTest).Assembly.CodeBase).LocalPath;
             string hsDir = Path.GetDirectoryName(codeBase);
-            var expectedPath = Path.Combine(hsDir, "data", "ZWaveParameters", "db");
+            var expectedPath = Path.Combine(hsDir, "Data", "ZWaveParameters", "db");
 
             Assert.AreEqual(expectedPath, path);
         }

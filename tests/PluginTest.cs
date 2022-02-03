@@ -164,10 +164,20 @@ namespace HSPI_ZWaveParametersTest
             pluginMock.Verify();
         }
 
-        [TestMethod]
-        public void PostBackProcforGetConfiguration()
+        [DataTestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public void PostBackProcforGetConfiguration(bool showSubParameteredValuesAsHexId)
         {
             var (zwaveConnectionMock, pluginMock) = CreatePlugInWithZWaveConnection();
+
+            var settingsFromIni = new Dictionary<string, string>
+            {
+                { SettingsPages.ShowSubParameteredValuesAsHexId, showSubParameteredValuesAsHexId.ToString()}
+            };
+
+            TestHelper.SetupHsControllerAndSettings(pluginMock, settingsFromIni);
+            pluginMock.Object.InitIO();
 
             int parameterValue = 93745;
             var input = new
@@ -186,6 +196,7 @@ namespace HSPI_ZWaveParametersTest
             var result = JsonSerializer.Deserialize<ZWaveParameterGetResult>(value);
             Assert.IsNull(result.ErrorMessage);
             Assert.AreEqual(result.Value, parameterValue);
+            Assert.AreEqual(result.ShowSubParameteredValuesAsHex, showSubParameteredValuesAsHexId);
         }
 
         [TestMethod]

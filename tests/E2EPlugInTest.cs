@@ -21,7 +21,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public void CheckDebugLevelSettingChange()
         {
-            var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController();
+            var (plugInMock, hsControllerMock) = TestHelper.CreateMockPluginAndHsController();
 
             PlugIn plugIn = plugInMock.Object;
 
@@ -41,7 +41,8 @@ namespace HSPI_ZWaveParametersTest
                 // invert all values
                 SettingsPages.CreateDefault(preferOnlineDatabaseDefault: true,
                                             enableDebugLoggingDefault : true,
-                                            logToFileDefault : true)
+                                            logToFileDefault : true,
+                                            showSubParameteredValuesAsHexDefault: true)
             };
 
             Assert.IsTrue(plugIn.SaveJuiSettingsPages(settingsCollection.ToJsonString()));
@@ -56,7 +57,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public void CheckDefaultSettingAreLoadedDuringInitialize()
         {
-            var (plugInMock, _) = CreateMockPluginAndHsController();
+            var (plugInMock, _) = TestHelper.CreateMockPluginAndHsController();
 
             PlugIn plugIn = plugInMock.Object;
             Assert.IsTrue(plugIn.HasSettings);
@@ -69,6 +70,7 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(settings[SettingsPages.PreferOnlineDatabaseId], false.ToString());
             Assert.AreEqual(settings[SettingsPages.LoggingDebugId], false.ToString());
             Assert.AreEqual(settings[SettingsPages.LogToFileId], false.ToString());
+            Assert.AreEqual(settings[SettingsPages.ShowSubParameteredValuesAsHexId], false.ToString());
         }
 
         [TestMethod]
@@ -79,7 +81,7 @@ namespace HSPI_ZWaveParametersTest
                 { SettingsPages.PreferOnlineDatabaseId, false.ToString()}
             };
 
-            var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController(settingsFromIni);
+            var (plugInMock, hsControllerMock) = TestHelper.CreateMockPluginAndHsController(settingsFromIni);
 
             const int deviceRef = 8475;
             CreateMockForHsController(hsControllerMock, deviceRef, TestHelper.AeonLabsZWaveData);
@@ -96,7 +98,7 @@ namespace HSPI_ZWaveParametersTest
                 { SettingsPages.PreferOnlineDatabaseId, true.ToString()}
             };
 
-            var (plugInMock, hsControllerMock) = CreateMockPluginAndHsController(settingsFromIni);
+            var (plugInMock, hsControllerMock) = TestHelper.CreateMockPluginAndHsController(settingsFromIni);
 
             var httpQueryMock = TestHelper.CreateAeonLabsSwitchHttpHandler();
 
@@ -116,7 +118,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public void CheckPlugInStatus()
         {
-            var (plugInMock, _) = CreateMockPluginAndHsController();
+            var (plugInMock, _) = TestHelper.CreateMockPluginAndHsController();
 
             PlugIn plugIn = plugInMock.Object;
             Assert.AreEqual(plugIn.OnStatusCheck().Status, PluginStatus.Ok().Status);
@@ -130,9 +132,10 @@ namespace HSPI_ZWaveParametersTest
                 { SettingsPages.PreferOnlineDatabaseId, true.ToString()},
                 { SettingsPages.LoggingDebugId, true.ToString()},
                 { SettingsPages.LogToFileId, true.ToString()},
+                { SettingsPages.ShowSubParameteredValuesAsHexId, true.ToString()},
             };
 
-            var (plugInMock, _) = CreateMockPluginAndHsController(settingsFromIni);
+            var (plugInMock, _) = TestHelper.CreateMockPluginAndHsController(settingsFromIni);
 
             PlugIn plugIn = plugInMock.Object;
             Assert.IsTrue(plugIn.HasSettings);
@@ -161,41 +164,7 @@ namespace HSPI_ZWaveParametersTest
                                                          "0");
         }
 
-        private static (Mock<PlugIn> mockPlugin, Mock<IHsController> mockHsController)
-                        CreateMockPluginAndHsController()
-        {
-            return CreateMockPluginAndHsController(new Dictionary<string, string>());
-        }
 
-        private static (Mock<PlugIn> mockPlugin, Mock<IHsController> mockHsController)
-                         CreateMockPluginAndHsController(Dictionary<string, string> settingsFromIni)
-        {
-            var mockHsController = new Mock<IHsController>(MockBehavior.Strict);
-
-            var mockPlugin = new Mock<PlugIn>(MockBehavior.Loose)
-            {
-                CallBase = true,
-            };
-
-            // set mock homeseer via reflection
-            Type plugInType = typeof(AbstractPlugin);
-            var method = plugInType.GetMethod("set_HomeSeerSystem", BindingFlags.NonPublic | BindingFlags.SetProperty | BindingFlags.Instance);
-            method.Invoke(mockPlugin.Object, new object[] { mockHsController.Object });
-
-            mockHsController.Setup(x => x.GetIniSection("Settings", PlugInData.PlugInId + ".ini")).Returns(settingsFromIni);
-            mockHsController.Setup(x => x.SaveINISetting("Settings", It.IsAny<string>(), It.IsAny<string>(), PlugInData.PlugInId + ".ini"));
-            mockHsController.Setup(x => x.WriteLog(It.IsAny<ELogType>(), It.IsAny<string>(), PlugInData.PlugInName, It.IsAny<string>()));
-
-            var offLineDatabase = new OfflineOpenZWaveDatabase(TestHelper.GetOfflineDatabasePath());
-
-            mockPlugin.Protected()
-                      .Setup<OfflineOpenZWaveDatabase>("CreateOfflineOpenDBOfflineDatabase")
-                      .Returns(offLineDatabase);
-
-            mockPlugin.Object.InitIO();
-
-            return (mockPlugin, mockHsController);
-        }
 
         private static void VerifyCorrectDeviceConfigPage(int deviceRef, PlugIn plugIn)
         {

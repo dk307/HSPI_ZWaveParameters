@@ -140,6 +140,17 @@ $('#{0}').ready(function() {{
   </data>
   <data name="PostForRefreshScript" xml:space="preserve">
     <value>&lt;script&gt;
+
+function decimalToHexString(number, size)
+{
+  if (number &lt; 0)
+  {
+    number = size + number + 1;
+  }
+  number &amp;= size;
+  return number.toString(16).toUpperCase();
+}
+
 function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrapper, idValue) {
 	var formObject = {
 		   homeId: homeId,
@@ -170,15 +181,7 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 			$('#' + idValueWrapper).show();
 			
 			var parameterValue = result.Value;
-			// alert(parameterValue);
-			
-			// apply mask
-			var bitmask = eval( idValue + '_mask');
 
-			if (bitmask != 0) {
-				parameterValue &amp;= bitmask;
-			}
-			
 			var obj = $('#' + idValue);
 
 			// select
@@ -188,6 +191,15 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 				obj.val(index);		
 			} else {
 				//input	
+				
+				var hasSubParameters = eval( idValue + '_hasSubParameters');
+   			    var showSubParametersAsHex = result.ShowSubParameteredValuesAsHex;
+								
+				if (hasSubParameters &amp;&amp; showSubParametersAsHex) {
+					var size = eval( idValue + '_size');
+					parameterValue = '0x' + decimalToHexString(parameterValue, size);
+				}
+				
 				obj.val(parameterValue);	
 			}
 		} else {

@@ -12,7 +12,6 @@ namespace Hspi.OpenZWaveDB
 {
     internal class HttpQueryMaker : IHttpQueryMaker
     {
- 
         private static HttpClient CreateHttpClient()
         {
             var handler = new HttpClientHandler

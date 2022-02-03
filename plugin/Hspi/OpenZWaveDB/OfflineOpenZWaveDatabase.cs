@@ -29,8 +29,8 @@ namespace Hspi.OpenZWaveDB
         private static bool IsMonoRunTime => Type.GetType("Mono.Runtime") != null;
 
         public static async Task Download(IHttpQueryMaker queryMaker,
-                                                  string databasePath,
-                                          int maxCount = 1500,
+                                          string databasePath,
+                                          int maxCount = 1550,
                                           CancellationToken token = default)
         {
             OpenZWaveDatabaseOnlineInterface serverInterface = new(queryMaker);

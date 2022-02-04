@@ -223,8 +223,10 @@ namespace Hspi
 
                     return JsonSerializer.Serialize(new ZWaveParameterGetResult()
                     {
-                        Value = value
-                    });
+                        Value = value,
+                        ShowSubParameteredValuesAsHex = 
+                                settingsPages?.ShowSubParameteredValuesAsHex ?? false
+                    }); 
                 }
                 throw new ArgumentException("Unknown operation");
             }
@@ -246,7 +248,9 @@ namespace Hspi
             Logger.ConfigureLogging(LogDebug, settingsPages.LogtoFileEnabled, HomeSeerSystem);
         }
 
-        internal record ZWaveParameterGetResult(string? ErrorMessage = null, int? Value = null);
+        internal record ZWaveParameterGetResult(string? ErrorMessage = null, 
+                                                int? Value = null, 
+                                                bool? ShowSubParameteredValuesAsHex = null);
 
         private const string DeviceConfigPageOperation = "GET";
         private const string HTMLEndline = "<BR>";

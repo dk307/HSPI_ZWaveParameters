@@ -99,7 +99,8 @@ namespace Hspi
 
             string label = "Value";
 
-            scripts.Add(Invariant($"<script> const {id}_mask = 0x{parameter.Bitmask:x};</script>"));
+            scripts.Add(Invariant($"<script> const {id}_hasSubParameters = {(parameter.HasSubParameters ? 1 : 0)};</script>"));
+            scripts.Add(Invariant($"<script> const {id}_size = 0x{((1L << (parameter.Size * 8)) - 1):x};</script>"));
 
             if (parameter.HasOptions && !parameter.HasSubParameters)
             {

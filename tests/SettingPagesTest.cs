@@ -24,19 +24,24 @@ namespace HSPI_ZWaveParametersTest
             Assert.IsTrue(page.ContainsViewWithId(SettingsPages.PreferOnlineDatabaseId));
             Assert.IsTrue(page.ContainsViewWithId(SettingsPages.LogToFileId));
             Assert.IsTrue(page.ContainsViewWithId(SettingsPages.LoggingDebugId));
+            Assert.IsTrue(page.ContainsViewWithId(SettingsPages.ShowSubParameteredValuesAsHexId));
         }
 
         [DataTestMethod]
-        [DataRow(false, false, false)]
-        [DataRow(true, false, false)]
-        [DataRow(false, true, false)]
-        [DataRow(true, false, true)]
-        [DataRow(true, true, true)]
-        public void DefaultValues(bool preferOnline, bool enableDefaultLogging, bool logToFileEnable)
+        [DataRow(false, false, false, false)]
+        [DataRow(false, false, false, true)]
+        [DataRow(true, false, false, false)]
+        [DataRow(false, true, false, false)]
+        [DataRow(true, false, true, false)]
+        [DataRow(true, true, true, true)]
+        public void DefaultValues(bool preferOnline,
+                                  bool enableDefaultLogging,
+                                  bool logToFileEnable,
+                                  bool showSubParameteredValuesAsHex)
         {
             var settingsCollection = new SettingsCollection
             {
-                SettingsPages.CreateDefault(preferOnline, enableDefaultLogging, logToFileEnable)
+                SettingsPages.CreateDefault(preferOnline, enableDefaultLogging, logToFileEnable, showSubParameteredValuesAsHex)
             };
 
             var settingPages = new SettingsPages(settingsCollection);
@@ -44,6 +49,7 @@ namespace HSPI_ZWaveParametersTest
             Assert.AreEqual(settingPages.PreferOnlineDatabase, preferOnline);
             Assert.AreEqual(settingPages.DebugLoggingEnabled, enableDefaultLogging);
             Assert.AreEqual(settingPages.LogtoFileEnabled, logToFileEnable);
+            Assert.AreEqual(settingPages.ShowSubParameteredValuesAsHex, showSubParameteredValuesAsHex);
         }
 
         [TestMethod]
@@ -104,6 +110,22 @@ namespace HSPI_ZWaveParametersTest
             ToggleView changedView = new(SettingsPages.PreferOnlineDatabaseId, "name", !initialValue);
             Assert.IsTrue(settingPages.OnSettingChange(changedView));
             Assert.AreEqual(settingPages.PreferOnlineDatabase, !initialValue);
+        }
+
+        [DataTestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public void OnSettingShowSubParameteredValuesAsHexChange(bool initialValue)
+        {
+            var settingsCollection = new SettingsCollection
+            {
+                SettingsPages.CreateDefault(showSubParameteredValuesAsHexDefault: initialValue)
+            };
+            var settingPages = new SettingsPages(settingsCollection);
+
+            ToggleView changedView = new(SettingsPages.ShowSubParameteredValuesAsHexId, "name", !initialValue);
+            Assert.IsTrue(settingPages.OnSettingChange(changedView));
+            Assert.AreEqual(settingPages.ShowSubParameteredValuesAsHex, !initialValue);
         }
     }
 }

@@ -44,13 +44,17 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CompilerHelper.cs" />
+    <Compile Include="..\plugin\shared\Hspi\CompilerHelper.cs">
+      <Link>shared\CompilerHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\plugin\shared\tests\ExceptionHelperTest.cs">
+      <Link>shared\ExceptionHelperTest.cs</Link>
+    </Compile>
     <Compile Include="ShippedDllsTest.cs" />
     <Compile Include="E2EPlugInTest.cs" />
     <Compile Include="OfflineOpenZWaveDatabaseTest.cs" />
     <Compile Include="SettingPagesTest.cs" />
     <Compile Include="DeviceConfigPageTest.cs" />
-    <Compile Include="shared\ExceptionHelperTest.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="HttpQueryMakerTest.cs" />
     <Compile Include="SanitizeHtmlTest.cs" />

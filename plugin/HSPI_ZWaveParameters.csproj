@@ -198,7 +198,7 @@
       <Version>4.3.4</Version>
     </PackageReference>
     <PackageReference Include="System.Text.Json">
-      <Version>6.0.1</Version>
+      <Version>6.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

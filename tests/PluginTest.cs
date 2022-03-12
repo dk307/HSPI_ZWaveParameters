@@ -42,7 +42,7 @@ namespace HSPI_ZWaveParametersTest
         public void GetJuiDeviceConfigPageErrored()
         {
             int devOrFeatRef = 8374;
-            var pluginMock = CreatePlugInMock();
+            var pluginMock = TestHelper.CreatePlugInMock();
 
             var deviceConfigPageMock = new Mock<IDeviceConfigPage>(MockBehavior.Strict);
 
@@ -86,7 +86,7 @@ namespace HSPI_ZWaveParametersTest
         [TestMethod]
         public void OnDeviceConfigChangeAfterRestart()
         {
-            var pluginMock = CreatePlugInMock();
+            var pluginMock = TestHelper.CreatePlugInMock();
             var page = PageFactory.CreateDeviceConfigPage("id", "name");
             try
             {
@@ -256,7 +256,7 @@ namespace HSPI_ZWaveParametersTest
 
         private static (Mock<PlugIn>, Mock<IDeviceConfigPage>) CreatePlugInAndDeviceConfig(int devOrFeatRef)
         {
-            var pluginMock = CreatePlugInMock();
+            var pluginMock = TestHelper.CreatePlugInMock();
             var deviceConfigPageMock = new Mock<IDeviceConfigPage>(MockBehavior.Strict);
             pluginMock.Protected()
                .Setup<IDeviceConfigPage>("CreateDeviceConfigPage", devOrFeatRef)
@@ -264,18 +264,21 @@ namespace HSPI_ZWaveParametersTest
             return (pluginMock, deviceConfigPageMock);
         }
 
-        private static Mock<PlugIn> CreatePlugInMock()
+
+        [TestMethod]
+        public void InitFirstTime()
         {
-            return new Mock<PlugIn>(MockBehavior.Loose)
-            {
-                CallBase = true,
-            };
+            var plugin = TestHelper.CreatePlugInMock();
+            TestHelper.SetupHsControllerAndSettings(plugin, new Dictionary<string, string>());
+            Assert.IsTrue(plugin.Object.InitIO());
+            plugin.Object.ShutdownIO();
         }
+
 
         private static (Mock<IZWaveConnection>, Mock<PlugIn>) CreatePlugInWithZWaveConnection()
         {
             var zwaveConnectionMock = new Mock<IZWaveConnection>(MockBehavior.Strict);
-            var pluginMock = CreatePlugInMock();
+            var pluginMock = TestHelper.CreatePlugInMock();
             pluginMock.Protected()
                .Setup<IZWaveConnection>("CreateZWaveConnection")
                .Returns(zwaveConnectionMock.Object)

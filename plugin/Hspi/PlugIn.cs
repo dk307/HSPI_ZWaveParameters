@@ -133,8 +133,6 @@ namespace Hspi
                 offlineOpenZWaveDatabase = CreateOfflineOpenDBOfflineDatabase();
                 offlineOpenZWaveDatabase.StartLoadAsync(ShutdownCancellationToken);
 
-                Task.Run(DownloadZWaveDatabase);
-
                 Log.Information("Plugin Started");
             }
             catch (Exception ex)

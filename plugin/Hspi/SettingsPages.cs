@@ -27,7 +27,7 @@ namespace Hspi
                                          bool showSubParameteredValuesAsHexDefault = false)
         {
             var settings = PageFactory.CreateSettingsPage(SettingPageId, "Settings");
-            settings = settings.WithToggle(PreferOnlineDatabaseId, "Prefer online database", preferOnlineDatabaseDefault);
+            settings = settings.WithToggle(PreferOnlineDatabaseId, "Use online database", preferOnlineDatabaseDefault);
             settings = settings.WithToggle(LoggingDebugId, "Enable debug logging", enableDebugLoggingDefault);
             settings = settings.WithToggle(LogToFileId, "Log to file", logToFileDefault);
             settings = settings.WithToggle(ShowSubParameteredValuesAsHexId, "Show Parameters with Bitmask as Hexadecimal", showSubParameteredValuesAsHexDefault);

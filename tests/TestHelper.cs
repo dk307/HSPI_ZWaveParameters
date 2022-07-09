@@ -145,7 +145,7 @@ namespace HSPI_ZWaveParametersTest
             }
         }
 
-        public static void VeryHtmlValid(string html)
+        public static void VerifyHtmlValid(string html)
         {
             HtmlAgilityPack.HtmlDocument htmlDocument = new();
             htmlDocument.LoadHtml(html);

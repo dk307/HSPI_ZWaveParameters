@@ -257,13 +257,13 @@ namespace HSPI_ZWaveParametersTest
                 if (!zwaveData.Listening)
                 {
                     // verify valid non-listening message
-                    TestHelper.VeryHtmlValid(page.Views[index++].ToHtml());
+                    TestHelper.VerifyHtmlValid(page.Views[index++].ToHtml());
                 }
 
                 // verify refresh button
                 if (deviceConfigPage.Data.HasRefreshableParameters)
                 {
-                    TestHelper.VeryHtmlValid(page.Views[index++].ToHtml());
+                    TestHelper.VerifyHtmlValid(page.Views[index++].ToHtml());
                 }
 
                 // verify parameters

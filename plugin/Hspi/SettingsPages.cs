@@ -4,7 +4,7 @@
 
 namespace Hspi
 {
-    internal class SettingsPages
+    internal sealed class SettingsPages
     {
         public SettingsPages(SettingsCollection collection)
         {
@@ -27,7 +27,7 @@ namespace Hspi
                                          bool showSubParameteredValuesAsHexDefault = false)
         {
             var settings = PageFactory.CreateSettingsPage(SettingPageId, "Settings");
-            settings = settings.WithToggle(PreferOnlineDatabaseId, "Prefer online database", preferOnlineDatabaseDefault);
+            settings = settings.WithToggle(PreferOnlineDatabaseId, "Use online database", preferOnlineDatabaseDefault);
             settings = settings.WithToggle(LoggingDebugId, "Enable debug logging", enableDebugLoggingDefault);
             settings = settings.WithToggle(LogToFileId, "Log to file", logToFileDefault);
             settings = settings.WithToggle(ShowSubParameteredValuesAsHexId, "Show Parameters with Bitmask as Hexadecimal", showSubParameteredValuesAsHexDefault);
@@ -68,5 +68,7 @@ namespace Hspi
         internal const string PreferOnlineDatabaseId = "PreferOnlineDatabase";
         internal const string ShowSubParameteredValuesAsHexId = "ShowSubParameteredValuesAsHex";
         internal const string SettingPageId = "setting_page_id";
+                private SettingsPages? settingsPages;
+
     }
 }

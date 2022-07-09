@@ -1,16 +1,13 @@
 ﻿using HomeSeer.Jui.Types;
 using HomeSeer.Jui.Views;
 using HomeSeer.PluginSdk;
-using HomeSeer.PluginSdk.Logging;
 using Hspi;
 using Hspi.OpenZWaveDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
 using Serilog;
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace HSPI_ZWaveParametersTest
 {
@@ -48,8 +45,6 @@ namespace HSPI_ZWaveParametersTest
             Assert.IsTrue(plugIn.SaveJuiSettingsPages(settingsCollection.ToJsonString()));
 
             Assert.IsTrue(Log.Logger.IsEnabled(Serilog.Events.LogEventLevel.Debug));
-
-            VerifyCorrectDeviceConfigPage(deviceRef, plugIn);
 
             plugInMock.Verify();
         }
@@ -163,8 +158,6 @@ namespace HSPI_ZWaveParametersTest
                                                          zwaveData.Listening ? 0x80.ToString() : "0",
                                                          "0");
         }
-
-
 
         private static void VerifyCorrectDeviceConfigPage(int deviceRef, PlugIn plugIn)
         {

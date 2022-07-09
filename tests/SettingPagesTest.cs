@@ -16,10 +16,10 @@ namespace HSPI_ZWaveParametersTest
 
             foreach (var view in page.Views)
             {
-                TestHelper.VeryHtmlValid(view.ToHtml());
+                TestHelper.VerifyHtmlValid(view.ToHtml());
             }
 
-            TestHelper.VeryHtmlValid(page.ToHtml());
+            TestHelper.VerifyHtmlValid(page.ToHtml());
 
             Assert.IsTrue(page.ContainsViewWithId(SettingsPages.PreferOnlineDatabaseId));
             Assert.IsTrue(page.ContainsViewWithId(SettingsPages.LogToFileId));

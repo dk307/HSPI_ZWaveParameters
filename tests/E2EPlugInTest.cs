@@ -155,7 +155,6 @@ namespace HSPI_ZWaveParametersTest
                                                          zwaveData.HomeId.ToString(),
                                                          zwaveData.NodeId.ToString(),
                                                          zwaveData.Firmware.ToString(),
-                                                         zwaveData.Firmware.ToString(),
                                                          zwaveData.Listening ? 0x80.ToString() : "0",
                                                          "0");
         }

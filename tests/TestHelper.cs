@@ -47,6 +47,7 @@ namespace HSPI_ZWaveParametersTest
             return CreateMockPluginAndHsController(new Dictionary<string, string>());
         }
 
+
         public static (Mock<PlugIn> mockPlugin, Mock<IHsController> mockHsController)
                  CreateMockPluginAndHsController(Dictionary<string, string> settingsFromIni)
         {
@@ -118,7 +119,6 @@ namespace HSPI_ZWaveParametersTest
                                                             string nodeId,
                                                             string homeId,
                                                             string firmware,
-                                                            string firmwareStr,
                                                             string capability,
                                                             string security)
         {
@@ -131,8 +131,6 @@ namespace HSPI_ZWaveParametersTest
             AddIfNotNull("node_id", nodeId);
             AddIfNotNull("homeid", homeId);
             AddIfNotNull("node_version_app", firmware);
-            AddIfNotNull("node_version_app_string", firmwareStr);
-            AddIfNotNull("node_version_app_string", firmwareStr);
             AddIfNotNull("capability", capability);
             AddIfNotNull("security", security);
 
@@ -161,7 +159,6 @@ namespace HSPI_ZWaveParametersTest
                 CallBase = true,
             };
         }
-
         public const string ZWaveInterface = "Z-Wave";
     }
 }

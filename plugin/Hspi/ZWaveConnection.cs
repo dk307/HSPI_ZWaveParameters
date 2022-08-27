@@ -76,30 +76,30 @@ namespace Hspi
 
             var nodeId = GetValueFromExtraDataWithTrim<Byte>(plugInData, "node_id");
             var homeId = GetValueFromExtraData(plugInData, "homeid");
-            var firmware = GetValueFromExtraData(plugInData, "node_version_app");
-            if (!IsValidFirmwareVersion(firmware))
+            var firmwareStr = GetValueFromExtraData(plugInData, "node_version_app_string");
+            if (!IsValidFirmwareVersion(firmwareStr))
             {
-                var firmwareStr = GetValueFromExtraData(plugInData, "node_version_app_string");
-                if (IsValidFirmwareVersion(firmwareStr))
+                var firmware = GetValueFromExtraData(plugInData, "node_version_app_string");
+                if (IsValidFirmwareVersion(firmware))
                 {
-                    firmware = firmwareStr;
+                    firmwareStr = firmware;
                 }
             }
 
             Log.Debug("PED Data for deviceRef:{deviceRef} is manufacturerId:{manufacturerId} productId:{productId} productType:{productType} firmware:{firmware}",
-                       deviceRef, manufacturerId, productId, productType, firmware);
+                       deviceRef, manufacturerId, productId, productType, firmwareStr);
 
             if (!manufacturerId.HasValue
                 || !productType.HasValue
                 || !productId.HasValue
                 || !nodeId.HasValue
                 || homeId == null
-                || string.IsNullOrWhiteSpace(firmware))
+                || string.IsNullOrWhiteSpace(firmwareStr))
             {
                 throw new ZWavePlugInDataInvalidException("Device Z-Wave plugin data is not valid");
             }
 
-            if (manufacturerId == 0 && productId == 0 && productType == 0 && !IsValidFirmwareVersion(firmware))
+            if (manufacturerId == 0 && productId == 0 && productType == 0 && !IsValidFirmwareVersion(firmwareStr))
             {
                 throw new ZWavePlugInDataInvalidException("Device Z-Wave plugin data is not valid");
             }
@@ -108,13 +108,13 @@ namespace Hspi
 
             Version firmwareVersion;
             // some version are simple digits, version parse needs minor version too
-            if (int.TryParse(firmware, NumberStyles.Integer, CultureInfo.InvariantCulture, out var singleDigit))
+            if (int.TryParse(firmwareStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out var singleDigit))
             {
                 firmwareVersion = new Version(singleDigit, 0);
             }
             else
             {
-                firmwareVersion = new Version(firmware);
+                firmwareVersion = new Version(firmwareStr);
             }
 
             var zwaveData = new ZWaveData(manufacturerId.Value, productId.Value,

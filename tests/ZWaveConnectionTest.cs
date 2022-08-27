@@ -34,9 +34,13 @@ namespace HSPI_ZWaveParametersTest
             yield return new object[] { new ZWaveData(0x84, 74, 20, 234, "3425", new Version(0, 0), false),
                                                       0x84.ToString(), 74.ToString(), 20.ToString(), 234.ToString(), "3425", "0","0", "0", "0" };
 
-            // firmware string version not valid
+            // firmware version not valid
             yield return new object[] { new ZWaveData(0x84, 74, 20, 234, "3425", new Version(3, 3), false),
-                                                      0x84.ToString(), 74.ToString(), 20.ToString(), 234.ToString(), "3425", "3.3","0", "0", "0" };
+                                                      0x84.ToString(), 74.ToString(), 20.ToString(), 234.ToString(), "3425", "0","3.3", "0", "0" };
+
+            // firmware version in str and app different
+            yield return new object[] { new ZWaveData(0x84, 74, 20, 234, "3425", new Version(3, 3), false),
+                                                      0x84.ToString(), 74.ToString(), 20.ToString(), 234.ToString(), "3425", "1.4","3.3", "0", "0" };
         }
 
         [TestMethod]

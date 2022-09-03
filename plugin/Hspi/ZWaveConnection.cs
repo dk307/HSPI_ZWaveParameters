@@ -76,10 +76,10 @@ namespace Hspi
 
             var nodeId = GetValueFromExtraDataWithTrim<Byte>(plugInData, "node_id");
             var homeId = GetValueFromExtraData(plugInData, "homeid");
-            var firmwareStr = GetValueFromExtraData(plugInData, "node_version_app_string");
+            var firmwareStr = GetValueFromExtraData(plugInData, "node_version_appstring");
             if (!IsValidFirmwareVersion(firmwareStr))
             {
-                var firmware = GetValueFromExtraData(plugInData, "node_version_app_string");
+                var firmware = GetValueFromExtraData(plugInData, "node_version_app");
                 if (IsValidFirmwareVersion(firmware))
                 {
                     firmwareStr = firmware;

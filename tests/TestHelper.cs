@@ -131,8 +131,7 @@ namespace HSPI_ZWaveParametersTest
             AddIfNotNull("node_id", nodeId);
             AddIfNotNull("homeid", homeId);
             AddIfNotNull("node_version_app", firmware);
-            AddIfNotNull("node_version_app_string", firmwareStr);
-            AddIfNotNull("node_version_app_string", firmwareStr);
+            AddIfNotNull("node_version_appstring", firmwareStr);
             AddIfNotNull("capability", capability);
             AddIfNotNull("security", security);
 

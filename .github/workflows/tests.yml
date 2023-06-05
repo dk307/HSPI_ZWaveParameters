@@ -20,7 +20,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: true
           fetch-depth: 0
@@ -35,12 +35,12 @@ jobs:
         uses: NuGet/setup-nuget@v1.0.5
 
       - name: Set up JDK 11 for Sonarcloud
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 1.11
    
       - name: Cache Nuget Packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: nuget
         with:
          path: ~/.nuget/packages
@@ -48,7 +48,7 @@ jobs:
          restore-keys: ${{ runner.os }}-nuget-
         
       - name: Cache Sonar Scanner
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: sonar-scanner
         with:
          path: ~/.sonar
@@ -57,7 +57,7 @@ jobs:
               ${{ runner.os }}-${{ env.SONAR_SCANNER_DOWNLOAD_URL }}
 
       - name: Cache DotCover
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: dotCover
         with:
          path: ~/.dotCover
@@ -104,14 +104,14 @@ jobs:
 
       - name: Upload unit tests binaries
         id: unit-test-binaries
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
          path: .\tests\bin\Debug
          name: Test-Files-${{ github.sha }}
 
       - name: Upload binaries
         id: test-binaries
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
          path: .\plugin\bin\Debug
          name: Dll-Files-${{ github.sha }}
@@ -142,13 +142,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: true
           fetch-depth: 0
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
 
       - name: Navigate to Workspace
         run: cd $GITHUB_WORKSPACE

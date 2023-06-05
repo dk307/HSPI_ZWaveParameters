@@ -87,7 +87,7 @@ namespace Hspi.OpenZWaveDB
             {
                 Log.Warning("No matching firmware found for manufactureId:{manufactureId} productType:{productType} productId:{productId} firmware:{firmware}. Picking first in list",
                             ManufactureId, ProductType, ProductId, Firmware);
-                id = devices.First().Id;
+                id = devices.FirstOrDefault()?.Id;
             }
 
             return id ?? throw new ShowErrorMessageException("Device not found in the open zwave database");

@@ -68,7 +68,5 @@ namespace Hspi
         internal const string PreferOnlineDatabaseId = "PreferOnlineDatabase";
         internal const string ShowSubParameteredValuesAsHexId = "ShowSubParameteredValuesAsHex";
         internal const string SettingPageId = "setting_page_id";
-                private SettingsPages? settingsPages;
-
     }
 }

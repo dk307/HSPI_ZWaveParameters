@@ -58,7 +58,7 @@ namespace HSPI_ZWaveParametersTest
         {
             await TestOnDeviceConfigChange((view, parameter) =>
             {
-                if (view is InputView inputView)
+                if (view is InputView)
                 {
                     return (true, Invariant($"0x{parameter.Default:x}"), parameter.Default);
                 }
@@ -71,7 +71,7 @@ namespace HSPI_ZWaveParametersTest
         {
             var task = TestOnDeviceConfigChange((view, parameter) =>
             {
-                if (view is InputView inputView)
+                if (view is InputView)
                 {
                     return (true, (((long)int.MaxValue) + 1).ToString(), parameter.Default);
                 }
@@ -86,7 +86,7 @@ namespace HSPI_ZWaveParametersTest
         {
             var task = TestOnDeviceConfigChange((view, parameter) =>
             {
-                if (view is InputView inputView)
+                if (view is InputView)
                 {
                     return (true, "abcd", parameter.Default);
                 }
@@ -336,7 +336,7 @@ namespace HSPI_ZWaveParametersTest
             var scriptNodes = htmlDocument.DocumentNode.SelectNodes(Invariant($"//*/script"));
             Assert.IsNotNull(scriptNodes);
 
-            string last = scriptNodes.Last().OuterHtml;
+            var last = scriptNodes.LastOrDefault()?.OuterHtml;
             Assert.AreEqual(last.Contains(".ready(function() {"), hasRefreshAllButton);
         }
 

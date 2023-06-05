@@ -167,7 +167,7 @@ namespace HSPI_ZWaveParametersTest
             // assert page is not error
             var page = Page.FromJsonString(pageJson);
 
-            Assert.AreEqual(page.Type, EPageType.DeviceConfig);
+            Assert.AreEqual(EPageType.DeviceConfig, page.Type);
             Assert.IsFalse(page.ContainsViewWithId("exception"));
         }
     }

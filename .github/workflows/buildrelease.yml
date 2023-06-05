@@ -74,6 +74,6 @@ jobs:
           name: "Development Build"
           fail_on_unmatched_files: true
           files: |
-           .\plugin\bin\Release\HSPI_ZWaveParameters_*.zip
-           .\plugin\bin\Release\updater_override.json
+           ./plugin/bin/Release/HSPI_ZWaveParameters_*.zip
+           ./plugin/bin/Release/updater_override.json
  

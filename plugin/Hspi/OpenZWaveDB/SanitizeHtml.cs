@@ -1,6 +1,7 @@
-﻿using Ganss.XSS;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using Ganss.Xss;
 
 #nullable enable
 
@@ -10,13 +11,23 @@ namespace Hspi.OpenZWaveDB
     {
         public SanitizeHtml()
         {
-            htmlSanitizer = new(allowedTags: AllowedTags,
-                                allowedCssProperties: Array.Empty<string>())
+            HtmlSanitizerOptions htmlSanitizerOptions = new()
+            {
+                AllowedTags = SanitizeHtml.AllowedTags.ToImmutableSortedSet(),
+                AllowedCssProperties = { },
+            };
+
+            htmlSanitizer = new(htmlSanitizerOptions)
             {
                 KeepChildNodes = true,
             };
 
-            htmlStriper = new(allowedTags: Array.Empty<string>())
+            HtmlSanitizerOptions htmlSanitizerOptions2 = new()
+            {
+                AllowedTags = { },
+            };
+
+            htmlStriper = new(htmlSanitizerOptions2)
             {
                 KeepChildNodes = true,
             };
@@ -36,7 +47,7 @@ namespace Hspi.OpenZWaveDB
                                      "h6","i","p","small","strong","sub","sup","ul","ol",
                                      "li","table","tr","td" };
 
-        private readonly HtmlSanitizer htmlSanitizer;
-        private readonly HtmlSanitizer htmlStriper;
+        private readonly Ganss.Xss.HtmlSanitizer htmlSanitizer;
+        private readonly Ganss.Xss.HtmlSanitizer htmlStriper;
     }
 }

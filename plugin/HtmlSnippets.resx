@@ -152,7 +152,7 @@ function decimalToHexString(number, size)
 }
 
 function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrapper, idValue) {
-	var formObject = {
+	const formObject = {
 		   homeId: homeId,
 		   nodeId: nodeId,
 		   parameter: parameter,
@@ -173,14 +173,22 @@ function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrap
 	})  
 	.done(function(resultJson) {
 		$('#' + idMessage).removeClass("spinner-border");	
-		
-		var result = JSON.parse(resultJson);
+				
+		let result;
+		try {
+			result = JSON.parse(resultJson);
+		}
+		catch(e){
+			result = {
+				ErrorMessage : "Failed to get Result with error:" + e.message
+			};
+		}
 			
 		if (result.ErrorMessage == null) {	
 			$('#' + idMessage).hide();
 			$('#' + idValueWrapper).show();
 			
-			var parameterValue = result.Value;
+			const parameterValue = result.Value;
 
 			var obj = $('#' + idValue);
 

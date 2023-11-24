@@ -179,7 +179,7 @@ namespace Hspi
         private static int ZWaveParameterFromId(string idParameter)
         {
             if (idParameter.StartsWith(ZWaveParameterPrefix, StringComparison.OrdinalIgnoreCase) &&
-                int.TryParse(idParameter.Substring(ZWaveParameterPrefix.Length), out int id))
+                int.TryParse(idParameter[ZWaveParameterPrefix.Length..], out int id))
             {
                 return id;
             }

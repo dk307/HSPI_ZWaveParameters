@@ -64,12 +64,8 @@ namespace Hspi
                 throw new NotAZWaveDeviceException("Device is not a Z-Wave device");
             }
 
-            var plugInData = (PlugExtraData)HomeSeerSystem.GetPropertyByRef(deviceRef, EProperty.PlugExtraData);
-            if (plugInData == null)
-            {
-                throw new ZWavePlugInDataInvalidException("Device Plugin extra data is not valid");
-            }
-
+            var plugInData = (PlugExtraData)HomeSeerSystem.GetPropertyByRef(deviceRef, EProperty.PlugExtraData)
+                              ?? throw new ZWavePlugInDataInvalidException("Device Plugin extra data is not valid");
             var manufacturerId = GetValueFromExtraDataWithTrim<Int32>(plugInData, "manufacturer_id");
             var productId = GetValueFromExtraDataWithTrim<UInt16>(plugInData, "manufacturer_prod_id");
             var productType = GetValueFromExtraDataWithTrim<UInt16>(plugInData, "manufacturer_prod_type");

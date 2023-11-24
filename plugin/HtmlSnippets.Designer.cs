@@ -112,7 +112,7 @@ namespace Hspi {
         ///}
         ///
         ///function refreshZWaveParameter(homeId, nodeId, parameter, idMessage, idValueWrapper, idValue) {
-        ///	var formObject = {
+        ///	const formObject = {
         ///		   homeId: homeId,
         ///		   nodeId: nodeId,
         ///		   parameter: parameter,
@@ -121,7 +121,7 @@ namespace Hspi {
         ///	   
         ///	$(&apos;#&apos; + idValueWrapper).hide();
         ///	$(&apos;#&apos; + idMessage).html(&apos;&apos;)
-        ///	$(&apos;#&apos; + idMessage).addClass(&quot;sp [rest of string was truncated]&quot;;.
+        ///	$(&apos;#&apos; + idMessage).addClass(&quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PostForRefreshScript {
             get {

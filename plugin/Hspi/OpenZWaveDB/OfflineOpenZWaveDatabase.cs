@@ -30,14 +30,14 @@ namespace Hspi.OpenZWaveDB
 
         public static async Task Download(IHttpQueryMaker queryMaker,
                                           string databasePath,
-                                          int maxCount = 1550,
+                                          int maxCount = 1700,
                                           CancellationToken token = default)
         {
             OpenZWaveDatabaseOnlineInterface serverInterface = new(queryMaker);
 
             Directory.CreateDirectory(databasePath);
 
-            for (int deviceId = 1; deviceId <= maxCount; deviceId++) // 1500 based on current upper limit
+            for (int deviceId = 1; deviceId <= maxCount; deviceId++) // 1700 based on current upper limit
             {
                 using var stream = await serverInterface.GetDeviceId(deviceId, token).ConfigureAwait(false);
                 using TextReader reader = new StreamReader(stream);
@@ -109,7 +109,7 @@ namespace Hspi.OpenZWaveDB
                 var versionMin = data.RootElement.GetProperty("version_min").Deserialize<Version>();
                 var versionMax = data.RootElement.GetProperty("version_max").Deserialize<Version>();
 
-                var deviceRefEntries = deviceRef?.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var deviceRefEntries = deviceRef?.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (var entry in deviceRefEntries ??
                                       throw new ArgumentException("Ref entries in file are invalid", nameof(file)))
@@ -228,8 +228,9 @@ namespace Hspi.OpenZWaveDB
                 throw;
             }
         }
-        private static readonly Encoding fileEncoding = Encoding.UTF8;
 
+        private static readonly Encoding fileEncoding = Encoding.UTF8;
+        private static readonly char[] separator = new char[] { ',' };
         private readonly string folderDBPath;
 
         private ImmutableDictionary<Tuple<int, string>, ImmutableList<Entry>> entries =

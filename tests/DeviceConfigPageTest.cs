@@ -296,7 +296,7 @@ namespace HSPI_ZWaveParametersTest
                     continue;
                 }
 
-                var idString = view.Id.Substring(view.Id.LastIndexOf('_') + 1);
+                var idString = view.Id[(view.Id.LastIndexOf('_') + 1)..];
                 var id = int.Parse(idString);
                 var parameter = deviceConfigPage.Data.Parameters.First(x => x.Id == id);
                 var (changed, newValue, expectedValue) = changedData(view, parameter);
